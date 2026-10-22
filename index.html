@@ -1,5 +1,5 @@
 <!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-fn1eP7tOfL5m9Fsoc80NEeGHRRr6ETqHpfUPI7Ov498=' 'sha256-CMreCuFwB1CpVPG6JKYvE23rB8UuZscvLTJVC4IweOg='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-+oYJHmk8QKcyA8k+qqjBYRyxTN4b+VB4teYC39D6rvI=' 'sha256-CMreCuFwB1CpVPG6JKYvE23rB8UuZscvLTJVC4IweOg='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
@@ -463,6 +463,23 @@ mark { background: color-mix(in srgb, var(--accent) 28%, transparent); color: in
 .steps-i div { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; align-items: start; font-size: .94rem }
 .steps-i div::before { counter-increment: s; content: counter(s); width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: .85rem }
 @media (prefers-reduced-motion: reduce) { [data-view].entering, [data-view].entering *, .sheet, .sheet-back, .box.on, .reveal, .lvl-body, .mini > div { animation: none !important } .cover .bg { transform: none } }
+.doors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px }
+.door { position: relative; isolation: isolate; overflow: hidden; border: 0; border-radius: 18px; min-height: 170px; cursor: pointer; text-align: left; color: #fff; padding: 0; background: #0b1a2e; box-shadow: var(--shadow-2) }
+.door::before { content: ""; position: absolute; inset: 0; z-index: -2; background: var(--di) center / cover; transition: transform .6s ease }
+.door::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(6,14,28,.15), rgba(6,14,28,.88)) }
+.door:hover::before { transform: scale(1.05) }
+.door:active { transform: scale(.98) }
+.door-in { position: absolute; inset: auto 0 0 0; padding: 14px; display: grid; gap: 3px }
+.door small { font-size: .66rem; text-transform: uppercase; letter-spacing: .12em; color: #9fd0ff; font-weight: 700 }
+.door strong { font-family: var(--f-display); font-size: 1.25rem; line-height: 1.1 }
+.door span span, .door-in > span { font-size: .78rem; color: rgba(255,255,255,.85); line-height: 1.3 }
+.tile-hl { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)) }
+.pesq { display: grid; gap: 10px; margin-top: 10px }
+.pq-top { display: flex; justify-content: space-between; gap: 8px; font-size: .88rem }
+.pq-bar { display: flex; height: 24px; border-radius: 8px; overflow: hidden; margin: 4px 0 2px; font-family: var(--f-mono); font-size: .76rem; color: #fff }
+.pq-bar span { display: flex; align-items: center; padding: 0 8px }
+.pq-bar span + span { justify-content: flex-end }
+.sync-box { width: 100%; min-height: 70px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font-family: var(--f-mono); font-size: .76rem; padding: 10px; word-break: break-all }
 .lic-next { display: grid; grid-template-columns: 96px minmax(0, 1fr); text-align: left; cursor: pointer; overflow: hidden; padding: 0; border: 1px solid var(--line); min-height: 96px }
 .lic-next .lic-img { background-size: cover; background-position: center; min-height: 96px }
 .lic-next .lic-in { padding: 14px; display: grid; gap: 4px; align-content: center }
@@ -493,14 +510,11 @@ mark { background: color-mix(in srgb, var(--accent) 28%, transparent); color: in
     </button>
     <nav class="topnav" aria-label="Seções">
       <button type="button" data-go="inicio">Início</button>
-      <button type="button" data-go="governos">Governos</button>
-      <button type="button" data-go="mundo">Brasil e o mundo</button>
-      <button type="button" data-go="terras">Terras raras</button>
-      <button type="button" data-go="offshore">Offshore</button>
-      <button type="button" data-go="aprender">Aprender</button>
+      <button type="button" data-go="politica">Política</button>
+      <button type="button" data-go="eleicao">2º turno</button>
+      <button type="button" data-go="quimica">Engenharia química</button>
+      <button type="button" data-go="aprender">Trilha</button>
       <button type="button" data-go="noticias">Notícias</button>
-      <button type="button" data-go="planos">Planos 2026</button>
-      <button type="button" data-go="debate">Debate</button>
       <button type="button" data-go="fontes">Fontes</button>
     </nav>
     <span class="spacer"></span>
@@ -521,10 +535,10 @@ mark { background: color-mix(in srgb, var(--accent) 28%, transparent); color: in
     <div class="cover" id="home-cover">
       <div class="bg" style="background-image:url('img/congresso.jpg')"></div>
       <span class="credit">Foto: Ivolindbergh, CC BY-SA 4.0</span>
-      <div class="cover-in">
-        <div class="eyebrow">Dados oficiais · 2011 a 2026</div>
-        <h1>O Brasil em números, governo por governo.</h1>
-        <p>Toque num indicador para abrir o gráfico. Toque em qualquer ponto para ver o que aconteceu ali.</p>
+      <div class="cover-in" id="home-cover-in">
+        <div class="eyebrow">Brasil 2027</div>
+        <h1>Política e engenharia química, com dados.</h1>
+        <p>Escolha um dos dois cantos. Tudo tem fonte e se atualiza todo dia.</p>
         <div class="pill" style="justify-self:start">2º turno · domingo, 25/10</div>
         <div class="vs">
           <div class="vs-c" style="--cc:var(--g-bolso)"><img src="img/flavio.jpg" alt="Flávio Bolsonaro"><div><b>Flávio (PL)</b><span>47,04%</span></div></div>
@@ -533,22 +547,81 @@ mark { background: color-mix(in srgb, var(--accent) 28%, transparent); color: in
         </div>
       </div>
     </div>
-    <div id="home-cards"></div>
-    <div class="group-title"><h3>Explorar</h3></div>
-    <div class="tiles">
-      <button type="button" class="tile" data-go="noticias"><strong>Notícias do dia</strong><span>Brasil, mundo, engenharia química e offshore</span></button>
-      <button type="button" class="tile" data-go="offshore"><strong>Offshore e FPSOs</strong><span>Petrobras, MODEC, SBM, BW, Total e outras</span></button>
-      <button type="button" class="tile" data-go="aprender"><strong>Aprender</strong><span>Mercado offshore, SGI e segurança de processos</span></button>
-      <button type="button" class="tile" data-go="buscar"><strong>Buscar</strong><span>Procurar em tudo ou perguntar ao Claude</span></button>
-      <button type="button" class="tile" data-go="debate"><strong>Debate</strong><span>O que não contam e como rebater</span></button>
-      <button type="button" class="tile" data-go="governos"><strong>Governos lado a lado</strong><span>O que cada um recebeu e entregou</span></button>
-      <button type="button" class="tile" data-go="mundo"><strong>Brasil e o mundo</strong><span>China, EUA, tarifaço e crises</span></button>
-      <button type="button" class="tile" data-go="terras"><strong>Terras raras</strong><span>2ª maior reserva do mundo</span></button>
-      <button type="button" class="tile" data-go="planos"><strong>Planos 2026</strong><span>Lula × Flávio, tema por tema</span></button>
+    <div class="doors">
+      <button type="button" class="door" data-go="politica" style="--di:url('img/planalto.jpg')"><span class="door-in"><small>Canto 1</small><strong>Política</strong><span>Eleição, 2º turno, debate, planos, governos e indicadores</span></span></button>
+      <button type="button" class="door" data-go="quimica" style="--di:url('img/tocha.jpg')"><span class="door-in"><small>Canto 2</small><strong>Engenharia química</strong><span>Offshore, trilha de estudo, empresas, setor químico e política da química</span></span></button>
     </div>
     <div class="group-title"><h3>Últimas notícias</h3><button type="button" class="back" data-go="noticias">Ver todas →</button></div>
     <div class="news" id="home-news"></div>
   </section>
+
+  <!-- POLÍTICA -->
+  <section data-view="politica" hidden>
+    <div class="cover"><div class="bg" style="background-image:url('img/planalto.jpg')"></div><span class="credit">Foto: Senado Federal, CC BY 2.0</span>
+      <div class="cover-in"><div class="eyebrow">Canto 1</div><h2>Política</h2><p>O Brasil em números, governo por governo, e tudo da eleição. Toque num indicador para abrir o gráfico.</p></div></div>
+    <div class="tiles">
+      <button type="button" class="tile tile-hl" data-go="eleicao"><strong>2º turno ao vivo</strong><span>Pesquisas, sigilos, debates e resultado</span></button>
+      <button type="button" class="tile" data-go="debate"><strong>Debate</strong><span>O que não contam e como rebater</span></button>
+      <button type="button" class="tile" data-go="planos"><strong>Planos 2026</strong><span>Lula × Flávio, tema por tema</span></button>
+      <button type="button" class="tile" data-go="governos"><strong>Governos lado a lado</strong><span>O que cada um recebeu e entregou</span></button>
+      <button type="button" class="tile" data-go="mundo"><strong>Brasil e o mundo</strong><span>China, EUA, tarifaço e crises</span></button>
+      <button type="button" class="tile" data-go="terras"><strong>Terras raras</strong><span>2ª maior reserva do mundo</span></button>
+    </div>
+    <div id="home-cards"></div>
+    <div class="group-title"><h3>Notícias de política e economia</h3><button type="button" class="back" data-go="noticias" data-cat="brasil">Ver todas →</button></div>
+    <div class="news" id="pol-news"></div>
+  </section>
+
+  <!-- ENGENHARIA QUÍMICA -->
+  <section data-view="quimica" hidden>
+    <div class="cover"><div class="bg" style="background-image:url('img/tocha.jpg')"></div><span class="credit">Foto: Varodrig, CC BY-SA 3.0</span>
+      <div class="cover-in"><div class="eyebrow">Canto 2</div><h2>Engenharia química</h2><p>Offshore, a trilha de estudo para o estágio, as empresas, o setor químico e a política que mexe com ele.</p></div></div>
+    <div class="tiles">
+      <button type="button" class="tile tile-hl" data-go="aprender"><strong>Trilha exponencial</strong><span>Lições que destravam outras</span></button>
+      <button type="button" class="tile" data-go="offshore"><strong>Offshore e FPSOs</strong><span>Do básico ao avançado, com questões</span></button>
+      <button type="button" class="tile" data-go="offshore" data-anchor="co-list"><strong>Empresas</strong><span>Fichas completas de 16 empresas</span></button>
+    </div>
+    <div class="group-title"><h3>O setor químico em números</h3><span class="muted small">Abiquim e Cefic</span></div>
+    <div class="stats">
+      <div class="stat"><div class="s-v">US$ 167,8 bi</div><div class="s-l">faturamento da indústria química brasileira em 2025 (+2,9%)</div><div class="s-d">Abiquim</div></div>
+      <div class="stat"><div class="s-v">US$ 56,8 bi</div><div class="s-l">déficit comercial de produtos químicos em 2025, o maior da série</div><div class="s-d">Abiquim</div></div>
+      <div class="stat"><div class="s-v">64%</div><div class="s-l">uso da capacidade das fábricas em 2025, o menor desde 1990</div><div class="s-d">Abiquim</div></div>
+      <div class="stat"><div class="s-v">46%</div><div class="s-l">das vendas mundiais de químicos são da China (Europa: 13%)</div><div class="s-d">Cefic, 2025</div></div>
+    </div>
+    <div class="card pad stack" style="margin-top:14px">
+      <h3>Política e engenharia química</h3>
+      <details class="mini"><summary>Por que a química brasileira está em crise</summary><div><p>Em 2025 o Brasil importou US$ 72,4 bilhões em produtos químicos (+13%) e exportou só US$ 15,5 bilhões. Com tanto produto importado, principalmente da China, as fábricas daqui usaram só 64% da capacidade.</p><p>O gás natural caro é parte do problema: ele é matéria-prima e combustível de boa parte da indústria química.</p></div></details>
+      <details class="mini"><summary>O que o governo fez</summary><div><p>Elevou temporariamente o imposto de importação de 30 grupos de produtos químicos (medida renovada em outubro de 2025) e adotou medidas antidumping. No 1º trimestre de 2026 a produção cresceu 22,8% sobre o fim de 2025 e as importações caíram 19,1%, segundo a Abiquim.</p><p>A Abiquim aposta no PRESIQ (projeto de lei 892/2025), em segurança jurídica e no mercado de gás livre.</p></div></details>
+      <details class="mini"><summary>Leis que mexem com a área</summary><div><p><b>Combustível do Futuro (Lei 14.993/2024):</b> mistura obrigatória e incentivos para biocombustíveis e biometano.</p><p><b>Minerais críticos (Lei 15.506/2026):</b> incentivos para refinar terras raras e outros minerais no Brasil.</p><p><b>CONAMA 393/2007, NR-13 e NR-20:</b> regras de descarte, vasos de pressão e inflamáveis que todo engenheiro químico de planta usa.</p></div></details>
+      <details class="mini"><summary>O que cada candidato propõe que afeta a química</summary><div><p><b>Flávio:</b> reduzir impostos sobre energia elétrica e combustíveis, revisar a reforma tributária para baixar o IVA, desonerar exportações e investimentos, licença ambiental com prazo.</p><p><b>Lula:</b> política industrial (Nova Indústria Brasil), Petrobras de volta à produção de fertilizantes e às compras públicas puxando a produção nacional.</p><p class="muted small">Do plano de governo de cada um. Veja tudo em Planos 2026.</p></div></details>
+      <details class="mini"><summary>China: a potência química do mundo</summary><div><p>A China responde por 46% das vendas mundiais de produtos químicos (Cefic, 2025); a Europa, por 13%. Isso explica a pressão dos importados sobre as fábricas brasileiras e o debate sobre tarifas.</p></div></details>
+      <div class="src-line">Fontes: <a href="https://folhadoabc.com.br/industria-quimica-tem-faturamento-de-us-1586-bi/" target="_blank" rel="noopener">Abiquim via Folha do ABC</a> · <a href="https://www.robbreportbrasil.com.br/noticias-lide/setores-produtivos/producao-da-industria-quimica-cresce-228-no-1-tri-ante-fim-de-2025-diz-abiquim" target="_blank" rel="noopener">Abiquim (1º tri/2026)</a> · <a href="https://petronoticias.com.br/abiquim-aposta-na-implementacao-do-presiq-seguranca-juridica-e-mercado-de-gas-livre-para-um-2026-vitorioso/" target="_blank" rel="noopener">Petronotícias (PRESIQ)</a> · <a href="https://cefic.org/facts-and-figures-of-the-european-chemical-industry/" target="_blank" rel="noopener">Cefic</a></div>
+    </div>
+    <div class="card pad stack" style="margin-top:14px">
+      <h3>Químicos e engenheiros no poder</h3>
+      <p class="muted small">Curiosidades verdadeiras, com fonte.</p>
+      <details class="mini"><summary>Xi Jinping, presidente da China</summary><div><p>Estudou engenharia química na Universidade Tsinghua, em Pequim, de 1975 a 1979. Depois fez doutorado em Direito (teoria marxista) na mesma universidade. Críticos lembram que o currículo tinha muitas aulas de marxismo e que ele nunca trabalhou como engenheiro.</p><p>Ou seja: o líder da maior potência química do mundo tem diploma da sua área.</p></div></details>
+      <details class="mini"><summary>Hu Jintao, presidente anterior da China</summary><div><p>Formado em engenharia hidráulica, também em Tsinghua. Por anos a cúpula chinesa foi chamada de “tecnocrata” por ter tantos engenheiros.</p></div></details>
+      <details class="mini"><summary>Angela Merkel, ex-chanceler da Alemanha</summary><div><p>Doutora em química quântica. Trabalhou como pesquisadora na Academia de Ciências de Berlim Oriental antes de entrar na política.</p></div></details>
+      <details class="mini"><summary>Margaret Thatcher, ex-primeira-ministra britânica</summary><div><p>Formou-se em química em Oxford e trabalhou como química pesquisadora na indústria antes da carreira política.</p></div></details>
+      <div class="src-line">Fontes: <a href="https://en.wikipedia.org/wiki/Xi_Jinping" target="_blank" rel="noopener">Wikipédia (Xi Jinping)</a> · <a href="https://foreignpolicy.com/2019/07/04/chinas-overrated-technocrats-stem-engineering-xi-jinping/" target="_blank" rel="noopener">Foreign Policy</a> · <a href="https://en.wikipedia.org/wiki/Hu_Jintao" target="_blank" rel="noopener">Wikipédia (Hu Jintao)</a> · <a href="https://en.wikipedia.org/wiki/Angela_Merkel" target="_blank" rel="noopener">Wikipédia (Merkel)</a> · <a href="https://en.wikipedia.org/wiki/Margaret_Thatcher" target="_blank" rel="noopener">Wikipédia (Thatcher)</a></div>
+    </div>
+    <div class="group-title"><h3>Notícias de química e offshore</h3><button type="button" class="back" data-go="noticias" data-cat="quimica">Ver todas →</button></div>
+    <div class="news" id="qui-news"></div>
+  </section>
+
+  <!-- 2º TURNO -->
+  <section data-view="eleicao" hidden>
+    <div class="cover"><div class="bg" style="background-image:url('img/congresso.jpg')"></div><span class="credit">Foto: Ivolindbergh, CC BY-SA 4.0</span>
+      <div class="cover-in"><div class="eyebrow">Eleição 2026</div><h2>2º turno ao vivo</h2><p id="el-sub">Domingo, 25 de outubro. Atualizado todo dia pelo robô, com fonte em tudo.</p>
+        <div class="vs" id="el-vs">
+          <div class="vs-c" style="--cc:var(--g-bolso)"><img src="img/flavio.jpg" alt="Flávio Bolsonaro"><div><b>Flávio (PL)</b><span>47,04%</span></div></div>
+          <i>1º turno</i>
+          <div class="vs-c" style="--cc:var(--g-lula)"><img src="img/lula.jpg" alt="Lula"><div><b>Lula (PT)</b><span>45,15%</span></div></div>
+        </div></div></div>
+    <div id="el-body" class="stack"></div>
+  </section>
+
 
   <!-- INDICADOR -->
   <section data-view="indicador" hidden>
@@ -847,7 +920,11 @@ mark { background: color-mix(in srgb, var(--accent) 28%, transparent); color: in
   <section data-view="mais" hidden>
     <div class="view-head"><h2>Mais</h2></div>
     <div class="tiles">
+      <button type="button" class="tile" data-go="noticias"><strong>Todas as notícias</strong><span>Os dois cantos juntos, por categoria</span></button>
+      <button type="button" class="tile" data-go="eleicao"><strong>2º turno ao vivo</strong><span>Pesquisas, sigilos, debates e resultado</span></button>
       <button type="button" class="tile" data-go="debate"><strong>Debate</strong><span>O que não contam, checagens, sigilos e caso Master</span></button>
+      <button type="button" class="tile" data-go="offshore"><strong>Offshore e FPSOs</strong><span>Trilha, questões e empresas</span></button>
+      <button type="button" class="tile" data-go="sync"><strong>Levar meu progresso</strong><span>Copiar o progresso para outro aparelho</span></button>
       <button type="button" class="tile" data-go="buscar"><strong>Buscar</strong><span>Procurar em todo o app ou perguntar ao Claude</span></button>
       <button type="button" class="tile" data-go="planos"><strong>Planos 2026</strong><span>Lula × Flávio, tema por tema</span></button>
       <button type="button" class="tile" data-go="governos"><strong>Governos lado a lado</strong><span>O que cada um recebeu e entregou</span></button>
@@ -869,9 +946,9 @@ mark { background: color-mix(in srgb, var(--accent) 28%, transparent); color: in
 
 <nav class="bottomnav" aria-label="Navegação">
   <button type="button" data-go="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9l8-5 8 5v10"/><path d="M8 19v-5h8v5"/></svg>Início</button>
-  <button type="button" data-go="noticias"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>Notícias</button>
-  <button type="button" data-go="offshore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15h18l-2 4H5z"/><path d="M7 15V9h4v6M13 15v-4h4v4M9 9V5"/></svg>Offshore</button>
-  <button type="button" data-go="aprender"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg>Aprender</button>
+  <button type="button" data-go="politica"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10M19 21V10M9 21V10M15 21V10M2 10l10-6 10 6z"/></svg>Política</button>
+  <button type="button" data-go="quimica"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/><path d="M7.5 14h9"/></svg>Química</button>
+  <button type="button" data-go="aprender"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg>Trilha</button>
   <button type="button" data-go="mais"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>Mais</button>
 </nav>
 
@@ -1510,9 +1587,11 @@ function go(view, opts) {
     if (on && changed) { s.classList.remove("entering"); void s.offsetWidth; s.classList.add("entering"); }
   });
   if (!opts.fromPop) { try { history[opts.initial ? "replaceState" : "pushState"]({ view: view, ind: state.ind }, ""); } catch (e) {} }
-  var navKey = view === "indicador" ? "inicio" : (["governos", "mundo", "terras", "fontes", "planos", "buscar", "debate"].indexOf(view) >= 0 ? "mais" : view);
+  var navKey = ["politica", "eleicao", "debate", "planos", "governos", "mundo", "terras", "indicador"].indexOf(view) >= 0 ? "politica" : ["quimica", "offshore"].indexOf(view) >= 0 ? "quimica" : ["aprender", "inicio"].indexOf(view) >= 0 ? view : "mais";
   document.querySelectorAll(".bottomnav [data-go]").forEach(function (b) { if (b.dataset.go === navKey) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
-  document.querySelectorAll(".topnav [data-go]").forEach(function (b) { var k = view === "indicador" ? "inicio" : view; if (b.dataset.go === k) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+  document.querySelectorAll(".topnav [data-go]").forEach(function (b) { var k = navKey === "mais" ? view : navKey === "politica" && view === "eleicao" ? "eleicao" : navKey; if (b.dataset.go === k) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+  if (view === "eleicao") renderEleicao();
+  if (view === "politica" || view === "quimica" || view === "inicio") renderNewsBits();
   if (view === "indicador") renderIndicador();
   if (view === "noticias") renderNews();
   if (view === "planos") renderPlans();
@@ -1523,7 +1602,9 @@ function go(view, opts) {
 }
 document.addEventListener("click", function (e) {
   var b = e.target.closest("[data-go]"); if (!b) return;
+  if (b.dataset.go === "sync") { openSync(); return; }
   go(b.dataset.go, { ind: b.dataset.ind, cat: b.dataset.cat });
+  if (b.dataset.anchor && $(b.dataset.anchor)) setTimeout(function () { $(b.dataset.anchor).scrollIntoView({ behavior: "smooth", block: "start" }); }, 80);
 });
 
 /* ---------- início ---------- */
@@ -1946,6 +2027,10 @@ function renderNewsBits() {
   $("home-news").innerHTML = all.slice(0, 3).map(newsCard).join("");
   var off = all.filter(function (n) { return n.cat === "offshore"; }).slice(0, 4);
   $("off-news").innerHTML = off.length ? off.map(newsCard).join("") : '<div class="card empty">Sem notícias do setor ainda.</div>';
+  var pol = all.filter(function (n) { return n.cat === "brasil" || n.cat === "mundo"; }).slice(0, 6);
+  $("pol-news").innerHTML = pol.length ? pol.map(newsCard).join("") : '<div class="card empty">Sem notícias ainda.</div>';
+  var qui = all.filter(function (n) { return n.cat === "quimica" || n.cat === "offshore"; }).slice(0, 6);
+  $("qui-news").innerHTML = qui.length ? qui.map(newsCard).join("") : '<div class="card empty">Sem notícias ainda.</div>';
   if (state.view === "noticias") renderNews();
 }
 
@@ -2117,13 +2202,13 @@ var LICOES = [
   { id: "l1", t: "O setor offshore em 5 minutos", tema: "Mercado", img: "img/fpso.jpg", cred: "Ptérodactyl Ivo, CC BY 2.0", next: ["l2", "l3"],
     b: ["Offshore é tudo o que acontece no mar: achar, produzir e transportar petróleo e gás. No Brasil, quase tudo sai das bacias de Santos e de Campos, em frente a Rio, São Paulo e Espírito Santo.", "O pré-sal responde por cerca de 80% da produção nacional, que chegou a 4,25 milhões de barris por dia em março de 2026 (ANP).", "Quem produz é a operadora (Petrobras, Shell, Equinor, TotalEnergies). Quem fornece plataformas, equipamentos e serviços forma a cadeia em volta dela, boa parte com base no Rio e em Macaé."],
     q: ["Quanto da produção brasileira vem do pré-sal?", ["Cerca de 20%", "Cerca de 50%", "Cerca de 80%"], 2, "Cerca de 80%. Por isso quase todo projeto novo no Brasil é de pré-sal, em águas ultraprofundas."], f: [["ANP via Economic News Brasil", "https://economicnewsbrasil.com.br/2026/05/04/producao-de-petroleo-do-brasil-recorde-concentracao-petrobras/"]] },
-  { id: "l2", t: "Por dentro do FPSO", tema: "Processo", img: "img/n-2026-10-19-p82.jpg", cred: "Agência Gov / Petrobras", next: ["l4", "l5", "l6"],
+  { id: "l2", t: "Por dentro do FPSO", tema: "Processo", img: "img/turret.jpg", cred: "Área do turret de um FPSO · AlfvanBeem, CC0", next: ["l4", "l5", "l6"],
     b: ["Um FPSO é um navio-plataforma que produz, armazena e transfere petróleo. Em cima fica a planta de processo (topside); embaixo, o casco com os tanques.", "Os dutos que sobem do fundo do mar (risers) trazem óleo, gás e água misturados. A planta separa e trata cada um.", "Um FPSO da série 80 da Petrobras, como a P-82, tem 345 m de comprimento, pesa mais de 100 mil toneladas e processa 225 mil barris de óleo e 12 milhões de m³ de gás por dia."],
     q: ["O que significa a letra S em FPSO?", ["Segurança (Safety)", "Armazenamento (Storage)", "Submarino (Subsea)"], 1, "Storage: armazenamento. O óleo fica nos tanques do casco até um navio aliviador buscar."], f: [F_P82] },
-  { id: "l3", t: "Quem é quem no mercado", tema: "Mercado", next: ["l7", "l8"],
+  { id: "l3", t: "Quem é quem no mercado", tema: "Mercado", img: "img/sonda.jpg", cred: "Navios-sonda · Niels Johannes, CC BY-SA 4.0", next: ["l7", "l8"],
     b: ["Operadoras: têm o direito de produzir no campo e ficam com o petróleo (Petrobras, Shell, Equinor, TotalEnergies, PRIO, BW Energy).", "Afretadoras de FPSO: constroem e operam plataformas para as operadoras (MODEC, SBM Offshore, BW Offshore, Ocyan).", "Estaleiros: constroem cascos e módulos, quase sempre na Ásia (como a Seatrium, em Singapura).", "Submarino: dutos, umbilicais e equipamentos no fundo do mar (Subsea7, TechnipFMC).", "Serviços: engenharia e software (Radix), gases industriais (White Martins), energia (Eneva, Engie)."],
     q: ["A MODEC é principalmente...", ["Uma operadora que fica com o petróleo", "Uma empresa que constrói e opera FPSOs para outras", "Um estaleiro"], 1, "A MODEC é afretadora: constrói e opera FPSOs, e recebe uma diária da operadora."], f: [["Upstream (MODEC no Brasil)", "https://www.upstreamonline.com/exclusive/-proud-to-be-part-of-pre-salt-history-modec-chases-brazil-fpso-opportunities/2-1-2036970"]] },
-  { id: "l4", t: "Separação trifásica", tema: "Processo", next: ["l9", "l10"],
+  { id: "l4", t: "Separação trifásica", tema: "Processo", img: "img/separador.jpg", cred: "Separador horizontal de óleo e gás · Mattinbgn, CC BY 3.0", next: ["l9", "l10"],
     b: ["Do poço vem uma mistura de óleo, gás e água (às vezes com areia). O primeiro passo é separar as três fases em vasos separadores.", "A separação usa gravidade e tempo de residência: o gás sobe, o óleo fica no meio e a água, mais pesada, vai para o fundo.", "Aquecimento e produtos químicos (desemulsificantes) ajudam a quebrar a emulsão de água no óleo.", "É a aplicação direta de operações unitárias: balanço de massa, equilíbrio de fases e dimensionamento de vasos."],
     q: ["Num separador trifásico, qual fase fica por baixo?", ["Gás", "Óleo", "Água"], 2, "A água, por ser a mais densa. O gás sai por cima e o óleo fica na camada do meio."], f: [] },
   { id: "l5", t: "Gás do pré-sal e o CO₂", tema: "Processo", next: ["l11", "l12"],
@@ -2135,10 +2220,10 @@ var LICOES = [
   { id: "l7", t: "Contratos: afretamento, BOT e EPC", tema: "Estratégia", next: ["l15", "l16"],
     b: ["Afretamento: a afretadora constrói e opera o FPSO e recebe uma diária por 15 a 25 anos.", "BOT (construir, operar e transferir): a afretadora constrói e opera por um prazo e depois passa a unidade à operadora. Os dois FPSOs de Sergipe, da SBM, têm 6,5 anos de operação antes da transferência.", "EPC: a operadora compra a plataforma pronta; o estaleiro projeta, compra e constrói. É o caso da série 80 da Petrobras.", "Cada modelo divide de um jeito diferente o risco da obra e o custo ao longo da vida do campo."],
     q: ["No modelo BOT, o que acontece no fim do prazo de operação?", ["A plataforma é desmontada", "A plataforma passa para a operadora", "O contrato vira afretamento"], 1, "A plataforma é transferida para a operadora, que segue operando com ela."], f: [F_SEAP, F_P82] },
-  { id: "l8", t: "Ciclo de vida de um campo", tema: "Mercado", next: ["l17", "l18"],
+  { id: "l8", t: "Ciclo de vida de um campo", tema: "Mercado", img: "img/n-2026-10-19-p82.jpg", cred: "P-82 a caminho de Búzios · Agência Gov / Petrobras", next: ["l17", "l18"],
     b: ["Exploração (sísmica e poços pioneiros) → avaliação → declaração de comercialidade → decisão de investir (FID) → projeto e construção → primeiro óleo → ramp-up → platô → declínio → descomissionamento.", "Do primeiro óleo ao platô, a produção sobe rápido conforme os poços são ligados.", "Cada fase tem empresas e empregos diferentes: exploração usa geólogos e sondas; construção usa estaleiros; operação usa tripulação e manutenção."],
     q: ["Qual fase vem logo antes do primeiro óleo?", ["Declínio", "Projeto e construção", "Descomissionamento"], 1, "Projeto e construção, depois da decisão final de investimento (FID)."], f: [] },
-  { id: "l9", t: "Tratamento do óleo e o BSW", tema: "Processo", next: ["l19"],
+  { id: "l9", t: "Tratamento do óleo e o BSW", tema: "Processo", img: "img/aliviador.jpg", cred: "Navio aliviador · BoH, CC BY-SA 3.0", next: ["l19"],
     b: ["Depois da separação, o óleo ainda tem água e sal. Ele passa por aquecimento e tratadores eletrostáticos até ficar dentro da especificação.", "BSW é o teor de água e sedimentos no óleo. Precisa ser baixo para o óleo ser vendido e não corroer tanques e navios.", "O óleo tratado vai para os tanques do casco e depois para o navio aliviador."],
     q: ["O que mede o BSW?", ["A pressão do poço", "A água e os sedimentos no óleo", "O teor de enxofre"], 1, "Água e sedimentos (basic sediment and water). Quanto menor, melhor o óleo para venda."], f: [] },
   { id: "l10", t: "Água produzida e a regra do descarte", tema: "Meio ambiente", next: ["l26"],
@@ -2150,10 +2235,10 @@ var LICOES = [
   { id: "l12", t: "Reinjeção e captura de carbono", tema: "Meio ambiente", next: ["l18"],
     b: ["Reinjetar gás e CO₂ tem dois efeitos: mantém a pressão do reservatório (o que ajuda a produzir mais) e evita emissões.", "O pré-sal tornou a Petrobras uma das maiores praticantes de captura e reinjeção de CO₂ do mundo.", "Isso aparece em relatórios de sustentabilidade e em perguntas de entrevista sobre transição energética."],
     q: ["Além de evitar emissões, reinjetar gás ajuda em quê?", ["A manter a pressão do reservatório", "A esfriar o navio", "A reduzir o BSW"], 0, "Mantém a pressão do reservatório, o que sustenta a produção."], f: [] },
-  { id: "l13", t: "Tocha e sistemas de alívio", tema: "Segurança", next: ["l19"],
+  { id: "l13", t: "Tocha e sistemas de alívio", tema: "Segurança", img: "img/tocha.jpg", cred: "Tocha de plataforma no Mar do Norte · Varodrig, CC BY-SA 3.0", next: ["l19"],
     b: ["Toda planta de processo precisa de uma saída segura quando a pressão sobe demais: válvulas de alívio mandam o gás para a tocha (flare), onde ele é queimado.", "A tocha é uma barreira de segurança, não um desperdício planejado. Queima contínua grande é sinal de problema ou de falta de capacidade de compressão.", "Dimensionar alívio e tocha é trabalho de engenharia de processo e entra nos estudos de HAZOP."],
     q: ["Para que serve a tocha (flare) de um FPSO?", ["Iluminar o convés", "Queimar com segurança o gás aliviado", "Aquecer o óleo"], 1, "Queimar com segurança o gás que precisa sair do processo numa sobrepressão."], f: [] },
-  { id: "l14", t: "Sistemas que as empresas usam", tema: "Sistemas", next: ["l30", "l31", "l32"],
+  { id: "l14", t: "Sistemas que as empresas usam", tema: "Sistemas", img: "img/controle.jpg", cred: "Sala de controle de refinaria · Gerryrkirk, CC BY-SA 4.0", next: ["l30", "l31", "l32"],
     b: ["Manutenção: a MODEC usa o IBM Maximo como sistema de gestão de manutenção, inclusive para controlar estoque entre navios e almoxarifados em terra.", "Gêmeo digital: a Petrobras testou com a ABS e a Akselos um gêmeo digital estrutural de um FPSO; com o CESAR, monitora corrosão por CO₂ em dutos.", "A SBM usa o software da Aize nos FPSOs da Guiana e fez uma aliança com a SLB para usar inteligência artificial no desempenho dos FPSOs.", "A Ocyan criou o Nexio, um hub de soluções digitais com inteligência artificial e dados."],
     q: ["Que tipo de sistema é o IBM Maximo?", ["Simulador de processo", "Gestão de manutenção e ativos", "Software de licitação"], 1, "Gestão de manutenção e ativos: ordens de serviço, inspeções, estoque de peças."], f: [F_MAXIMO, F_ABS, F_AIZE, F_SLB] },
   { id: "l15", t: "Como se ganha uma licitação", tema: "Estratégia", next: ["l26"],
@@ -2204,7 +2289,7 @@ var LICOES = [
   { id: "l30", t: "Manutenção e integridade", tema: "Sistemas", next: [],
     b: ["Manutenção preventiva segue calendário; preditiva usa dados (vibração, temperatura, espessura) para agir antes da falha.", "Sistemas de gestão de manutenção, como o IBM Maximo usado pela MODEC, organizam ordens de serviço, planos de inspeção e estoque de peças.", "Integridade cuida de corrosão, fadiga e espessura de equipamentos e dutos, ligada à NR-13."],
     q: ["Manutenção preditiva usa o quê?", ["Só o calendário", "Dados do equipamento para agir antes da falha", "Sorte"], 1, "Dados como vibração e temperatura para prever a falha."], f: [F_MAXIMO] },
-  { id: "l31", t: "Gêmeo digital", tema: "Sistemas", next: [],
+  { id: "l31", t: "Gêmeo digital", tema: "Sistemas", img: "img/arvore.jpg", cred: "Robô submarino (ROV) em estrutura submarina · domínio público", next: [],
     b: ["Gêmeo digital é uma réplica virtual da plataforma, alimentada com dados reais, para monitorar e testar cenários.", "A Petrobras testou um gêmeo estrutural (ABS e Akselos) que mostra pontos de tensão no casco de um FPSO.", "Com o CESAR, criou um gêmeo para acompanhar corrosão por CO₂ em dutos em tempo real."],
     q: ["Para que serve um gêmeo digital?", ["Substituir a tripulação", "Monitorar e testar cenários numa réplica virtual", "Fazer a contabilidade"], 1, "Monitorar o estado real e testar “e se” sem mexer na unidade."], f: [F_ABS, F_CESAR] },
   { id: "l32", t: "Simulação de processos", tema: "Sistemas", next: [],
@@ -2295,6 +2380,100 @@ $("trilha-lic").addEventListener("click", function (e) {
     GERADAS.push(r); try { localStorage.setItem("b27-licoes-geradas", JSON.stringify(GERADAS.slice(-200))); } catch (er) {}
     renderTrilha(); openLicao(id);
   }).catch(function () { g.disabled = false; g.textContent = "Não deu agora. Tentar de novo"; });
+});
+
+/* ---------- 2º turno: base verificada + novidades que o robô grava em painel.eleicao ---------- */
+var EL_PESQ = [
+  ["21/10", "Quaest", 50.56, 49.44, "votos válidos"],
+  ["21/10", "Meio/Ideia", 51.1, 48.9, "votos válidos; margem de 2,5 pontos"],
+  ["19/10", "AtlasIntel/Bloomberg", 51.1, 48.9, "votos válidos; coleta antes do debate da Band"],
+  ["15/10", "Datafolha", 51, 49, "votos válidos"],
+  ["13–15/10", "PoderData", 50, 50, "votos válidos"]
+];
+var EL_SIGILO = [
+  ["18/10", "No debate da Band, Lula propõe que os dois abram os sigilos bancário e telefônico, incluindo familiares, e entreguem os dados aos presidentes do STF e do TSE antes do 2º turno. Flávio responde que “não tem nada a esconder”, mas não diz se aceita."],
+  ["19/10", "Lula, nas redes: “Você tem uma semana para ter coragem de provar se é honesto ou não.”"],
+  ["20/10", "Lula protocola no STF e no TSE um pedido para quebrar os próprios sigilos bancário, fiscal e telefônico e os da família, com a condição de Flávio fazer o mesmo. No TSE, o pedido foi para o ministro André Mendonça."],
+  ["até 22/10", "Não há registro de que Flávio tenha aceitado abrir os sigilos nem de decisão do STF ou do TSE sobre o pedido. Flávio é investigado em dois inquéritos no STF. O PT liga o desafio a um áudio sobre um suposto empréstimo pedido a Daniel Vorcaro; a resposta de Flávio sobre isso não apareceu nas fontes."],
+  ["contexto", "Do outro lado, o governo Lula manteve o sigilo de 100 anos em vários pedidos e a FAB aplicou até 100 anos de sigilo à lista de passageiros dos voos do jato de Vorcaro (ver aba Debate → Sigilos)."]
+];
+var EL_SIG_F = [["CNN Brasil", "https://www.cnnbrasil.com.br/eleicoes/lula-fala-em-abrir-sigilos-flavio-diz-que-nao-tem-nada-a-esconder/"], ["Nexo", "https://www.nexojornal.com.br/expresso/2026/10/20/lula-autoriza-quebra-de-sigilo-lulinha-flavio-bolsonaro"], ["Metrópoles", "https://www.metropoles.com/brasil/lula-desafia-flavio-a-abrir-conta-bancaria-e-sigilo-telefonico"]];
+var EL_PESQ_F = [["CartaCapital (AtlasIntel)", "https://www.cartacapital.com.br/politica/lula-sobe-mas-flavio-segue-a-frente-no-2o-turno-indica-atlasintel/"], ["Poder360 (agregado)", "https://www.poder360.com.br/poder-eleicoes-2026/saiba-como-estao-lula-e-flavio-nas-pesquisas-a-7-dias-do-2o-turno/"], ["Hora Hiper", "https://horahiper.com.br/eleicoes-2026/segundo-turno-presidencial-chega-com-disputa-apertada-e-historico-favoravel-a-quem-lidera-no-primeiro-193592"]];
+function linkSeguro(f) { return f && /^https:\/\//.test(f[1]) ? '<a href="' + esc(f[1]) + '" target="_blank" rel="noopener">' + esc(f[0]) + "</a>" : esc(f ? f[0] : ""); }
+function renderEleicao() {
+  var live = LIVE.eleicao || {}, h = "";
+  var res = live.resultado;
+  if (res && typeof res.flavio === "number" && typeof res.lula === "number") {
+    h += '<div class="card pad stack reveal"><div class="eyebrow">Resultado do 2º turno' + (res.apurado ? " · " + esc(String(res.apurado)) + " das urnas apuradas" : "") + '</div><div class="numgrid"><div><b>' + fmt(res.flavio, 2) + '%</b><span>Flávio Bolsonaro (PL)</span></div><div><b>' + fmt(res.lula, 2) + "%</b><span>Lula (PT)</span></div></div>" + (res.vencedor ? '<p class="lead"><strong>' + esc(String(res.vencedor)) + "</strong></p>" : "") + (res.fonte ? fontesLine([res.fonte]) : "") + "</div>";
+  }
+  var pesq = (Array.isArray(live.pesquisas) ? live.pesquisas.filter(function (p) { return Array.isArray(p) && typeof p[2] === "number" && typeof p[3] === "number"; }) : []).concat(EL_PESQ);
+  h += '<div class="card pad"><h3>Pesquisas (votos válidos)</h3><p class="muted small">Diferenças dentro da margem de erro são empate técnico.</p><div class="pesq">' + pesq.slice(0, 8).map(function (p) {
+    var tot = p[2] + p[3] || 100, wf = p[2] / tot * 100;
+    return '<div class="pq"><div class="pq-top"><b>' + esc(p[1]) + '</b><span class="muted small">' + esc(p[0]) + '</span></div><div class="pq-bar"><span style="width:' + wf + '%;background:var(--g-bolso)">' + fmt(p[2], p[2] % 1 ? 1 : 0) + '</span><span style="width:' + (100 - wf) + '%;background:var(--g-lula)">' + fmt(p[3], p[3] % 1 ? 1 : 0) + '</span></div><small class="muted">' + esc(p[4] || "") + "</small></div>";
+  }).join("") + '</div><div class="legend"><span><span class="sw" style="background:var(--g-bolso)"></span>Flávio</span><span><span class="sw" style="background:var(--g-lula)"></span>Lula</span></div>' + fontesLine(EL_PESQ_F) + "</div>";
+  h += '<div class="card pad"><h3>Os sigilos, dia a dia</h3><div class="timeline">' + EL_SIGILO.map(function (s) { return '<div class="tl-item"><div class="tl-when">' + esc(s[0]) + '</div><div class="tl-what"><p>' + esc(s[1]) + "</p></div></div>"; }).join("") + "</div>" + fontesLine(EL_SIG_F) + "</div>";
+  var itens = Array.isArray(live.itens) ? live.itens.filter(function (x) { return x && x.titulo; }) : [];
+  h += '<div class="card pad"><h3>Novidades da reta final</h3>' + (itens.length ? '<div class="timeline">' + itens.slice(0, 20).map(function (x) { return '<div class="tl-item"><div class="tl-when">' + esc(x.data || "") + '</div><div class="tl-what"><strong>' + esc(x.titulo) + "</strong><p>" + esc(x.texto || "") + "</p>" + (x.fonte ? '<small class="muted">' + linkSeguro(x.fonte) + "</small>" : "") + "</div></div>"; }).join("") + "</div>" : '<p class="muted">Toda manhã o robô acrescenta aqui o que mudou: sigilos, pesquisas, debates e apoios.</p>') + (live.atualizado ? '<p class="muted small" style="margin-top:8px">Atualizado em ' + esc(String(live.atualizado)) + "</p>" : "") + "</div>";
+  h += '<div class="card pad stack"><h3>Debates</h3><p><b>Band, 18/10:</b> os checadores acharam erros dos dois lados. Veja falas falsas de Lula e de Flávio na aba Debate.</p><p><b>Globo, 23/10 (sexta):</b> último debate. A campanha de Lula pediu checagem de fatos ao vivo.</p><button type="button" class="full-btn" data-go="debate">Abrir a aba Debate</button><button type="button" class="full-btn" data-go="planos">Comparar os planos de governo</button>' + fontesLine([["Correio Braziliense (checagem na Globo)", "https://www.correiobraziliense.com.br/politica/2026/10/7525239-campanha-de-lula-tem-conversas-com-tv-globo-sobre-checagem-de-fatos-no-debate.html"], ["Agência Lupa (Band)", "https://www.agencialupa.org/checagem/2026/10/18/ao-vivo-checagem-do-debate-entre-lula-e-flavio-bolsonaro-na-band/"]]) + "</div>";
+  $("el-body").innerHTML = h;
+}
+function aplicarEleicaoCapa() {
+  var res = (LIVE.eleicao || {}).resultado;
+  if (!res || typeof res.flavio !== "number" || typeof res.lula !== "number") return;
+  ["home-cover-in"].forEach(function (id) {
+    var el = $(id); if (!el) return;
+    var pill = el.querySelector(".pill"); if (pill) pill.textContent = "Resultado do 2º turno" + (res.apurado ? " · " + res.apurado + " apurado" : "");
+    var spans = el.querySelectorAll(".vs-c span"); if (spans.length === 2) { spans[0].textContent = fmt(res.flavio, 2) + "%"; spans[1].textContent = fmt(res.lula, 2) + "%"; }
+    var i = el.querySelector(".vs i"); if (i) i.textContent = "2º turno";
+  });
+}
+
+/* ---------- gráficos que se atualizam: séries oficiais baixadas todo dia ---------- */
+function aplicarSeries(dados) {
+  if (!dados || !dados.series) return;
+  Object.keys(dados.series).forEach(function (k) {
+    var ind = indById[k], s = dados.series[k];
+    if (!ind || !Array.isArray(s) || s.length < 10) return;
+    var pts = s.filter(function (p) { return p && typeof p.t === "number" && typeof p.v === "number" && isFinite(p.v); }).map(function (p) {
+      var q = { t: p.t, v: p.v, rot: String(p.rot || "") }; if (p.parcial) q.parcial = true; if (typeof p.ano === "number") q.ano = p.ano; return q;
+    });
+    if (pts.length >= 10) { ind.dados = pts; ind.atualizadaEm = dados.atualizado; }
+  });
+  renderHome();
+  if (state.view === "indicador") renderIndicador();
+}
+
+/* ---------- levar o progresso para outro aparelho (código, sem servidor) ---------- */
+function codigoProgresso() {
+  var dados = { l: Object.keys(licDone), q: Object.keys(thinkDone) };
+  return "B27-" + btoa(unescape(encodeURIComponent(JSON.stringify(dados)))).replace(/=+$/, "");
+}
+function aplicarCodigo(cod) {
+  var c = String(cod || "").trim().replace(/^B27-/, "");
+  if (!/^[A-Za-z0-9+/]+$/.test(c) || c.length > 20000) return false;
+  try {
+    var d = JSON.parse(decodeURIComponent(escape(atob(c))));
+    var ids = {}; LICOES.forEach(function (l) { ids[l.id] = 1; });
+    (Array.isArray(d.l) ? d.l : []).forEach(function (id) { if (typeof id === "string" && /^[A-Za-z0-9_-]{1,60}$/.test(id) && !licDone[id]) licDone[id] = Date.now(); });
+    (Array.isArray(d.q) ? d.q : []).forEach(function (i) { if (/^\d{1,3}$/.test(String(i))) thinkDone[i] = true; });
+    saveLic(); saveThink(); renderTrilha(); renderThink();
+    return true;
+  } catch (e) { return false; }
+}
+function openSync() {
+  coOpen = null; sheetBody.dataset.lic = "";
+  var n = Object.keys(licDone).length, q = Object.keys(thinkDone).length;
+  openSheet('<div class="stack"><h2>Levar meu progresso</h2><p class="lead">Neste aparelho: ' + n + " lições concluídas e " + q + ' questões entendidas.</p><div class="sec"><h4>1. Copie o código deste aparelho</h4><textarea id="sync-out" readonly class="sync-box">' + esc(codigoProgresso()) + '</textarea><button type="button" class="full-btn" id="sync-copy">Copiar código</button></div><div class="sec"><h4>2. No outro aparelho, cole aqui</h4><textarea id="sync-in" class="sync-box" placeholder="Cole o código B27-..."></textarea><button type="button" class="reveal-btn" id="sync-apply">Juntar com o progresso daqui</button><div id="sync-msg"></div></div><p class="muted small">O código só tem os números das lições concluídas. Nada é enviado para servidor nenhum: você mesmo copia e cola (pelo WhatsApp para você mesmo, e-mail ou anotações).</p></div>');
+}
+sheetBody.addEventListener("click", function (e) {
+  if (e.target.closest("#sync-copy")) {
+    var t = $("sync-out"), b = e.target.closest("#sync-copy");
+    try { navigator.clipboard.writeText(t.value).then(function () { b.textContent = "Código copiado ✓"; }, function () { t.select(); b.textContent = "Selecionei o código: copie com Ctrl+C"; }); } catch (er) { t.select(); }
+  }
+  if (e.target.closest("#sync-apply")) {
+    var ok = aplicarCodigo($("sync-in").value);
+    $("sync-msg").innerHTML = '<div class="why reveal">' + (ok ? "Pronto: o progresso foi juntado. Lições concluídas agora: " + Object.keys(licDone).length + "." : "Código inválido. Confira se copiou inteiro, começando por B27-.") + "</div>";
+  }
 });
 
 /* ---------- planos ---------- */
@@ -2534,6 +2713,8 @@ function aplicarPainel(d) {
   if (!d) return;
   LIVE.upd = d.atualizado ? String(d.atualizado) : null;
   LIVE.ind = d.indicadores && typeof d.indicadores === "object" ? d.indicadores : {};
+  LIVE.eleicao = d.eleicao && typeof d.eleicao === "object" ? d.eleicao : null;
+  aplicarEleicaoCapa(); if (state.view === "eleicao") renderEleicao();
   renderHome();
   if (state.view === "indicador") renderIndicador();
   if (state.view === "noticias") renderNews();
@@ -2545,6 +2726,7 @@ function startLive() {
     fetch("dados/noticias.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (l) {
       if (Array.isArray(l)) { LIVE.news = l.filter(function (n) { return n && n.titulo && n.data; }); renderNewsBits(); }
     }).catch(function () {});
+    fetch("dados/series.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(aplicarSeries).catch(function () {});
     fetch("dados/licoes.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (l) {
       if (Array.isArray(l)) { LIVE.licoes = l; renderTrilha(); }
     }).catch(function () {});
@@ -2562,13 +2744,9 @@ function startLive() {
     }, function () {});
     db.doc("meta/painel").onSnapshot(function (snap) {
       var d = snap.exists ? snap.data() : null;
-      if (!d) return;
-      LIVE.upd = d.atualizado ? String(d.atualizado) : null;
-      LIVE.ind = d.indicadores && typeof d.indicadores === "object" ? d.indicadores : {};
-      renderHome();
-      if (state.view === "indicador") renderIndicador();
-      if (state.view === "noticias") renderNews();
+      if (d) aplicarPainel(d);
     }, function () {});
+    db.doc("meta/series").onSnapshot(function (snap) { if (snap.exists) aplicarSeries(snap.data()); }, function () {});
   }).catch(function () {});
 }
 
@@ -2576,7 +2754,7 @@ function startLive() {
 renderHome(); renderEmpresas(); renderNewsBits(); renderPlans(); renderLearn(); renderGloss(); setupAsk(); renderThink(); renderDebate(); renderTrilha();
 var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { if (state.view === "indicador") drawChart(); }, 150); });
 var h0 = location.hash.replace("#", "");
-var VIEWS = ["inicio", "governos", "mundo", "terras", "offshore", "aprender", "buscar", "noticias", "planos", "fontes", "mais", "debate"];
+var VIEWS = ["inicio", "governos", "mundo", "terras", "offshore", "aprender", "buscar", "noticias", "planos", "fontes", "mais", "debate", "politica", "quimica", "eleicao"];
 if (VIEWS.indexOf(h0) >= 0) go(h0, { initial: true }); else if (indById[h0]) go("indicador", { ind: h0, initial: true }); else go("inicio", { initial: true });
 startLive();
 })();
