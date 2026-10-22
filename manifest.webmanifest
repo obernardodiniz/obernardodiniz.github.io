@@ -1,0 +1,26 @@
+{
+  "name": "Brasil 2027",
+  "short_name": "Brasil 2027",
+  "lang": "pt-BR",
+  "description": "O Brasil em números, governo por governo, com offshore, estudo e notícias do dia.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07111F",
+  "theme_color": "#07111F",
+  "icons": [
+    {
+      "src": "img/icone-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "img/icone-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
