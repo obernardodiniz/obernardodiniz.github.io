@@ -1,1 +1,502 @@
-[]
+[
+ {
+  "id": "2026-10-21-woodside-amonia",
+  "data": "2026-10-21",
+  "cat": "quimica",
+  "titulo": "Woodside reduz aposta em fábrica de amônia nos EUA",
+  "fonte": "Offshore Engineer (Reuters)",
+  "link": "https://www.oedigital.com/news/543812-woodside-cuts-production-outlook-scales-back-us-ammonia-investment",
+  "credito": "Offshore Engineer",
+  "resumo": "A australiana Woodside vai diminuir o investimento na fábrica de amônia de Beaumont, no Texas, porque a procura dos clientes ficou abaixo do esperado. A empresa também baixou o teto da previsão de produção do ano e já tinha cancelado parte dos gastos em energia de baixo carbono.",
+  "pontos": [
+   "A planta foi comprada em 2024 por US$ 2,35 bilhões.",
+   "No trimestre, operou a 69% da capacidade por falta de matéria-prima de terceiros e por uma parada de 30 dias após um incidente de segurança.",
+   "A nova CEO, Liz Westcott, abandonou a meta de emissões de longo prazo e cancelou US$ 5 bi em gastos de baixo carbono.",
+   "A receita do trimestre subiu para US$ 4,28 bilhões.",
+   "O projeto de GNL Browse, na Austrália, atrai interesse de possíveis sócios."
+  ],
+  "numeros": [
+   [
+    "174–181 milhões boe",
+    "nova faixa de produção da Woodside em 2026"
+   ],
+   [
+    "69%",
+    "uso da capacidade da fábrica de amônia no trimestre"
+   ],
+   [
+    "30 dias",
+    "parada da planta após incidente de segurança"
+   ],
+   [
+    "US$ 84/boe",
+    "preço médio obtido, alta de 40% em um ano"
+   ],
+   [
+    "US$ 2,35 bilhões",
+    "valor pago pela fábrica de Beaumont em 2024"
+   ]
+  ],
+  "porque": "A amônia é um produto clássico da engenharia química (processo Haber-Bosch, a partir de gás natural) e é vista como portadora de hidrogênio. O caso mostra que demanda, matéria-prima e segurança de processo decidem se um projeto químico dá certo.",
+  "termos": [
+   [
+    "Amônia (NH₃)",
+    "base de fertilizantes, feita de hidrogênio e nitrogênio"
+   ],
+   [
+    "boe",
+    "barril de óleo equivalente, que soma óleo e gás numa mesma unidade"
+   ],
+   [
+    "Fator de utilização",
+    "quanto da capacidade da planta foi de fato usado"
+   ],
+   [
+    "GNL",
+    "gás natural resfriado até virar líquido para ser transportado em navio"
+   ]
+  ],
+  "img": "img/n-2026-10-21-woodside-amonia.jpg"
+ },
+ {
+  "id": "2026-10-21-technipfmc-bp-20k",
+  "data": "2026-10-21",
+  "cat": "offshore",
+  "titulo": "TechnipFMC e BP fecham acordo para árvores de natal de 20 mil psi",
+  "fonte": "Offshore Energy",
+  "link": "https://offshore-energy.biz/2026/10/21/technipfmc-to-supply-20k-subsea-trees-to-bp-in-us-oil-rich-geological-area",
+  "credito": "Offshore Energy",
+  "resumo": "A BP assinou um memorando com a TechnipFMC para comprar sistemas de árvore de natal molhada que suportam 20.000 psi, usados nos campos do Paleogeno, no Golfo dos EUA. A ideia é padronizar o equipamento para ter prazos mais previsíveis.",
+  "pontos": [
+   "O acordo é um memorando de entendimento: define a parceria, sem valor divulgado.",
+   "A TechnipFMC aposta em soluções 20K padronizadas e repetíveis.",
+   "A BP prevê investir cerca de US$ 10 bilhões nos projetos do Paleogeno.",
+   "Kaskida deve começar a produzir em 2029 e Tiber em 2030, com 80 mil barris/dia cada.",
+   "Tiber reaproveita mais de 85% do projeto de Kaskida."
+  ],
+  "numeros": [
+   [
+    "20.000 psi",
+    "pressão de trabalho dos equipamentos (cerca de 1.380 bar)"
+   ],
+   [
+    "US$ 10 bilhões",
+    "investimento previsto da BP no Paleogeno"
+   ],
+   [
+    "80 mil barris/dia",
+    "capacidade de Kaskida e de Tiber, cada"
+   ],
+   [
+    "10 bilhões de barris",
+    "recursos descobertos que os projetos começam a destravar"
+   ]
+  ],
+  "porque": "A TechnipFMC tem fábrica e base no Brasil e fornece equipamento submarino para a Petrobras. Padronizar projetos e reaproveitar desenho é a mesma lógica dos FPSOs replicantes de Búzios, e é tema comum em entrevista de estágio.",
+  "termos": [
+   [
+    "Árvore de natal molhada",
+    "conjunto de válvulas no fundo do mar que controla o fluxo do poço"
+   ],
+   [
+    "psi",
+    "libra por polegada quadrada; 1 bar ≈ 14,5 psi"
+   ],
+   [
+    "MoU",
+    "memorando de entendimento, acordo de intenções antes do contrato"
+   ],
+   [
+    "Paleogeno",
+    "camada geológica profunda e de alta pressão no Golfo dos EUA"
+   ]
+  ],
+  "img": "img/n-2026-10-21-technipfmc-bp-20k.jpg"
+ },
+ {
+  "id": "2026-10-21-petroleo-ormuz",
+  "data": "2026-10-21",
+  "cat": "mundo",
+  "titulo": "Brent fica em US$ 108,82 entre negociação na Ucrânia e ataques em Ormuz",
+  "fonte": "eixos (Estadão Conteúdo)",
+  "link": "https://eixos.com.br/petroleo-e-gas/petroleo-fecha-sem-direcao-com-avanco-nas-negociacoes-russia-ucrania-e-tensoes-no-oriente-medio/",
+  "credito": "eixos",
+  "resumo": "O petróleo terminou a quarta-feira quase parado depois de um dia agitado. A notícia de que Rússia e Ucrânia vão voltar a negociar com os EUA segurou os preços, enquanto ataques a petroleiros perto do Iraque e de Omã e a queda dos estoques americanos empurravam para cima.",
+  "pontos": [
+   "Putin recebeu o enviado americano Steve Witkoff em São Petersburgo.",
+   "Na véspera, Witkoff tinha se reunido com Zelensky e líderes europeus em Oslo.",
+   "A agência britânica UKMTO relatou petroleiros atingidos por projéteis perto do Iraque e de Omã.",
+   "O chanceler do Irã disse querer saída diplomática, mas que o país está pronto para se defender.",
+   "Mesmo com a guerra, os embarques do Oriente Médio ficaram acima do nível de antes do conflito."
+  ],
+  "numeros": [
+   [
+    "US$ 108,82",
+    "Brent de dezembro no fechamento (+0,03%)"
+   ],
+   [
+    "US$ 97,15",
+    "WTI de dezembro (−0,68%)"
+   ],
+   [
+    "24 milhões de barris/dia",
+    "fluxo por Ormuz e rotas alternativas na semana até 18/10"
+   ],
+   [
+    "23,3 milhões",
+    "mesmo fluxo antes da guerra"
+   ],
+   [
+    "3,06 milhões de barris",
+    "queda nos estoques dos EUA na semana"
+   ]
+  ],
+  "porque": "O preço do Brent decide o caixa da Petrobras e das petroleiras que operam no Rio, e com ele o ritmo de novos FPSOs e contratações. Também pesa na inflação brasileira via diesel e gasolina.",
+  "termos": [
+   [
+    "Brent",
+    "petróleo de referência negociado em Londres, usado pela Petrobras"
+   ],
+   [
+    "WTI",
+    "petróleo de referência dos EUA"
+   ],
+   [
+    "Estreito de Ormuz",
+    "passagem marítima entre Irã e Omã por onde sai boa parte do petróleo do Golfo"
+   ],
+   [
+    "UKMTO",
+    "órgão da Marinha britânica que monitora a segurança de navios na região"
+   ]
+  ],
+  "img": "img/n-2026-10-21-petroleo-ormuz.jpg"
+ },
+ {
+  "id": "2026-10-21-mei",
+  "data": "2026-10-21",
+  "cat": "brasil",
+  "titulo": "Lula sanciona perdão de dívidas e teto maior para o MEI",
+  "fonte": "Agência Brasil",
+  "link": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-10/perdao-de-dividas-e-novo-teto-do-mei-entenda-o-que-muda",
+  "credito": "Agência Brasil",
+  "resumo": "A nova lei complementar do MEI (chamada Prospera MEI) perdoa dívidas de impostos federais de microempreendedores e sobe o limite de faturamento por ano. Um decreto assinado junto dispensa o MEI de emitir nota fiscal quando vende para pessoa física.",
+  "pontos": [
+   "O perdão vale para débitos com a União registrados até 13 de outubro de 2026.",
+   "Para manter o perdão, o MEI precisa pagar a guia mensal (DAS) em dia nos seis primeiros meses.",
+   "O teto anual passa de R$ 81 mil para R$ 110 mil em 2027 e R$ 140 mil em 2028.",
+   "Em algumas atividades, o MEI poderá ter até dois empregados.",
+   "Dívidas com bancos entram em outra frente, ligada ao Desenrola 3.0, com leilões a partir de novembro.",
+   "O Pix MEI prevê até R$ 5 mil para comprar equipamentos entre 2027 e 2030."
+  ],
+  "numeros": [
+   [
+    "3,6 milhões",
+    "microempreendedores que o governo estima beneficiar com o perdão"
+   ],
+   [
+    "R$ 110 mil",
+    "novo teto anual do MEI em 2027"
+   ],
+   [
+    "R$ 140 mil",
+    "teto em 2028"
+   ],
+   [
+    "R$ 40,5 mil",
+    "faturamento máximo do nanoempreendedor"
+   ],
+   [
+    "90%",
+    "desconto mínimo exigido dos bancos na renegociação"
+   ]
+  ],
+  "porque": "Mostra como o governo usa política fiscal em ano de eleição: perdoar dívida custa arrecadação e pesa na conta pública, que é um dos temas que mais mexem com juros e câmbio. Também é útil para quem um dia pensa em prestar serviço de engenharia como MEI ou PJ.",
+  "termos": [
+   [
+    "MEI",
+    "microempreendedor individual: CNPJ simplificado, com imposto fixo mensal"
+   ],
+   [
+    "DAS",
+    "guia única mensal de impostos do Simples Nacional"
+   ],
+   [
+    "Remissão",
+    "perdão legal de uma dívida com o governo"
+   ],
+   [
+    "Lei complementar",
+    "lei que exige maioria absoluta no Congresso e regula temas previstos na Constituição"
+   ]
+  ],
+  "img": "img/n-2026-10-21-mei.webp"
+ },
+ {
+  "id": "2026-10-21-iss-pis-cofins",
+  "data": "2026-10-21",
+  "cat": "brasil",
+  "titulo": "STF tira o ISS da base do PIS/Cofins; União perde R$ 35 bi",
+  "fonte": "Agência Brasil",
+  "link": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-10/stf-decide-que-iss-nao-integra-base-de-calculo-do-piscofins",
+  "credito": "Agência Brasil",
+  "resumo": "O Supremo decidiu, por maioria, que o ISS cobrado pelos municípios não pode entrar na conta do PIS e da Cofins, dois tributos federais. A decisão vale para todos os processos parecidos no país e tem impacto estimado de R$ 35 bilhões para o governo federal.",
+  "pontos": [
+   "O caso estava no STF desde 2008.",
+   "A tese: o ISS só passa pelo caixa da empresa a caminho da prefeitura, então não é receita dela.",
+   "O processo julgado veio de uma empresa de ônibus.",
+   "A tese fixada deve ser aplicada a todos os casos iguais em andamento.",
+   "Afeta empresas de serviços como clínicas, escolas, eventos e assistência técnica."
+  ],
+  "numeros": [
+   [
+    "R$ 35 bilhões",
+    "impacto estimado nas contas do governo federal"
+   ],
+   [
+    "2008",
+    "ano em que a ação chegou ao STF"
+   ]
+  ],
+  "porque": "Decisões judiciais sobre impostos mexem no resultado fiscal do governo, que já está em déficit. Para empresas de engenharia e serviços do offshore, que pagam ISS, a carga de PIS/Cofins tende a cair.",
+  "termos": [
+   [
+    "ISS",
+    "imposto municipal sobre serviços"
+   ],
+   [
+    "PIS/Cofins",
+    "contribuições federais calculadas sobre o faturamento das empresas"
+   ],
+   [
+    "Base de cálculo",
+    "o valor sobre o qual a alíquota do imposto é aplicada"
+   ],
+   [
+    "Tese de repercussão geral",
+    "entendimento do STF que passa a valer para todos os casos iguais"
+   ]
+  ],
+  "img": "img/n-2026-10-21-iss-pis-cofins.webp"
+ },
+ {
+  "id": "2026-10-21-desenrola",
+  "data": "2026-10-21",
+  "cat": "brasil",
+  "titulo": "Desenrola 3.0 pode renegociar até R$ 90 bi em dívidas antigas",
+  "fonte": "Agência Brasil",
+  "link": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-10/ministro-preve-renegociacao-de-r-90-bi-em-3a-fase-do-desenrola",
+  "credito": "Agência Brasil",
+  "resumo": "O ministro da Fazenda, Dario Durigan, disse que bancos e fundos poderão oferecer até R$ 90 bilhões em dívidas atrasadas na primeira etapa do Desenrola 3.0. O governo compra essas carteiras em leilão com desconto mínimo de 90% e depois repassa o abatimento ao devedor.",
+  "pontos": [
+   "Comprar tudo custaria no máximo R$ 9 bilhões, por causa do desconto mínimo de 90%.",
+   "Os credores têm cinco dias úteis para informar quanto têm de dívida que se encaixa nas regras.",
+   "Entram dívidas de até R$ 10 mil, com 720 a 1.645 dias de atraso, de cartão e crédito pessoal.",
+   "O leilão está previsto para novembro e pode ir para o começo de dezembro.",
+   "Por enquanto o consumidor não precisa fazer nada; a etapa atual é só com os bancos."
+  ],
+  "numeros": [
+   [
+    "R$ 90 bilhões",
+    "dívidas que podem ser oferecidas na 1ª chamada"
+   ],
+   [
+    "R$ 9 bilhões",
+    "gasto máximo do governo nessa compra"
+   ],
+   [
+    "90%",
+    "desconto mínimo exigido"
+   ],
+   [
+    "R$ 10 mil",
+    "valor original máximo da dívida"
+   ],
+   [
+    "R$ 150 bilhões",
+    "estimativa total de dívidas elegíveis no lançamento"
+   ]
+  ],
+  "porque": "Endividamento das famílias trava consumo e crescimento. Entender como o governo usa leilões e deságio ajuda a ler a política econômica, e o mesmo raciocínio de leilão aparece em contratos e licitações do setor de energia.",
+  "termos": [
+   [
+    "Deságio",
+    "desconto sobre o valor de face de uma dívida ou título"
+   ],
+   [
+    "Carteira de crédito",
+    "conjunto de empréstimos de um banco"
+   ],
+   [
+    "FIDC",
+    "fundo que compra direitos de crédito, como dívidas a receber"
+   ],
+   [
+    "Medida provisória",
+    "norma do presidente com força de lei que o Congresso precisa aprovar depois"
+   ]
+  ],
+  "img": "img/n-2026-10-21-desenrola.jpg"
+ },
+ {
+  "id": "2026-10-20-petroleiras-lucro",
+  "data": "2026-10-20",
+  "cat": "mundo",
+  "titulo": "Guerra no Irã infla o lucro das petroleiras; mercado cobra disciplina",
+  "fonte": "Offshore Engineer (Reuters)",
+  "link": "https://www.oedigital.com/news/543785-oil-giants-face-spending-dilemma-as-iran-war-profits-soar",
+  "credito": "Offshore Engineer",
+  "resumo": "Shell, BP, TotalEnergies, Exxon e Chevron devem mostrar lucros bem maiores no 3º trimestre, puxados pelo refino e pela negociação de petróleo com a guerra no Irã. Os investidores querem saber se o dinheiro extra vai para dívida e recompra de ações ou para novos projetos.",
+  "pontos": [
+   "Shell, BP e TotalEnergies esperam margens de refino três a quatro vezes maiores que um ano antes.",
+   "Chevron e Exxon têm usado o dinheiro extra para pagar dívida.",
+   "A BP deve atingir a meta de redução de dívida cerca de um ano antes do previsto.",
+   "A BP marcou uma atualização de estratégia para 15 de dezembro.",
+   "Shell e TotalEnergies divulgam resultados em 29/10; BP, Chevron e Exxon em 30/10."
+  ],
+  "numeros": [
+   [
+    "US$ 42/barril",
+    "margem de refino recorde indicada pela Shell"
+   ],
+   [
+    "US$ 4 bilhões",
+    "caixa de refino e química esperado pela TotalEnergies no trimestre"
+   ],
+   [
+    "US$ 4,5 bilhões",
+    "ganho possível no lucro de refino da Exxon frente ao trimestre anterior"
+   ],
+   [
+    "US$ 7 bilhões",
+    "lucro da BP projetado pela TPH, contra US$ 5,7 bi no 2º tri"
+   ],
+   [
+    "0,8 vez",
+    "dívida líquida/geração de caixa esperada para a BP no 3º tri"
+   ]
+  ],
+  "porque": "Shell, TotalEnergies e Equinor operam no pré-sal. Se escolherem investir o lucro extra em novos campos, abre espaço para FPSOs, serviços e vagas no Rio; se preferirem pagar dívida e acionistas, o ritmo fica mais lento.",
+  "termos": [
+   [
+    "Margem de refino",
+    "diferença entre o preço dos derivados e o custo do petróleo processado"
+   ],
+   [
+    "Recompra de ações (buyback)",
+    "a empresa usa caixa para comprar as próprias ações"
+   ],
+   [
+    "Desalavancagem",
+    "reduzir a dívida em relação à geração de caixa"
+   ],
+   [
+    "Trading",
+    "área que compra e vende petróleo e derivados no mercado"
+   ]
+  ],
+  "img": "img/n-2026-10-20-petroleiras-lucro.jpg"
+ },
+ {
+  "id": "2026-10-20-leilao-gas-uniao",
+  "data": "2026-10-20",
+  "cat": "quimica",
+  "titulo": "1º leilão do gás da União tem 36 empresas; química leva a maior fatia",
+  "fonte": "PPSA",
+  "link": "https://www.presalpetroleo.gov.br/noticias/1o-leilao-de-gas-natural-da-uniao-tem-36-empresas-habilitadas/",
+  "credito": "PPSA",
+  "resumo": "A Pré-Sal Petróleo (PPSA) vende pela primeira vez, direto à indústria, o gás do pré-sal que pertence à União. O leilão, nesta quinta (22/10), oferece 1,1 milhão de m³ por dia para 2027, e o setor químico e petroquímico tem o maior lote.",
+  "pontos": [
+   "São 110 lotes de 10 mil m³/dia, divididos entre cinco setores da indústria de base.",
+   "O gás é entregue na saída da unidade de tratamento de Itaboraí, no Complexo Boaventura (antigo Comperj).",
+   "Quem ganhar precisa contratar o transporte do gás por conta própria ou por comercializadora.",
+   "O preço segue 115% do Henry Hub (referência dos EUA) mais o prêmio oferecido no leilão.",
+   "Vence quem oferecer o maior prêmio; o lance inicial é de US$ 1,80 por MMBtu."
+  ],
+  "numeros": [
+   [
+    "36",
+    "empresas habilitadas"
+   ],
+   [
+    "1,1 milhão m³/dia",
+    "volume total ofertado"
+   ],
+   [
+    "350 mil m³/dia",
+    "fatia do setor químico e petroquímico (35 lotes)"
+   ],
+   [
+    "mar–dez/2027",
+    "período de entrega"
+   ],
+   [
+    "320",
+    "contribuições recebidas na consulta ao mercado"
+   ]
+  ],
+  "porque": "Gás natural é matéria-prima e energia para a indústria química. Mais gás vendido por outros agentes além da Petrobras pode baratear insumos e atrair projetos no Rio, perto de Itaboraí.",
+  "termos": [
+   [
+    "PPSA",
+    "estatal que representa a União nos contratos de partilha do pré-sal"
+   ],
+   [
+    "Henry Hub",
+    "preço de referência do gás natural nos EUA"
+   ],
+   [
+    "MMBtu",
+    "milhão de BTU, unidade de energia usada para precificar gás"
+   ],
+   [
+    "UPGN / UTG",
+    "unidade que trata o gás do pré-sal antes de ir para o mercado"
+   ]
+  ],
+  "img": "img/n-2026-10-20-leilao-gas-uniao.png"
+ },
+ {
+  "id": "2026-10-20-gas-release",
+  "data": "2026-10-20",
+  "cat": "offshore",
+  "titulo": "Petrobras apoia adiamento da audiência do Gas Release",
+  "fonte": "Agência Petrobras",
+  "link": "https://agencia.petrobras.com.br/w/negocio/adiamento-do-gas-release-favorece-debate-e-decis%C3%A3o-qualificada",
+  "credito": "Agência Petrobras",
+  "resumo": "A ANP adiou para 19 de novembro a audiência pública do programa Gas Release, que obrigaria a Petrobras a vender em leilão parte do gás que produz. A Petrobras elogiou o adiamento e voltou a dizer que a proposta pode reduzir investimentos em oferta de gás.",
+  "pontos": [
+   "Pela proposta da ANP, a agência definiria preço mínimo, volume e prazo das vendas obrigatórias.",
+   "Os compradores poderiam usar o gás ou revendê-lo.",
+   "A Petrobras mandou suas sugestões à consulta pública em setembro.",
+   "A empresa diz que a medida só redistribui volumes que já existem e pode ter efeito passageiro.",
+   "Segundo a Petrobras, a nova data não atrasa os passos seguintes da ANP."
+  ],
+  "numeros": [
+   [
+    "19/11/2026",
+    "nova data da audiência pública"
+   ]
+  ],
+  "porque": "O gás do pré-sal sai dos FPSOs da Bacia de Santos e chega ao Rio por gasodutos. Quem fica com esse gás e a que preço define a viabilidade de projetos de gás, petroquímica e fertilizantes, e a estratégia da Petrobras.",
+  "termos": [
+   [
+    "Gas Release",
+    "programa de venda obrigatória de parte do gás de um agente dominante"
+   ],
+   [
+    "ANP",
+    "agência que regula petróleo, gás e biocombustíveis"
+   ],
+   [
+    "Audiência pública",
+    "sessão aberta em que a sociedade opina antes de uma regra ser aprovada"
+   ],
+   [
+    "Concentração de mercado",
+    "quando poucos agentes controlam a maior parte da oferta"
+   ]
+  ],
+  "img": ""
+ }
+]

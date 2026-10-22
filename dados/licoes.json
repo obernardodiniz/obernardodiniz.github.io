@@ -1,1 +1,107 @@
-[]
+[
+ {
+  "id": "d-2026-10-22-1",
+  "data": "2026-10-22",
+  "t": "Gás do pré-sal: do FPSO até a indústria",
+  "tema": "mercado",
+  "b": [
+   "O gás que sai junto com o petróleo no pré-sal é separado no próprio FPSO. Uma parte vira combustível das turbinas da plataforma, uma parte é reinjetada no reservatório (para manter a pressão e guardar o CO₂) e o resto é exportado por gasoduto até a costa. Em agosto de 2026, segundo a ANP, o Brasil aproveitou 98,1% do gás produzido e queimou 4,16 milhões de m³ por dia em tocha.",
+   "Na costa, o gás passa por uma unidade de tratamento, que tira água, CO₂ e separa os líquidos (como propano e butano). No Rio, a referência é a UTG de Itaboraí, no Complexo de Energias Boaventura (antigo Comperj). Só depois disso ele vira 'gás de mercado' e entra na malha de transporte.",
+   "Quem é dono desse gás? Nos contratos de partilha, a União tem uma parte da produção, representada pela estatal PPSA. A PPSA marcou para 22/10/2026 o primeiro leilão para vender esse gás direto à indústria: 1,1 milhão de m³ por dia para 2027, com a maior fatia (35 lotes) reservada ao setor químico e petroquímico.",
+   "Do outro lado, a ANP discute o Gas Release, que obrigaria a Petrobras a vender em leilão parte do seu gás para aumentar a concorrência. A Petrobras critica a ideia, dizendo que ela reduz a previsibilidade dos investimentos. A audiência pública foi adiada para 19/11/2026.",
+   "Para o estagiário: entender esse caminho (poço → FPSO → gasoduto → tratamento → cliente) ajuda a conversar com áreas de processo, comercial e regulação, e explica por que o preço do gás pesa tanto na petroquímica e nos fertilizantes."
+  ],
+  "q": [
+   "No primeiro leilão do gás da União, qual setor recebeu a maior quantidade de lotes?",
+   [
+    "Vidreiro",
+    "Químico e petroquímico",
+    "Ceramista"
+   ],
+   1,
+   "O setor químico e petroquímico ficou com 35 dos 110 lotes (350 mil m³/dia)."
+  ],
+  "f": [
+   [
+    "PPSA (36 habilitadas)",
+    "https://www.presalpetroleo.gov.br/noticias/1o-leilao-de-gas-natural-da-uniao-tem-36-empresas-habilitadas/"
+   ],
+   [
+    "Agência Petrobras (Gas Release)",
+    "https://agencia.petrobras.com.br/w/negocio/adiamento-do-gas-release-favorece-debate-e-decis%C3%A3o-qualificada"
+   ],
+   [
+    "Agência Gov (produção de agosto)",
+    "https://agenciagov.ebc.com.br/noticias/202610/petrobras-producao-gas-petroleo-cresce-17-em-agosto"
+   ]
+  ],
+  "img": "",
+  "cred": ""
+ },
+ {
+  "id": "d-2026-10-22-2",
+  "data": "2026-10-22",
+  "t": "Árvore de natal molhada e o sistema submarino",
+  "tema": "sistemas",
+  "b": [
+   "Em campos de águas profundas, a cabeça do poço fica no fundo do mar. Em cima dela vai a árvore de natal molhada (ANM): um bloco de válvulas que abre, fecha e regula o fluxo do poço e permite injetar produtos químicos. O nome 'molhada' é porque ela fica submersa; a 'seca' fica na superfície.",
+   "Da ANM, o fluido segue por linhas flexíveis ou rígidas (flowlines e risers) até o FPSO. Um umbilical leva energia elétrica, sinais de controle, fluido hidráulico e químicos (como inibidores de hidrato e de incrustação). Tudo isso forma o sistema submarino, fornecido por empresas especializadas como a TechnipFMC.",
+   "As válvulas da ANM são barreiras de segurança do poço. Se a plataforma perder energia ou houver emergência, elas fecham sozinhas (falha segura). Em segurança de processo, elas aparecem no bow-tie como barreiras preventivas contra perda de contenção.",
+   "A pressão de projeto é decisiva. Em 21/10/2026, a BP assinou com a TechnipFMC um memorando para sistemas de 20.000 psi (cerca de 1.380 bar) para o Paleogeno do Golfo dos EUA. A ideia é padronizar o desenho para ganhar prazo: o projeto Tiber reaproveita mais de 85% do projeto de Kaskida.",
+   "Padronizar e repetir é a mesma lógica dos FPSOs 'replicantes' da Petrobras em Búzios. Para um engenheiro químico, os temas que mais aparecem são garantia de escoamento (hidrato, parafina, incrustação), injeção química e integridade."
+  ],
+  "q": [
+   "Por que as válvulas da árvore de natal molhada são projetadas para fechar sozinhas numa emergência?",
+   [
+    "Para economizar energia elétrica",
+    "Porque são uma barreira de segurança com falha segura",
+    "Para aumentar a vazão do poço"
+   ],
+   1,
+   "São barreiras contra perda de contenção: na falta de energia ou sinal, o padrão seguro é fechar o poço."
+  ],
+  "f": [
+   [
+    "Offshore Energy (TechnipFMC e BP)",
+    "https://offshore-energy.biz/2026/10/21/technipfmc-to-supply-20k-subsea-trees-to-bp-in-us-oil-rich-geological-area"
+   ]
+  ],
+  "img": "",
+  "cred": ""
+ },
+ {
+  "id": "d-2026-10-22-3",
+  "data": "2026-10-22",
+  "t": "Amônia: do gás natural ao fertilizante",
+  "tema": "química",
+  "b": [
+   "A amônia (NH₃) é feita pelo processo Haber-Bosch: hidrogênio e nitrogênio reagem a alta pressão e alta temperatura sobre um catalisador de ferro. O hidrogênio quase sempre vem do gás natural, por reforma a vapor, que também gera CO₂. Por isso o preço do gás decide o custo da amônia.",
+   "A maior parte da amônia vira fertilizante nitrogenado, como ureia e nitrato de amônio. No leilão do gás da União de 22/10/2026, os fertilizantes nitrogenados tiveram uma etapa própria, com 13 lotes (130 mil m³/dia). Também se fala da amônia como forma de transportar hidrogênio.",
+   "O negócio é sensível a demanda e matéria-prima. A australiana Woodside informou em 21/10/2026 que vai reduzir o investimento na fábrica de Beaumont, no Texas, comprada por US$ 2,35 bilhões em 2024: a procura dos clientes ficou abaixo do esperado e a planta rodou a 69% da capacidade no trimestre.",
+   "Segurança de processo: a amônia é tóxica e corrosiva para os olhos e pulmões, e é armazenada liquefeita sob pressão ou refrigerada. Vazamentos são cenários típicos de HAZOP e análise de consequência. A Woodside relatou uma parada de 30 dias após um incidente de segurança na mesma planta.",
+   "Para entrevista: saiba explicar a cadeia gás → hidrogênio → amônia → ureia, por que o custo do gás pesa tanto e quais barreiras protegem uma planta com produto tóxico (detecção de gás, válvulas de bloqueio, contenção e plano de emergência)."
+  ],
+  "q": [
+   "De onde vem, na maioria das fábricas, o hidrogênio usado para fazer amônia?",
+   [
+    "Da eletrólise da água do mar",
+    "Da reforma a vapor do gás natural",
+    "Do refino de gasolina"
+   ],
+   1,
+   "A rota dominante é a reforma a vapor do metano do gás natural, o que liga o preço da amônia ao preço do gás."
+  ],
+  "f": [
+   [
+    "Offshore Engineer / Reuters (Woodside)",
+    "https://www.oedigital.com/news/543812-woodside-cuts-production-outlook-scales-back-us-ammonia-investment"
+   ],
+   [
+    "PPSA (lotes por setor)",
+    "https://www.presalpetroleo.gov.br/noticias/1o-leilao-de-gas-natural-da-uniao-tem-36-empresas-habilitadas/"
+   ]
+  ],
+  "img": "",
+  "cred": ""
+ }
+]
