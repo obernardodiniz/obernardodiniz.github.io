@@ -1,4 +1,6 @@
 <!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-fn1eP7tOfL5m9Fsoc80NEeGHRRr6ETqHpfUPI7Ov498=' 'sha256-CMreCuFwB1CpVPG6JKYvE23rB8UuZscvLTJVC4IweOg='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#07111F">
@@ -461,6 +463,18 @@ mark { background: color-mix(in srgb, var(--accent) 28%, transparent); color: in
 .steps-i div { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; align-items: start; font-size: .94rem }
 .steps-i div::before { counter-increment: s; content: counter(s); width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: .85rem }
 @media (prefers-reduced-motion: reduce) { [data-view].entering, [data-view].entering *, .sheet, .sheet-back, .box.on, .reveal, .lvl-body, .mini > div { animation: none !important } .cover .bg { transform: none } }
+.lic-next { display: grid; grid-template-columns: 96px minmax(0, 1fr); text-align: left; cursor: pointer; overflow: hidden; padding: 0; border: 1px solid var(--line); min-height: 96px }
+.lic-next .lic-img { background-size: cover; background-position: center; min-height: 96px }
+.lic-next .lic-in { padding: 14px; display: grid; gap: 4px; align-content: center }
+.lic-next:not(:has(.lic-img)) { grid-template-columns: minmax(0, 1fr) }
+.lic-next small { font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); font-weight: 700 }
+.lic-next strong { font-family: var(--f-display); font-size: 1.1rem }
+.lic-chips { display: flex; flex-wrap: wrap; gap: 6px }
+.quiz { display: grid; gap: 6px }
+.qopt { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 10px 12px; cursor: pointer; font-size: .92rem }
+.qopt.right { border-color: var(--good); background: color-mix(in srgb, var(--good) 14%, var(--surface)) }
+.qopt.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--surface)) }
+.reveal-btn[disabled] { opacity: .45; cursor: default }
 .top-search { flex-shrink: 0; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; display: grid; place-items: center; color: var(--ink-2) }
 .top-search svg { width: 18px; height: 18px }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important } }
@@ -791,7 +805,9 @@ mark { background: color-mix(in srgb, var(--accent) 28%, transparent); color: in
 
   <!-- APRENDER -->
   <section data-view="aprender" hidden>
-    <div class="view-head"><div class="eyebrow">Para o estágio</div><h2>Aprender: offshore, SGI e segurança de processos</h2><p>Cinco módulos curtos que ligam o que você estudou na faculdade ao que o mercado offshore do Rio faz hoje. Toque num módulo para abrir.</p></div>
+    <div class="view-head"><div class="eyebrow">Para o estágio</div><h2>Trilha exponencial</h2><p>Leia a lição, acerte a pergunta rápida e confirme. Cada lição concluída destrava as próximas, e toda manhã entram lições novas.</p></div>
+    <div class="stack" id="trilha-lic"></div>
+    <div class="group-title" style="margin-top:26px"><h3>Biblioteca</h3><span class="muted small">Resumos para consulta</span></div>
     <div class="learn-grid" id="learn"></div>
     <div class="card pad" style="margin-top:14px">
       <h3>Glossário do setor</h3>
@@ -1106,7 +1122,7 @@ var EMPRESAS = [
       historia: ["Criada em 1953, no governo Getúlio Vargas, para explorar o petróleo do país. Anunciou as grandes descobertas do pré-sal em 2007 e virou uma das maiores produtoras em águas profundas do mundo.",
         ["1953: a Lei 2.004 cria a Petrobras, com o monopólio do petróleo.", "1974: descoberta na Bacia de Campos (campo de Garoupa) abre a era offshore.", "1997: a Lei do Petróleo acaba com o monopólio; a empresa passa a concorrer.", "2007: anúncio das descobertas do pré-sal (Tupi, hoje campo de Lula).", "2014: a Operação Lava Jato expõe corrupção em contratos da empresa.", "2025: lucro de R$ 110,1 bilhões e produção de 2,99 milhões de boe/dia.", "2026: recordes de produção e de valor de mercado."]],
       funciona: ["No offshore, é a operadora: decide onde perfurar, contrata sondas, plataformas e serviços e responde à ANP pela segurança.",
-        ["Exploração e produção ficam com 75% do plano de investimento.", "Usa plataformas próprias e alugadas. As próprias recentes são compradas por EPC: o estaleiro projeta, constrói e entrega funcionando.", "Opera campos em consórcio: em Búzios, com as chinesas CNOOC e CNPC e a estatal PPSA.", "Também atua em refino, gás natural e energia."]],
+        ["Máquinas: na P-78, a Siemens Energy fornece 4 turbogeradores, 8 trens de compressores elétricos e 2 trens com turbinas para reinjetar CO₂.", "Sistemas: testou com a ABS e a Akselos um gêmeo digital estrutural de FPSO e, com o CESAR, um gêmeo para corrosão por CO₂ em dutos.", "Exploração e produção ficam com 75% do plano de investimento.", "Usa plataformas próprias e alugadas. As próprias recentes são compradas por EPC: o estaleiro projeta, constrói e entrega funcionando.", "Opera campos em consórcio: em Búzios, com as chinesas CNOOC e CNPC e a estatal PPSA.", "Também atua em refino, gás natural e energia."]],
       numeros: ["Números do balanço de 2025 e de 2026.",
         ["Lucro líquido 2025: R$ 110,1 bilhões, três vezes o de 2024.", "Receita 2025: R$ 497,5 bilhões.", "Investimento 2025: R$ 112,9 bilhões (US$ 20,3 bi).", "Produção 2025: 2,99 milhões de boe/dia; pré-sal com 2,02 milhões de barris/dia.", "2º tri/2026: 3,34 milhões de boe/dia; pré-sal com 2,3 milhões.", "Valor de mercado: passou de R$ 800 bilhões em 14/10/2026, pela primeira vez."]],
       projetos: ["A série 80 de plataformas e o campo de Búzios, o maior do país.",
@@ -1124,7 +1140,7 @@ var EMPRESAS = [
       historia: ["Fundada no Japão em 26/12/1968, ligada ao grupo Mitsui, e especializada em unidades flutuantes. Cresceu junto com o pré-sal.",
         ["1968: fundação no Japão.", "Pré-sal: FPSOs como Carioca MV30 (Sépia), Guanabara MV31 (Mero), Almirante Barroso MV32 (Búzios) e Anita Garibaldi MV33 (Marlim).", "2024: quatro FPSOs da MODEC entre os 10 maiores produtores do Brasil.", "2026: Gato do Mato, para a Shell, é o 19º FPSO/FSO da empresa no Brasil.", "2026: o antigo Cidade de Niterói MV18 foi para reciclagem na Dinamarca."]],
       funciona: ["Projeta, constrói com estaleiros asiáticos, instala e opera FPSOs. Pode vender a unidade ou alugar e operar por anos.",
-        ["Receita de obra: entra enquanto a plataforma é construída.", "Receita de afretamento e operação: uma diária por 15 a 25 anos.", "Quando opera, a tripulação, a manutenção e a segurança a bordo são dela.", "Engenharia e operação brasileiras ficam no Rio."]],
+        ["Receita de obra: entra enquanto a plataforma é construída.", "Receita de afretamento e operação: uma diária por 15 a 25 anos.", "Quando opera, a tripulação, a manutenção e a segurança a bordo são dela.", "Sistemas: usa o IBM Maximo para gestão de manutenção, inclusive estoque de peças entre navios e almoxarifados em terra.", "Engenharia e operação brasileiras ficam no Rio."]],
       numeros: ["Resultados de 2025 e do 1º semestre de 2026.",
         ["Receita 2025: US$ 4,58 bilhões (+9%).", "Lucro 2025: US$ 360 milhões (+63%).", "Carteira: US$ 26,9 bi no fim de 2025 e US$ 25,0 bi no meio de 2026.", "1º semestre de 2026: receita de US$ 2,45 bi e lucro de US$ 224 mi.", "Meta para 2026: receita de US$ 4,6 bi e lucro de US$ 370 mi."]],
       projetos: ["Gato do Mato (Shell), Raia (Equinor) e dois FPSOs para a Guiana.",
@@ -1142,7 +1158,7 @@ var EMPRESAS = [
       historia: ["Empresa holandesa que nasceu com sistemas de amarração por boia (o nome vem de Single Buoy Moorings) e virou uma das maiores do mundo em FPSOs.",
         ["Origem: boias para amarrar e carregar navios petroleiros no mar.", "Evoluiu para turrets, FPSOs e operação de unidades.", "Brasil: FPSOs Almirante Tamandaré (Búzios) e Alexandre de Gusmão (Mero).", "29/05/2026: contrato com a Petrobras para dois FPSOs em Sergipe."]],
       funciona: ["Constrói, aluga e opera FPSOs, e também vende unidades prontas.",
-        ["Duas linhas: obras e vendas (Turnkey) e aluguel com operação (Lease and Operate).", "Em 2025 a linha de aluguel e operação deu US$ 1,24 bi de EBITDA, quase estável; a de obras caiu.", "Usa um casco padronizado (Fast4Ward) para ganhar tempo na construção."]],
+        ["Duas linhas: obras e vendas (Turnkey) e aluguel com operação (Lease and Operate).", "Em 2025 a linha de aluguel e operação deu US$ 1,24 bi de EBITDA, quase estável; a de obras caiu.", "Usa um casco padronizado (Fast4Ward) para ganhar tempo na construção.", "Sistemas: gêmeo digital da Aize nos FPSOs da Guiana e aliança com a SLB para usar inteligência artificial no desempenho dos FPSOs.", "Máquinas de Sergipe: a Siemens Energy entrega 16 módulos (8 por FPSO) com turbogeradores e compressores."]],
       numeros: ["Resultado de 2025, divulgado em fevereiro de 2026.",
         ["Receita: US$ 5,07 bi (−17%).", "EBITDA: US$ 1,71 bi.", "Lucro: US$ 677 mi (−25%).", "Carteira: US$ 31,1 bi.", "Meta 2026: receita de cerca de US$ 6,5 bi e EBITDA de US$ 1,8 bi."]],
       projetos: ["Sergipe (Petrobras), Jaguar (Guiana), GranMorgu (Suriname) e o FSO Chalchi.",
@@ -2084,6 +2100,203 @@ $("deb-body").addEventListener("click", function (e) {
   var r = e.target.closest("[data-reveal3]"); if (r) { var a = r.nextElementSibling; a.hidden = false; a.classList.add("reveal"); r.remove(); }
 });
 
+/* ---------- trilha exponencial: cada lição concluída destrava as seguintes ---------- */
+var F_P82 = ["Agência Gov (P-82)", "https://agenciagov.ebc.com.br/noticias/202610/plataforma-da-petrobras-p-82-buzios-10-inicia-viagem-rumo-ao-brasil"];
+var F_P78 = ["Rigzone (P-78, Siemens Energy)", "https://www.rigzone.com/news/siemens_scores_topsides_turbomachinery_deal_for_p78_fpso-19-apr-2022-168699-article/"];
+var F_SEAP = ["SBM Offshore (contratos SEAP)", "https://www.sbmoffshore.com/newsroom/sbm-offshore-signed-contracts-for-petrobras-fpsos-seap-i-and-seap-ii/"];
+var F_SIE = ["World Oil (Siemens Energy, SEAP)", "https://www.worldoil.com/news/2026/8/10/siemens-energy-supports-petrobras-offshore-expansion-with-fpso-systems/"];
+var F_SEPIA = ["Siemens (Sépia)", "https://press.siemens.com/global/en/pressrelease/siemens-deliver-gas-turbine-packages-services-petrobras-sepia-fpso"];
+var F_ABS = ["World Oil (gêmeo digital Petrobras)", "https://worldoil.com/news/2024/10/17/abs-to-lead-digital-twin-condition-monitoring-project-for-petrobras-fpsos/"];
+var F_CESAR = ["CESAR (gêmeo digital de dutos)", "https://www.cesar.org.br/web/english/w/petrobras-the-award-winning-digital-twin-project-to-ensure-operational-efficiency-and-safety"];
+var F_MAXIMO = ["OE Digital (MODEC e IBM Maximo)", "https://www.oedigital.com/news/481538-sro-solutions-upgrades-ibm-maximo-for-fpso-player-modec"];
+var F_AIZE = ["Aize (SBM e ExxonMobil)", "https://www.aize.io/blog/aize-agreement-exxonmobil-and-sbm"];
+var F_SLB = ["SBM Offshore (aliança com a SLB)", "https://www.sbmoffshore.com/newsroom/slb-and-sbm-offshore-agree-digital-alliance-to-transform-fpso-production-performance/"];
+var F_P78G = ["Brazil Energy Insight (P-78)", "https://brazilenergyinsight.com/2026/03/11/petrobras-p-78-fpso-achieves-gas-injection-milestone-in-buzios-field/"];
+var F_ANP = ["ANP", "https://www.gov.br/anp/pt-br"];
+var LICOES = [
+  { id: "l1", t: "O setor offshore em 5 minutos", tema: "Mercado", img: "img/fpso.jpg", cred: "Ptérodactyl Ivo, CC BY 2.0", next: ["l2", "l3"],
+    b: ["Offshore é tudo o que acontece no mar: achar, produzir e transportar petróleo e gás. No Brasil, quase tudo sai das bacias de Santos e de Campos, em frente a Rio, São Paulo e Espírito Santo.", "O pré-sal responde por cerca de 80% da produção nacional, que chegou a 4,25 milhões de barris por dia em março de 2026 (ANP).", "Quem produz é a operadora (Petrobras, Shell, Equinor, TotalEnergies). Quem fornece plataformas, equipamentos e serviços forma a cadeia em volta dela, boa parte com base no Rio e em Macaé."],
+    q: ["Quanto da produção brasileira vem do pré-sal?", ["Cerca de 20%", "Cerca de 50%", "Cerca de 80%"], 2, "Cerca de 80%. Por isso quase todo projeto novo no Brasil é de pré-sal, em águas ultraprofundas."], f: [["ANP via Economic News Brasil", "https://economicnewsbrasil.com.br/2026/05/04/producao-de-petroleo-do-brasil-recorde-concentracao-petrobras/"]] },
+  { id: "l2", t: "Por dentro do FPSO", tema: "Processo", img: "img/n-2026-10-19-p82.jpg", cred: "Agência Gov / Petrobras", next: ["l4", "l5", "l6"],
+    b: ["Um FPSO é um navio-plataforma que produz, armazena e transfere petróleo. Em cima fica a planta de processo (topside); embaixo, o casco com os tanques.", "Os dutos que sobem do fundo do mar (risers) trazem óleo, gás e água misturados. A planta separa e trata cada um.", "Um FPSO da série 80 da Petrobras, como a P-82, tem 345 m de comprimento, pesa mais de 100 mil toneladas e processa 225 mil barris de óleo e 12 milhões de m³ de gás por dia."],
+    q: ["O que significa a letra S em FPSO?", ["Segurança (Safety)", "Armazenamento (Storage)", "Submarino (Subsea)"], 1, "Storage: armazenamento. O óleo fica nos tanques do casco até um navio aliviador buscar."], f: [F_P82] },
+  { id: "l3", t: "Quem é quem no mercado", tema: "Mercado", next: ["l7", "l8"],
+    b: ["Operadoras: têm o direito de produzir no campo e ficam com o petróleo (Petrobras, Shell, Equinor, TotalEnergies, PRIO, BW Energy).", "Afretadoras de FPSO: constroem e operam plataformas para as operadoras (MODEC, SBM Offshore, BW Offshore, Ocyan).", "Estaleiros: constroem cascos e módulos, quase sempre na Ásia (como a Seatrium, em Singapura).", "Submarino: dutos, umbilicais e equipamentos no fundo do mar (Subsea7, TechnipFMC).", "Serviços: engenharia e software (Radix), gases industriais (White Martins), energia (Eneva, Engie)."],
+    q: ["A MODEC é principalmente...", ["Uma operadora que fica com o petróleo", "Uma empresa que constrói e opera FPSOs para outras", "Um estaleiro"], 1, "A MODEC é afretadora: constrói e opera FPSOs, e recebe uma diária da operadora."], f: [["Upstream (MODEC no Brasil)", "https://www.upstreamonline.com/exclusive/-proud-to-be-part-of-pre-salt-history-modec-chases-brazil-fpso-opportunities/2-1-2036970"]] },
+  { id: "l4", t: "Separação trifásica", tema: "Processo", next: ["l9", "l10"],
+    b: ["Do poço vem uma mistura de óleo, gás e água (às vezes com areia). O primeiro passo é separar as três fases em vasos separadores.", "A separação usa gravidade e tempo de residência: o gás sobe, o óleo fica no meio e a água, mais pesada, vai para o fundo.", "Aquecimento e produtos químicos (desemulsificantes) ajudam a quebrar a emulsão de água no óleo.", "É a aplicação direta de operações unitárias: balanço de massa, equilíbrio de fases e dimensionamento de vasos."],
+    q: ["Num separador trifásico, qual fase fica por baixo?", ["Gás", "Óleo", "Água"], 2, "A água, por ser a mais densa. O gás sai por cima e o óleo fica na camada do meio."], f: [] },
+  { id: "l5", t: "Gás do pré-sal e o CO₂", tema: "Processo", next: ["l11", "l12"],
+    b: ["O gás do pré-sal tem muito CO₂. Antes de exportar ou reinjetar, ele precisa ser tratado: secagem, remoção de CO₂ e compressão.", "O CO₂ separado não é jogado na atmosfera: volta para o reservatório. Isso reduz emissões e ajuda a manter a pressão do campo.", "Na P-78, em Búzios, a primeira injeção de gás aconteceu só 61 dias depois do primeiro óleo."],
+    q: ["O que costuma ser feito com o CO₂ separado no pré-sal?", ["É solto na atmosfera", "É reinjetado no reservatório", "É vendido como gás de cozinha"], 1, "É reinjetado. É um dos maiores usos de captura e armazenamento de carbono do mundo."], f: [F_P78G] },
+  { id: "l6", t: "Energia a bordo: turbogeradores", tema: "Máquinas", next: ["l13", "l14"],
+    b: ["Um FPSO é uma pequena cidade industrial isolada: precisa gerar a própria energia. Em geral usa turbinas a gás que queimam parte do gás produzido.", "Na P-78, a Siemens Energy fornece quatro conjuntos de turbogeradores para gerar energia.", "No FPSO de Sépia, foram quatro turbinas aeroderivativas SGT-A35, derivadas de motores de avião, que são leves e compactas.", "Manter essas máquinas funcionando é decisivo: se a energia cai, a produção para."],
+    q: ["De onde vem, normalmente, o combustível das turbinas de um FPSO?", ["Diesel trazido por barco", "Do próprio gás produzido", "De painéis solares"], 1, "Do próprio gás produzido, depois de tratado. Por isso gás e energia estão ligados a bordo."], f: [F_P78, F_SEPIA] },
+  { id: "l7", t: "Contratos: afretamento, BOT e EPC", tema: "Estratégia", next: ["l15", "l16"],
+    b: ["Afretamento: a afretadora constrói e opera o FPSO e recebe uma diária por 15 a 25 anos.", "BOT (construir, operar e transferir): a afretadora constrói e opera por um prazo e depois passa a unidade à operadora. Os dois FPSOs de Sergipe, da SBM, têm 6,5 anos de operação antes da transferência.", "EPC: a operadora compra a plataforma pronta; o estaleiro projeta, compra e constrói. É o caso da série 80 da Petrobras.", "Cada modelo divide de um jeito diferente o risco da obra e o custo ao longo da vida do campo."],
+    q: ["No modelo BOT, o que acontece no fim do prazo de operação?", ["A plataforma é desmontada", "A plataforma passa para a operadora", "O contrato vira afretamento"], 1, "A plataforma é transferida para a operadora, que segue operando com ela."], f: [F_SEAP, F_P82] },
+  { id: "l8", t: "Ciclo de vida de um campo", tema: "Mercado", next: ["l17", "l18"],
+    b: ["Exploração (sísmica e poços pioneiros) → avaliação → declaração de comercialidade → decisão de investir (FID) → projeto e construção → primeiro óleo → ramp-up → platô → declínio → descomissionamento.", "Do primeiro óleo ao platô, a produção sobe rápido conforme os poços são ligados.", "Cada fase tem empresas e empregos diferentes: exploração usa geólogos e sondas; construção usa estaleiros; operação usa tripulação e manutenção."],
+    q: ["Qual fase vem logo antes do primeiro óleo?", ["Declínio", "Projeto e construção", "Descomissionamento"], 1, "Projeto e construção, depois da decisão final de investimento (FID)."], f: [] },
+  { id: "l9", t: "Tratamento do óleo e o BSW", tema: "Processo", next: ["l19"],
+    b: ["Depois da separação, o óleo ainda tem água e sal. Ele passa por aquecimento e tratadores eletrostáticos até ficar dentro da especificação.", "BSW é o teor de água e sedimentos no óleo. Precisa ser baixo para o óleo ser vendido e não corroer tanques e navios.", "O óleo tratado vai para os tanques do casco e depois para o navio aliviador."],
+    q: ["O que mede o BSW?", ["A pressão do poço", "A água e os sedimentos no óleo", "O teor de enxofre"], 1, "Água e sedimentos (basic sediment and water). Quanto menor, melhor o óleo para venda."], f: [] },
+  { id: "l10", t: "Água produzida e a regra do descarte", tema: "Meio ambiente", next: ["l26"],
+    b: ["Com o tempo, os poços produzem cada vez mais água junto com o óleo.", "Antes de voltar ao mar, essa água passa por hidrociclones e flotação para tirar o óleo.", "A Resolução CONAMA 393/2007 limita o óleo na água descartada a uma média mensal de até 29 mg/L.", "É assunto de engenharia química e de SGI ao mesmo tempo: processo, monitoramento e registro para a fiscalização."],
+    q: ["Qual norma limita o óleo na água produzida descartada no mar?", ["NR-13", "CONAMA 393/2007", "ISO 9001"], 1, "A Resolução CONAMA 393/2007, com média mensal de até 29 mg/L."], f: [] },
+  { id: "l11", t: "Compressores: o coração do gás", tema: "Máquinas", next: ["l30"],
+    b: ["Para exportar ou reinjetar gás, é preciso aumentar muito a pressão. Isso é feito em trens de compressão.", "Na P-78, são oito trens de compressores movidos a motor elétrico (gás principal, exportação e injeção) e dois trens movidos por turbinas aeroderivativas para reinjetar CO₂.", "Nos FPSOs de Sergipe, a Siemens Energy entrega 16 módulos (8 por FPSO), com turbogeradores, compressores a turbina e compressores elétricos para reinjeção."],
+    q: ["Na P-78, o que move a maioria dos compressores de gás?", ["Motores elétricos", "Motores a diesel", "Energia solar"], 0, "Motores elétricos, alimentados pelos turbogeradores. Só os trens de CO₂ usam turbinas direto."], f: [F_P78, F_SIE] },
+  { id: "l12", t: "Reinjeção e captura de carbono", tema: "Meio ambiente", next: ["l18"],
+    b: ["Reinjetar gás e CO₂ tem dois efeitos: mantém a pressão do reservatório (o que ajuda a produzir mais) e evita emissões.", "O pré-sal tornou a Petrobras uma das maiores praticantes de captura e reinjeção de CO₂ do mundo.", "Isso aparece em relatórios de sustentabilidade e em perguntas de entrevista sobre transição energética."],
+    q: ["Além de evitar emissões, reinjetar gás ajuda em quê?", ["A manter a pressão do reservatório", "A esfriar o navio", "A reduzir o BSW"], 0, "Mantém a pressão do reservatório, o que sustenta a produção."], f: [] },
+  { id: "l13", t: "Tocha e sistemas de alívio", tema: "Segurança", next: ["l19"],
+    b: ["Toda planta de processo precisa de uma saída segura quando a pressão sobe demais: válvulas de alívio mandam o gás para a tocha (flare), onde ele é queimado.", "A tocha é uma barreira de segurança, não um desperdício planejado. Queima contínua grande é sinal de problema ou de falta de capacidade de compressão.", "Dimensionar alívio e tocha é trabalho de engenharia de processo e entra nos estudos de HAZOP."],
+    q: ["Para que serve a tocha (flare) de um FPSO?", ["Iluminar o convés", "Queimar com segurança o gás aliviado", "Aquecer o óleo"], 1, "Queimar com segurança o gás que precisa sair do processo numa sobrepressão."], f: [] },
+  { id: "l14", t: "Sistemas que as empresas usam", tema: "Sistemas", next: ["l30", "l31", "l32"],
+    b: ["Manutenção: a MODEC usa o IBM Maximo como sistema de gestão de manutenção, inclusive para controlar estoque entre navios e almoxarifados em terra.", "Gêmeo digital: a Petrobras testou com a ABS e a Akselos um gêmeo digital estrutural de um FPSO; com o CESAR, monitora corrosão por CO₂ em dutos.", "A SBM usa o software da Aize nos FPSOs da Guiana e fez uma aliança com a SLB para usar inteligência artificial no desempenho dos FPSOs.", "A Ocyan criou o Nexio, um hub de soluções digitais com inteligência artificial e dados."],
+    q: ["Que tipo de sistema é o IBM Maximo?", ["Simulador de processo", "Gestão de manutenção e ativos", "Software de licitação"], 1, "Gestão de manutenção e ativos: ordens de serviço, inspeções, estoque de peças."], f: [F_MAXIMO, F_ABS, F_AIZE, F_SLB] },
+  { id: "l15", t: "Como se ganha uma licitação", tema: "Estratégia", next: ["l26"],
+    b: ["Grandes contratos passam por qualificação técnica, econômica e de SMS antes do preço.", "Certificações (ISO 9001, 14001, 45001) e histórico de segurança e de entregas pesam na nota técnica.", "Depois vem o preço. Em licitações recentes, propostas foram desclassificadas por preço alto, sinal de que a operadora tem poder de barganha."],
+    q: ["O que costuma ser avaliado antes do preço?", ["A cor da empresa", "Qualificação técnica e de segurança", "O número de redes sociais"], 1, "Qualificação técnica, econômica e de SMS. Sem ela, o preço nem é aberto."], f: [] },
+  { id: "l16", t: "Eficiência operacional e a diária", tema: "Estratégia", next: ["l29"],
+    b: ["No afretamento, a receita da afretadora é a diária. Contratos costumam ligar o pagamento à eficiência: plataforma parada fora do plano rende menos.", "Por isso manutenção, integridade e segurança são parte do modelo de negócio, e não só custo.", "A BW Offshore teve 99,7% de disponibilidade comercial na frota em 2025: esse é o tipo de número que vende a empresa para o próximo contrato."],
+    q: ["Por que manutenção é estratégica para uma afretadora?", ["Porque paradas reduzem a receita", "Porque é obrigatório pintar o casco", "Não é estratégica"], 0, "Porque paradas não programadas reduzem ou cortam a diária."], f: [["BW Offshore (resultados 2025)", "https://bwoffshore.com/pressreleases/bw-offshore-fourth-quarter-and-full-year-results-2025"]] },
+  { id: "l17", t: "Descomissionamento", tema: "Mercado", next: [],
+    b: ["Quando um campo chega ao fim, a plataforma precisa ser retirada com segurança e os poços, abandonados de forma permanente.", "A ANP regula o tema e exige um programa de descomissionamento aprovado antes.", "Plataformas antigas da Bacia de Campos criaram um mercado de serviços de engenharia, barcos, reciclagem e meio ambiente. A MODEC mandou o antigo Cidade de Niterói para reciclagem na Dinamarca em 2026."],
+    q: ["Quem regula o descomissionamento de plataformas no Brasil?", ["Ibama sozinho", "ANP, junto com órgãos ambientais e a Marinha", "Ninguém"], 1, "A ANP, junto com o órgão ambiental e a Marinha, cada um na sua parte."], f: [F_ANP] },
+  { id: "l18", t: "FID: quando o projeto vira realidade", tema: "Estratégia", next: [],
+    b: ["FID é a decisão final de investimento. Antes dela, gasta-se com estudos; depois, com bilhões em obra.", "A decisão olha preço do petróleo, custo de equilíbrio, prazo, risco e financiamento.", "A BW Energy aprovou US$ 1,5 bilhão para Maromba em maio de 2025, com primeiro óleo previsto para o fim de 2027."],
+    q: ["O que muda depois do FID?", ["Nada", "O projeto passa a gastar o grosso do investimento", "O campo é vendido"], 1, "O dinheiro grande é comprometido: contratos de construção e equipamentos são assinados."], f: [["JPT (Maromba)", "https://jpt.spe.org/bw-energy-reaches-fid-on-maromba-project-offshore-brazil"]] },
+  { id: "l19", t: "Segurança de processos × segurança do trabalho", tema: "Segurança", next: ["l20", "l21"],
+    b: ["Segurança do trabalho cuida de quedas, cortes e choques. Segurança de processos cuida de perda de contenção: hidrocarboneto saindo e virando incêndio, explosão ou vazamento.", "Uma unidade pode ter ótimos números de acidente de trabalho e ainda estar perto de uma catástrofe.", "Por isso existem indicadores próprios: os eventos de segurança de processo (PSE), Tier 1 e Tier 2, da API RP 754."],
+    q: ["Qual é o foco da segurança de processos?", ["Quedas de altura", "Perda de contenção de produtos perigosos", "Uso de uniforme"], 1, "Perda de contenção: o que pode virar incêndio, explosão ou vazamento grave."], f: [] },
+  { id: "l20", t: "HAZOP passo a passo", tema: "Segurança", next: ["l22"],
+    b: ["O HAZOP divide o processo em trechos (nós) e aplica palavras-guia às variáveis: mais, menos, nenhum, reverso, além de.", "Exemplo: “mais pressão” no separador. Causas: válvula de saída fechada, bloqueio. Consequência: ruptura e vazamento. Proteções: válvula de alívio, alarme, intertravamento. Recomendação, se faltar proteção.", "É feito em equipe: processo, operação, instrumentação e segurança."],
+    q: ["Num HAZOP, o que é “mais pressão”?", ["Um desvio estudado com uma palavra-guia", "Uma norma", "Um equipamento"], 0, "É o desvio formado pela palavra-guia “mais” aplicada à variável pressão."], f: [] },
+  { id: "l21", t: "Bow-tie e barreiras", tema: "Segurança", next: ["l23"],
+    b: ["O bow-tie (gravata-borboleta) põe o evento perigoso no centro: à esquerda, as causas e as barreiras que previnem; à direita, as consequências e as barreiras que mitigam.", "Ajuda a explicar para qualquer pessoa onde estão as proteções e quais estão fracas.", "No modelo do queijo suíço, cada barreira tem furos; o acidente acontece quando os furos se alinham."],
+    q: ["No bow-tie, as barreiras do lado direito servem para...", ["Prevenir o evento", "Mitigar as consequências", "Calcular custos"], 1, "Mitigar: reduzir o estrago depois que o evento aconteceu."], f: [] },
+  { id: "l22", t: "LOPA e sistemas instrumentados (SIS)", tema: "Segurança", next: [],
+    b: ["A LOPA conta as camadas de proteção independentes de um cenário e verifica se o risco fica aceitável.", "Quando falta proteção, entra um sistema instrumentado de segurança (SIS), que desliga o processo sozinho.", "O nível de confiabilidade exigido do SIS é o SIL, definido pela norma IEC 61511."],
+    q: ["O que faz um SIS?", ["Desliga o processo automaticamente numa condição perigosa", "Calcula a produção", "Registra as horas trabalhadas"], 0, "Ele detecta a condição perigosa e leva o processo a um estado seguro."], f: [] },
+  { id: "l23", t: "Permissão de trabalho e gestão de mudanças", tema: "Segurança", next: ["l24", "l25"],
+    b: ["Permissão de trabalho: nenhum serviço perigoso começa sem autorização formal, análise de risco e isolamento do equipamento.", "Gestão de mudanças (MOC): toda alteração em equipamento, processo ou procedimento passa por análise antes de ser feita.", "Passagem de turno formal garante que o próximo turno saiba o que está em manutenção."],
+    q: ["Por que a passagem de turno é tão importante?", ["Para trocar o uniforme", "Para não perder informação sobre equipamentos em manutenção", "Não é importante"], 1, "Porque informação perdida na troca de turno já causou grandes acidentes."], f: [] },
+  { id: "l24", t: "Caso Piper Alpha (1988)", tema: "Casos", next: [],
+    b: ["No Mar do Norte, uma válvula de alívio de uma bomba estava fora para manutenção. O turno seguinte não soube e ligou a bomba.", "O gás vazou, explodiu e o incêndio destruiu a plataforma: 167 mortos.", "O caso mudou as regras no mundo todo, com o “safety case” britânico e a ênfase em permissão de trabalho e passagem de turno."],
+    q: ["Qual falha está no centro do caso Piper Alpha?", ["Falta de combustível", "Informação de manutenção perdida na troca de turno", "Erro de navegação"], 1, "A informação de que a válvula estava fora não chegou ao turno seguinte."], f: [] },
+  { id: "l25", t: "Caso FPSO Cidade de São Mateus (2015)", tema: "Casos", next: [],
+    b: ["Em fevereiro de 2015, uma explosão na casa de bombas do FPSO Cidade de São Mateus, no Espírito Santo, matou 9 pessoas.", "A unidade era operada pela BW Offshore para a Petrobras.", "É estudado no Brasil como exemplo de por que integridade, isolamento e gestão de risco a bordo não podem falhar."],
+    q: ["Quem operava o FPSO Cidade de São Mateus?", ["MODEC", "BW Offshore", "SBM Offshore"], 1, "A BW Offshore, para a Petrobras."], f: [["BW Offshore (história)", "https://bwoffshore.com/history"]] },
+  { id: "l26", t: "SGI: as três ISOs num sistema só", tema: "SGI", next: ["l27", "l28"],
+    b: ["ISO 9001 (qualidade), ISO 14001 (meio ambiente) e ISO 45001 (saúde e segurança) têm a mesma estrutura e o mesmo ciclo PDCA.", "Integradas, viram um Sistema de Gestão Integrado: uma auditoria, um controle de documentos, uma análise crítica.", "No offshore a área costuma se chamar SMS ou QSMS."],
+    q: ["Qual ciclo as três normas compartilham?", ["PDCA", "SWOT", "FID"], 0, "PDCA: planejar, fazer, checar e agir."], f: [] },
+  { id: "l27", t: "SGSO: o que a ANP exige", tema: "SGI", next: ["l29"],
+    b: ["O Sistema de Gerenciamento da Segurança Operacional (Resolução ANP 43/2007) vale para plataformas de produção.", "Tem 17 práticas de gestão, como identificação de riscos, gestão de mudanças, integridade mecânica, investigação de incidentes, treinamento e resposta a emergência.", "A ANP audita e pode interditar a unidade se encontrar falhas graves."],
+    q: ["Quantas práticas de gestão tem o SGSO?", ["5", "17", "45"], 1, "São 17 práticas de gestão."], f: [F_ANP] },
+  { id: "l28", t: "Auditoria e não conformidade", tema: "SGI", next: [],
+    b: ["Auditoria interna verifica se o que está escrito é o que está sendo feito.", "Quando não é, abre-se uma não conformidade: registra o problema, acha a causa raiz, define ação corretiva e verifica se funcionou.", "Ferramentas comuns: 5 porquês e diagrama de Ishikawa."],
+    q: ["Depois de registrar uma não conformidade, o próximo passo é...", ["Esquecer", "Achar a causa raiz", "Demitir alguém"], 1, "Achar a causa raiz, para a ação corretiva resolver de verdade."], f: [] },
+  { id: "l29", t: "Indicadores de SMS e de processo", tema: "SGI", next: ["l33"],
+    b: ["TRIR/TRIF: acidentes registráveis por horas trabalhadas.", "LTIF: acidentes com afastamento.", "PSE Tier 1 e 2: vazamentos de processo por gravidade.", "Eficiência operacional e custo de extração (lifting cost) mostram o desempenho do negócio."],
+    q: ["Qual indicador mede vazamentos de processo?", ["LTIF", "PSE Tier 1 e 2", "TRIR"], 1, "PSE Tier 1 e 2, pela API RP 754."], f: [] },
+  { id: "l30", t: "Manutenção e integridade", tema: "Sistemas", next: [],
+    b: ["Manutenção preventiva segue calendário; preditiva usa dados (vibração, temperatura, espessura) para agir antes da falha.", "Sistemas de gestão de manutenção, como o IBM Maximo usado pela MODEC, organizam ordens de serviço, planos de inspeção e estoque de peças.", "Integridade cuida de corrosão, fadiga e espessura de equipamentos e dutos, ligada à NR-13."],
+    q: ["Manutenção preditiva usa o quê?", ["Só o calendário", "Dados do equipamento para agir antes da falha", "Sorte"], 1, "Dados como vibração e temperatura para prever a falha."], f: [F_MAXIMO] },
+  { id: "l31", t: "Gêmeo digital", tema: "Sistemas", next: [],
+    b: ["Gêmeo digital é uma réplica virtual da plataforma, alimentada com dados reais, para monitorar e testar cenários.", "A Petrobras testou um gêmeo estrutural (ABS e Akselos) que mostra pontos de tensão no casco de um FPSO.", "Com o CESAR, criou um gêmeo para acompanhar corrosão por CO₂ em dutos em tempo real."],
+    q: ["Para que serve um gêmeo digital?", ["Substituir a tripulação", "Monitorar e testar cenários numa réplica virtual", "Fazer a contabilidade"], 1, "Monitorar o estado real e testar “e se” sem mexer na unidade."], f: [F_ABS, F_CESAR] },
+  { id: "l32", t: "Simulação de processos", tema: "Sistemas", next: [],
+    b: ["Simuladores calculam balanços de massa e energia de uma planta inteira.", "O Aspen HYSYS é o padrão da indústria de óleo e gás.", "O DWSIM é gratuito, de código aberto e criado por um engenheiro brasileiro: ótimo para praticar e montar um projeto para o currículo."],
+    q: ["Qual simulador é gratuito e de código aberto?", ["Aspen HYSYS", "DWSIM", "IBM Maximo"], 1, "O DWSIM."], f: [] },
+  { id: "l33", t: "Preparando-se para o estágio", tema: "Carreira", next: ["l34"],
+    b: ["Áreas para engenharia química: processo, SMS/QSMS, integridade, planejamento, química de produção.", "Vagas aparecem no LinkedIn, nas páginas de carreira e em plataformas como Gupy, Eureca, Cia de Talentos e CIEE.", "Estude: o que é um FPSO, quem é quem, HAZOP e bow-tie, SGI e SGSO, NR-13, NR-20 e NR-37, inglês técnico."],
+    q: ["Qual dessas é uma boa área de estágio para engenharia química no offshore?", ["QSMS", "Marketing de moda", "Nenhuma"], 0, "QSMS, processo, integridade e planejamento são as mais comuns."], f: [] },
+  { id: "l34", t: "Entrevista com o método STAR", tema: "Carreira", next: [],
+    b: ["STAR: Situação, Tarefa, Ação e Resultado. Conte um caso concreto em quatro partes.", "Exemplo: “No projeto de Segurança de Processos (situação), eu precisava avaliar um separador (tarefa); apliquei HAZOP com palavras-guia (ação) e encontrei dois desvios sem proteção (resultado).”", "Antes da entrevista, abra a ficha da empresa neste app e leia as notícias dela."],
+    q: ["O que significa o R do método STAR?", ["Risco", "Resultado", "Relatório"], 1, "Resultado: o que mudou por causa da sua ação."], f: [] }
+];
+var licDone = {};
+try { licDone = JSON.parse(localStorage.getItem("b27-licoes") || "{}") || {}; } catch (e) { licDone = {}; }
+function saveLic() { try { localStorage.setItem("b27-licoes", JSON.stringify(licDone)); } catch (e) {} }
+var GERADAS = [];
+try { GERADAS = JSON.parse(localStorage.getItem("b27-licoes-geradas") || "[]") || []; } catch (e) { GERADAS = []; }
+function limpaLic(l) { return l && typeof l.t === "string" && Array.isArray(l.b) ? { id: String(l.id), t: l.t, tema: String(l.tema || "Lição"), b: l.b.filter(function (p) { return typeof p === "string"; }), q: Array.isArray(l.q) && Array.isArray(l.q[1]) ? [String(l.q[0]), l.q[1].map(String), Number(l.q[2]), String(l.q[3] || "")] : null, f: Array.isArray(l.f) ? l.f.filter(function (x) { return Array.isArray(x) && /^https:\/\//.test(x[1]); }) : [], img: safeImg(l.img), cred: l.cred || "" } : null; }
+function allLicoes() { return LICOES.concat((LIVE.licoes || []).concat(GERADAS).map(limpaLic).filter(Boolean).map(function (x) { x.dia = true; x.next = []; return x; })); }
+function licById(id) { return allLicoes().filter(function (l) { return l.id === id; })[0]; }
+function unlocked() {
+  var ok = { l1: true };
+  LICOES.forEach(function (l) { if (licDone[l.id]) (l.next || []).forEach(function (n) { ok[n] = true; }); });
+  var nDone = Object.keys(licDone).length;
+  (LIVE.licoes || []).concat(GERADAS).forEach(function (l) { if (nDone >= 1 && l && l.id) ok[String(l.id)] = true; });
+  return ok;
+}
+function renderTrilha() {
+  var ok = unlocked(), all = allLicoes();
+  var done = all.filter(function (l) { return licDone[l.id]; }), avail = all.filter(function (l) { return ok[l.id] && !licDone[l.id]; }), locked = all.length - done.length - avail.length;
+  var prox = avail[0];
+  var h = '<div class="progress"><span>' + done.length + " concluídas · " + avail.length + " liberadas · " + locked + ' bloqueadas</span><span class="bar"><i style="width:' + (done.length / Math.max(1, all.length) * 100) + '%"></i></span></div>';
+  if (prox) h += '<button type="button" class="card lic-next" data-lic="' + prox.id + '">' + (prox.img ? '<span class="lic-img" style="background-image:url(\'' + esc(prox.img) + '\')"></span>' : "") + '<span class="lic-in"><small>Próxima lição · ' + esc(prox.tema || "") + (prox.dia ? " · lição do dia" : "") + "</small><strong>" + esc(prox.t) + '</strong><span class="more-l">Começar →</span></span></button>';
+  else h += '<div class="card pad"><strong>Você concluiu todas as lições liberadas.</strong><p class="muted small">Toda manhã o robô cria lições novas. ' + (SAMPLE ? "Ou peça uma agora:" : "") + "</p>" + (SAMPLE ? '<button type="button" class="reveal-btn" id="lic-gerar" style="margin-top:8px">Gerar nova lição com o Claude</button>' : "") + "</div>";
+  if (avail.length > 1) h += '<div class="group-title"><h3>Liberadas</h3></div><div class="lic-chips">' + avail.slice(1).map(function (l) { return '<button type="button" class="chip" data-lic="' + l.id + '">' + esc(l.t) + "</button>"; }).join("") + "</div>";
+  if (done.length) h += '<details class="mini" style="margin-top:10px"><summary>Concluídas (' + done.length + ")</summary><div>" + done.map(function (l) { return '<button type="button" class="chip" data-lic="' + l.id + '">✓ ' + esc(l.t) + "</button>"; }).join(" ") + "</div></details>";
+  $("trilha-lic").innerHTML = h;
+}
+function openLicao(id) {
+  var l = licById(id); if (!l) return; coOpen = null;
+  var h = "";
+  if (l.img) h += '<figure class="art-img"><img src="' + esc(l.img) + '" alt=""><figcaption>Imagem: ' + esc(l.cred || "") + "</figcaption></figure>";
+  h += '<div class="art stack"><div class="nw-meta"><span class="pill">' + esc(l.tema || "Lição") + "</span>" + (licDone[l.id] ? '<span class="pill" style="color:var(--good)">✓ concluída</span>' : "") + "</div><h2>" + esc(l.t) + "</h2>";
+  h += (l.b || []).map(function (p) { return '<p class="lead" style="font-size:.97rem">' + esc(p) + "</p>"; }).join("");
+  if (l.q) {
+    h += '<div class="sec"><h4>Pergunta rápida</h4><p style="font-weight:600;margin-bottom:8px">' + esc(l.q[0]) + '</p><div class="quiz">' + l.q[1].map(function (o, i) { return '<button type="button" class="qopt" data-qi="' + i + '">' + esc(o) + "</button>"; }).join("") + '</div><div class="ans" id="q-exp" hidden></div></div>';
+  }
+  h += '<button type="button" class="reveal-btn" id="lic-ok" data-id="' + esc(l.id) + '"' + (l.q && !licDone[l.id] ? " disabled" : "") + ">" + (licDone[l.id] ? "Já concluída ✓" : l.q ? "Responda a pergunta para concluir" : "Li e entendi") + "</button>";
+  h += '<div id="lic-unlock"></div>';
+  if (l.f && l.f.length) h += fontesLine(l.f);
+  h += "</div>";
+  if (sheetOpen) { coOpen = null; sheetBody.innerHTML = h; sheetEl.querySelector(".sheet").scrollTop = 0; }
+  else openSheet(h);
+  sheetBody.dataset.lic = l.id;
+}
+sheetBody.addEventListener("click", function (e) {
+  var o = e.target.closest("[data-qi]");
+  if (o && sheetBody.dataset.lic) {
+    var l = licById(sheetBody.dataset.lic), i = +o.dataset.qi, certo = i === l.q[2], exp = $("q-exp");
+    sheetBody.querySelectorAll("[data-qi]").forEach(function (b) { b.classList.remove("wrong", "right"); });
+    o.classList.add(certo ? "right" : "wrong");
+    exp.hidden = false; exp.classList.add("reveal");
+    exp.textContent = (certo ? "Certo! " : "Ainda não. ") + (certo ? l.q[3] : "Releia o texto acima e tente de novo.");
+    if (certo && !licDone[l.id]) { var b = $("lic-ok"); b.disabled = false; b.textContent = "Li e entendi"; }
+    return;
+  }
+  var ok = e.target.closest("#lic-ok");
+  if (ok && !ok.disabled && !licDone[ok.dataset.id]) {
+    var antes = unlocked(); licDone[ok.dataset.id] = Date.now(); saveLic();
+    var depois = unlocked(), novas = Object.keys(depois).filter(function (k) { return !antes[k] && !licDone[k]; }).map(licById).filter(Boolean);
+    ok.textContent = "Concluída ✓"; ok.disabled = true;
+    var prox = allLicoes().filter(function (x) { return depois[x.id] && !licDone[x.id]; })[0];
+    $("lic-unlock").innerHTML = '<div class="why reveal">' + (novas.length ? "<b>Você destravou " + novas.length + (novas.length > 1 ? " lições novas" : " lição nova") + ":</b> " + novas.map(function (n) { return esc(n.t); }).join(" · ") : "Lição concluída.") + "</div>" + (prox ? '<button type="button" class="full-btn" data-lic="' + prox.id + '">Próxima: ' + esc(prox.t) + " →</button>" : "");
+    renderTrilha();
+    return;
+  }
+  var nx = e.target.closest("[data-lic]");
+  if (nx) openLicao(nx.dataset.lic);
+});
+$("trilha-lic").addEventListener("click", function (e) {
+  var b = e.target.closest("[data-lic]"); if (b) { openLicao(b.dataset.lic); return; }
+  var g = e.target.closest("#lic-gerar"); if (!g || !SAMPLE) return;
+  g.disabled = true; g.textContent = "Criando…";
+  var feitas = allLicoes().map(function (l) { return l.t; }).join(" | ");
+  SAMPLE.json("Crie UMA lição curta, em português do Brasil, para um estudante de engenharia química que busca estágio no setor offshore do Rio e já estudou Gestão Estratégica (SGI) e Segurança de Processos. Ela deve aprofundar um destes temas já estudados, sem repetir: " + feitas + ". Use só conceitos consolidados; não invente números, datas, contratos ou notícias. Responda só com JSON: {\"t\":\"título\",\"tema\":\"uma palavra\",\"b\":[\"3 a 4 parágrafos curtos\"],\"q\":[\"pergunta\",[\"opção A\",\"opção B\",\"opção C\"],índice_da_certa,\"explicação\"]}").then(function (r) {
+    if (!r || !r.t || !Array.isArray(r.b) || !Array.isArray(r.q)) throw new Error("vazio");
+    var id = "g" + Date.now(); r.id = id; r.f = []; r.tema = (r.tema || "Claude") + " · gerada";
+    GERADAS.push(r); try { localStorage.setItem("b27-licoes-geradas", JSON.stringify(GERADAS.slice(-200))); } catch (er) {}
+    renderTrilha(); openLicao(id);
+  }).catch(function () { g.disabled = false; g.textContent = "Não deu agora. Tentar de novo"; });
+});
+
 /* ---------- planos ---------- */
 var busca = $("busca");
 function norm(s) { return String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
@@ -2292,7 +2505,7 @@ $("results").addEventListener("click", function (e) {
 var SAMPLE = null, askCtl = null;
 function setupAsk() {
   if (!window.claude || !window.claude.use) { $("ask-card").hidden = true; return; }
-  window.claude.use("sample").then(function (s) { SAMPLE = s; if (!s) $("ask-card").hidden = true; }).catch(function () { $("ask-card").hidden = true; });
+  window.claude.use("sample").then(function (s) { SAMPLE = s; if (!s) $("ask-card").hidden = true; renderTrilha(); }).catch(function () { $("ask-card").hidden = true; });
 }
 $("ask-btn").addEventListener("click", function () {
   var q = $("ask-q").value.trim(); if (!q || !SAMPLE) return;
@@ -2332,6 +2545,9 @@ function startLive() {
     fetch("dados/noticias.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (l) {
       if (Array.isArray(l)) { LIVE.news = l.filter(function (n) { return n && n.titulo && n.data; }); renderNewsBits(); }
     }).catch(function () {});
+    fetch("dados/licoes.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (l) {
+      if (Array.isArray(l)) { LIVE.licoes = l; renderTrilha(); }
+    }).catch(function () {});
     return;
   }
   window.claude.use("db").then(function (db) {
@@ -2339,6 +2555,10 @@ function startLive() {
     db.collection("noticias").orderBy("data", "desc").limit(80).onSnapshot(function (snap) {
       LIVE.news = snap.docs.map(function (d) { return d.data(); }).filter(function (n) { return n && n.titulo && n.data; });
       renderNewsBits();
+    }, function () {});
+    db.collection("licoes").orderBy("data", "desc").limit(300).onSnapshot(function (snap) {
+      LIVE.licoes = snap.docs.map(function (d) { var x = d.data(); x.id = x.id || d.id; return x; });
+      renderTrilha();
     }, function () {});
     db.doc("meta/painel").onSnapshot(function (snap) {
       var d = snap.exists ? snap.data() : null;
@@ -2353,7 +2573,7 @@ function startLive() {
 }
 
 /* ---------- início ---------- */
-renderHome(); renderEmpresas(); renderNewsBits(); renderPlans(); renderLearn(); renderGloss(); setupAsk(); renderThink(); renderDebate();
+renderHome(); renderEmpresas(); renderNewsBits(); renderPlans(); renderLearn(); renderGloss(); setupAsk(); renderThink(); renderDebate(); renderTrilha();
 var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { if (state.view === "indicador") drawChart(); }, 150); });
 var h0 = location.hash.replace("#", "");
 var VIEWS = ["inicio", "governos", "mundo", "terras", "offshore", "aprender", "buscar", "noticias", "planos", "fontes", "mais", "debate"];
