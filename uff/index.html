@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Caderneta UFF</title>
 <meta name="description" content="Provas, notas, aulas, agenda e plano de estudo da graduação em Engenharia Química na UFF.">
-<meta name="theme-color" content="#1d4f9e">
+<meta name="theme-color" content="#F2F5FA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#08111F" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -14,263 +15,338 @@
 <link rel="apple-touch-icon" href="img/icone-180.png">
 <link rel="icon" type="image/png" href="img/icone-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: app de celular — cabeçalho fino, conteúdo em uma coluna, barra de abas fixa embaixo */
+/* Caderneta UFF — app de celular: barra fina no topo, capa ilustrada de Niterói no Início, cartões leves, menu de 5 abas embaixo (mesma estrutura do Brasil 2027) */
 :root {
-  --papel: #f2f4f8;
-  --cartao: #ffffff;
-  --tinta: #14213d;
-  --tinta-2: #55617f;
-  --linha: #d8deea;
-  --uff: #1d4f9e;
-  --uff-suave: #e3ebf8;
-  --marca: #f2b632;
-  --marca-suave: #fdf1cf;
-  --ok: #1d7f53;
-  --vs: #b86a00;
-  --rep: #bf3326;
-  --ok-suave: #ddf1e6;
-  --vs-suave: #fbecd3;
-  --rep-suave: #f9e0dc;
-  --ext: #a3367a;
-  --ext-suave: #f7e1ee;
-  --f-titulo: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-  --f-texto: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
-  --f-num: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+  --papel: #F2F5FA;
+  --cartao: #FFFFFF;
+  --cartao-2: #EAF0F8;
+  --tinta: #0E1A2E;
+  --tinta-2: #4A5872;
+  --mudo: #7A879C;
+  --linha: #DFE6EF;
+  --uff: #1A4F9C;
+  --uff-2: #3D74C6;
+  --uff-suave: #E3ECF8;
+  --marca: #E3A81E;
+  --marca-suave: #FBF1D6;
+  --mac: #C8402E;
+  --ok: #1E8550;
+  --vs: #B5700A;
+  --rep: #C2392D;
+  --ok-suave: #DFF2E7;
+  --vs-suave: #FBEFD9;
+  --rep-suave: #FBE3E0;
+  --ext: #A3367A;
+  --ext-suave: #F7E1EE;
+  --sombra: 0 1px 2px rgba(14, 26, 46, .05), 0 8px 24px rgba(14, 26, 46, .06);
+  --raio: 16px;
+  --nav-h: 62px;
+  --f-titulo: "Archivo", "Segoe UI", system-ui, sans-serif;
+  --f-texto: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --f-num: "Archivo", "Segoe UI", system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --papel: #0e1524; --cartao: #161f34; --tinta: #e7ecf6; --tinta-2: #9ca8c4; --linha: #27324d;
-  --uff: #82a9ff; --uff-suave: #1c2a4a; --marca: #f5c451; --marca-suave: #3a3018;
-  --ok: #52c590; --vs: #f0a640; --rep: #ff7f70; --ok-suave: #15342a; --vs-suave: #3a2a12; --rep-suave: #3d1d1a;
-  --ext: #f08cc4; --ext-suave: #3a1a2e;
+  --papel: #08111F; --cartao: #0F1B2E; --cartao-2: #15243B; --tinta: #E8EEF7; --tinta-2: #AEBBD0; --mudo: #7F8FA8; --linha: #1F2F48;
+  --uff: #7FAEF5; --uff-2: #A7C8FA; --uff-suave: #132845; --marca: #F2C14E; --marca-suave: #33290F; --mac: #F07A63;
+  --ok: #4CC27E; --vs: #F0A640; --rep: #FF7A6E; --ok-suave: #12301F; --vs-suave: #33250E; --rep-suave: #3A1A17;
+  --ext: #F08CC4; --ext-suave: #3A1A2E;
+  --sombra: 0 1px 2px rgba(0, 0, 0, .35), 0 8px 24px rgba(0, 0, 0, .25);
   color-scheme: dark; } }
 :root[data-theme="dark"] {
-  --papel: #0e1524; --cartao: #161f34; --tinta: #e7ecf6; --tinta-2: #9ca8c4; --linha: #27324d;
-  --uff: #82a9ff; --uff-suave: #1c2a4a; --marca: #f5c451; --marca-suave: #3a3018;
-  --ok: #52c590; --vs: #f0a640; --rep: #ff7f70; --ok-suave: #15342a; --vs-suave: #3a2a12; --rep-suave: #3d1d1a;
-  --ext: #f08cc4; --ext-suave: #3a1a2e;
+  --papel: #08111F; --cartao: #0F1B2E; --cartao-2: #15243B; --tinta: #E8EEF7; --tinta-2: #AEBBD0; --mudo: #7F8FA8; --linha: #1F2F48;
+  --uff: #7FAEF5; --uff-2: #A7C8FA; --uff-suave: #132845; --marca: #F2C14E; --marca-suave: #33290F; --mac: #F07A63;
+  --ok: #4CC27E; --vs: #F0A640; --rep: #FF7A6E; --ok-suave: #12301F; --vs-suave: #33250E; --rep-suave: #3A1A17;
+  --ext: #F08CC4; --ext-suave: #3A1A2E;
+  --sombra: 0 1px 2px rgba(0, 0, 0, .35), 0 8px 24px rgba(0, 0, 0, .25);
   color-scheme: dark; }
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 [hidden] { display: none !important; }
 img { max-width: 100%; }
-body { margin: 0; background: var(--papel); color: var(--tinta); font: 400 16px/1.45 var(--f-texto); padding-top: env(safe-area-inset-top, 0px); }
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--papel); }
-.pagina { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 18px calc(96px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 22px; }
-h1, h2, h3 { font-family: var(--f-titulo); text-wrap: balance; margin: 0; }
-h1 { font-size: 1.55rem; font-weight: 800; letter-spacing: -0.01em; }
-h2 { font-size: 1.12rem; font-weight: 600; }
-h3 { font-size: 1rem; font-weight: 600; }
+body { margin: 0; background: var(--papel); color: var(--tinta); font: 400 15.5px/1.5 var(--f-texto); -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-family: var(--f-titulo); text-wrap: balance; margin: 0; letter-spacing: -.015em; }
+h2 { font-size: 1.08rem; font-weight: 700; }
+h3 { font-size: 1rem; font-weight: 700; }
+p { margin: 0; }
 .num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
-.rotulo { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--tinta-2); font-weight: 700; }
+.rotulo { font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; color: var(--mudo); font-weight: 700; }
 .fraco { color: var(--tinta-2); }
-.pequeno { font-size: 0.86rem; }
+.pequeno { font-size: .86rem; }
 button, select, input, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
+a { color: var(--uff); }
 :focus-visible { outline: 2px solid var(--uff); outline-offset: 2px; }
 
-.topo { display: flex; align-items: end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.topo .sem { font-family: var(--f-num); font-size: 0.85rem; color: var(--uff); background: var(--uff-suave); padding: 3px 9px; border-radius: 6px; }
+/* barra do topo */
+.topo { position: sticky; top: 0; z-index: 20; padding-top: env(safe-area-inset-top, 0px);
+  background: color-mix(in srgb, var(--cartao) 88%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-bottom: 1px solid var(--linha); }
+.topo-in { max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 10px; min-height: 54px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.brasao { height: 34px; width: auto; flex: none; display: block; }
+.marca-txt { display: grid; line-height: 1.1; min-width: 0; margin-right: auto; }
+.marca-txt strong { font-family: var(--f-titulo); font-weight: 800; font-size: 1.08rem; letter-spacing: -.02em; }
+.marca-txt span { font-size: .74rem; color: var(--mudo); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sem { font-family: var(--f-num); font-weight: 700; font-size: .8rem; color: var(--uff); background: var(--uff-suave); padding: 4px 10px; border-radius: 999px; font-variant-numeric: tabular-nums; }
 
-.secao { display: grid; gap: 10px; }
-.secao-cab { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.pagina { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px calc(var(--nav-h) + 28px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 18px; }
+.titulo-tela { font-size: 1.7rem; font-weight: 800; letter-spacing: -.025em; }
+#conteudo { display: grid; gap: 22px; min-width: 0; }
 
-.lista { display: grid; background: var(--cartao); border: 1px solid var(--linha); border-radius: 12px; overflow: hidden; }
-.linha { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; border-top: 1px solid var(--linha); min-width: 0; }
-.linha:first-child { border-top: 0; }
+/* seções e cartões */
+.secao { display: grid; gap: 10px; min-width: 0; }
+.secao-cab { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.secao-cab > p { flex: 1 1 220px; }
+.cartao { background: var(--cartao); border-radius: var(--raio); box-shadow: var(--sombra); padding: 16px; display: grid; gap: 10px; min-width: 0; }
+.lista { display: grid; background: var(--cartao); border-radius: var(--raio); box-shadow: var(--sombra); overflow: hidden; }
+.linha { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 13px 14px; min-width: 0; position: relative; }
+.linha + .linha::before { content: ""; position: absolute; top: 0; left: 14px; right: 14px; border-top: 1px solid var(--linha); }
 .linha > div { min-width: 0; }
-.linha.clicavel { cursor: pointer; }
-.linha.clicavel:hover { background: var(--uff-suave); }
-.linha .t { font-weight: 600; overflow-wrap: anywhere; }
-.linha .s { font-size: 0.86rem; color: var(--tinta-2); overflow-wrap: anywhere; }
-.vazio { padding: 18px 14px; color: var(--tinta-2); background: var(--cartao); border: 1px dashed var(--linha); border-radius: 12px; }
+.linha.clicavel, .clicavel { cursor: pointer; }
+.linha.clicavel:active { background: var(--cartao-2); }
+.linha .t { font-weight: 600; overflow-wrap: anywhere; line-height: 1.3; }
+.linha .s { font-size: .84rem; color: var(--tinta-2); overflow-wrap: anywhere; margin-top: 2px; }
+.linha .pilula, .linha .nota { justify-self: end; }
+.vazio { padding: 16px; color: var(--tinta-2); background: var(--cartao); border-radius: var(--raio); font-size: .92rem; border: 1px dashed var(--linha); }
 
-.dmenos { font-family: var(--f-num); font-weight: 600; font-size: 0.82rem; min-width: 52px; text-align: center; padding: 4px 6px; border-radius: 6px; background: var(--uff-suave); color: var(--uff); }
-.dmenos.urgente { background: var(--marca); color: #2a2100; }
+.dmenos { font-family: var(--f-num); font-weight: 700; font-size: .78rem; min-width: 56px; text-align: center; padding: 5px 6px; border-radius: 10px; background: var(--uff-suave); color: var(--uff); font-variant-numeric: tabular-nums; }
+.dmenos.urgente { background: var(--marca); color: #2a1f00; }
 .dmenos.perto { background: var(--marca-suave); color: var(--tinta); }
-.dmenos.passou { background: transparent; color: var(--tinta-2); border: 1px solid var(--linha); }
+.dmenos.passou { background: var(--cartao-2); color: var(--mudo); }
 
-.pilula { font-size: 0.78rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+.pilula { font-size: .74rem; font-weight: 700; padding: 4px 9px; border-radius: 999px; white-space: nowrap; }
 .p-ok { background: var(--ok-suave); color: var(--ok); }
 .p-vs { background: var(--vs-suave); color: var(--vs); }
 .p-rep { background: var(--rep-suave); color: var(--rep); }
 .p-cur { background: var(--uff-suave); color: var(--uff); }
-.p-pen { background: transparent; color: var(--tinta-2); border: 1px solid var(--linha); }
+.p-pen { background: var(--cartao-2); color: var(--mudo); }
 
-/* destaque da próxima prova */
-.proxima { background: var(--uff); color: #fff; border-radius: 14px; padding: 18px; display: grid; gap: 6px; }
-.proxima .rotulo { color: rgba(255,255,255,0.78); }
-.proxima .grande { font-family: var(--f-titulo); font-weight: 800; font-size: 2.6rem; line-height: 1; }
-.proxima .grande small { font-size: 1rem; font-weight: 600; margin-left: 6px; }
-:root[data-theme="dark"] .proxima, :root:not([data-theme="light"]) .proxima { color: #fff; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .proxima { background: #23407c; } }
-:root[data-theme="dark"] .proxima { background: #23407c; }
-
-.numeros { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.numero { background: var(--cartao); border: 1px solid var(--linha); border-radius: 12px; padding: 12px; display: grid; gap: 2px; }
-.numero .v { font-family: var(--f-num); font-size: 1.35rem; font-weight: 600; }
-
-.barra { height: 10px; border-radius: 999px; background: var(--linha); overflow: hidden; }
-.barra > i { display: block; height: 100%; background: var(--ok); }
-
-/* cartão de disciplina no período */
-.disc { background: var(--cartao); border: 1px solid var(--linha); border-radius: 12px; overflow: hidden; }
-.disc-cab { padding: 14px; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; border-bottom: 1px solid var(--linha); }
-.disc-cab > div { min-width: 0; }
-.disc-cab .cod { font-family: var(--f-num); font-size: 0.8rem; color: var(--tinta-2); }
-.aval { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 10px 14px; border-top: 1px solid var(--linha); }
-.aval:first-of-type { border-top: 0; }
-.aval > div { min-width: 0; }
-.nota { font-family: var(--f-num); font-weight: 600; font-size: 1.05rem; min-width: 44px; text-align: right; }
-.nota.vazia { color: var(--tinta-2); font-weight: 500; }
-.disc-pe { padding: 12px 14px; background: var(--papel); border-top: 1px solid var(--linha); display: grid; gap: 4px; }
-.disc-pe .media { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
-.disc-acoes { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-top: 1px solid var(--linha); }
-
-.btn { border: 1px solid var(--linha); background: var(--cartao); padding: 8px 12px; border-radius: 9px; font-weight: 600; font-size: 0.92rem; }
-.btn:hover { border-color: var(--uff); }
+.btn { border: 1px solid var(--linha); background: var(--cartao); padding: 9px 14px; border-radius: 12px; font-weight: 600; font-size: .9rem; color: var(--tinta); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.btn:active { background: var(--cartao-2); }
 .btn.forte { background: var(--uff); border-color: var(--uff); color: #fff; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.forte { color: #0e1524; } }
-:root[data-theme="dark"] .btn.forte { color: #0e1524; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.forte { color: #08111F; } }
+:root[data-theme="dark"] .btn.forte { color: #08111F; }
+.btn.leve { border-color: transparent; background: var(--uff-suave); color: var(--uff); }
 .btn.perigo { color: var(--rep); }
 .btn.perigo.armado { background: var(--rep); color: #fff; border-color: var(--rep); }
-.btn:disabled { opacity: 0.55; cursor: default; }
+.btn:disabled { opacity: .55; cursor: default; }
+.btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.acoes-folha { display: flex; gap: 8px; flex-wrap: wrap; }
 
-.marcar { width: 26px; height: 26px; border-radius: 7px; border: 2px solid var(--linha); background: var(--cartao); display: grid; place-items: center; padding: 0; }
-.marcar.feito { background: var(--ok); border-color: var(--ok); color: #fff; }
-.feito-txt .t { text-decoration: line-through; color: var(--tinta-2); }
+.marcar { width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--linha); background: var(--cartao); display: grid; place-items: center; padding: 0; color: #fff; font-weight: 800; }
+.marcar.feito { background: var(--ok); border-color: var(--ok); }
+.feito-txt .t { text-decoration: line-through; color: var(--mudo); }
 
-.periodo-grupo { display: grid; gap: 6px; }
-.filtros { display: flex; gap: 6px; flex-wrap: wrap; }
-.filtro { border: 1px solid var(--linha); background: var(--cartao); border-radius: 999px; padding: 5px 11px; font-size: 0.86rem; font-weight: 600; }
+.barra { height: 8px; border-radius: 999px; background: var(--cartao-2); overflow: hidden; }
+.barra > i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--uff), var(--uff-2)); }
+
+/* capa do Início: Niterói em camadas */
+.capa { position: relative; isolation: isolate; border-radius: 22px; overflow: hidden; color: #fff; min-height: 312px; display: grid; align-content: end; box-shadow: var(--sombra);
+  margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px)) + 8px); }
+.capa svg.cena { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; display: block; }
+.capa::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(5, 12, 26, .05) 0%, rgba(5, 12, 26, .12) 38%, rgba(5, 12, 26, .78) 100%); }
+.capa-in { padding: 18px; display: grid; gap: 10px; }
+.capa .ola { font-size: .86rem; font-weight: 600; color: rgba(255, 255, 255, .86); }
+.capa .destaque { font-family: var(--f-titulo); font-weight: 800; font-size: 1.55rem; line-height: 1.12; letter-spacing: -.02em; text-wrap: balance; }
+.capa .destaque small { display: block; font-family: var(--f-texto); font-weight: 600; font-size: .9rem; letter-spacing: 0; color: rgba(255, 255, 255, .85); margin-top: 4px; }
+.vidros { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.vidro { background: rgba(255, 255, 255, .13); border: 1px solid rgba(255, 255, 255, .2); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-radius: 14px; padding: 8px 10px; display: grid; gap: 0; min-width: 0; }
+.vidro b { font-family: var(--f-num); font-size: 1.2rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.vidro span { font-size: .72rem; color: rgba(255, 255, 255, .82); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* atalhos do Início */
+.atalhos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.atalho { border: 0; background: var(--cartao); box-shadow: var(--sombra); border-radius: 14px; padding: 12px 6px; display: grid; justify-items: center; gap: 4px; font-weight: 700; font-size: .8rem; color: var(--tinta); }
+.atalho svg { width: 22px; height: 22px; stroke: var(--uff); fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+/* faixa com a próxima data da UFF */
+.faixa { display: flex; align-items: center; gap: 10px; background: var(--marca-suave); border-radius: 14px; padding: 10px 14px; font-size: .88rem; }
+.faixa b { font-family: var(--f-num); color: var(--tinta); white-space: nowrap; }
+.faixa span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--tinta-2); }
+
+/* linha do tempo do dia */
+.hora { font-family: var(--f-num); font-size: .84rem; font-weight: 700; min-width: 46px; color: var(--tinta-2); font-variant-numeric: tabular-nums; }
+.tempo .linha { grid-template-columns: 46px 4px minmax(0, 1fr) auto; }
+.tempo .fio { align-self: stretch; width: 4px; border-radius: 4px; background: var(--uff); }
+.fio.c-prova { background: var(--marca); }
+.fio.c-ext { background: var(--ext); }
+.fio.c-uff { background: var(--mudo); }
+.fio.c-estudo { background: var(--uff-2); opacity: .6; }
+
+/* ícone das matérias e certificados */
+.ico { --c: var(--uff); width: 42px; height: 42px; border-radius: 13px; flex: none; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 15%, var(--cartao)); color: var(--c); }
+.ico svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ico.p { width: 34px; height: 34px; border-radius: 10px; }
+.ico.p svg { width: 18px; height: 18px; }
+
+/* chave Este período / Curso todo */
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--cartao-2); border-radius: 13px; padding: 4px; gap: 4px; }
+.seg button { border: 0; background: none; border-radius: 10px; padding: 8px 6px; font-weight: 700; font-size: .88rem; color: var(--tinta-2); }
+.seg button[aria-pressed="true"] { background: var(--cartao); color: var(--tinta); box-shadow: 0 1px 3px rgba(14, 26, 46, .12); }
+
+/* cartão de matéria do período */
+.disc { background: var(--cartao); border-radius: 18px; box-shadow: var(--sombra); overflow: hidden; }
+.disc-cab { padding: 14px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+.disc-cab > div { min-width: 0; }
+.disc-cab h3 { font-size: 1.02rem; line-height: 1.25; }
+.disc-cab .cod { font-size: .78rem; color: var(--mudo); font-weight: 600; }
+.disc .lista { box-shadow: none; border-radius: 0; background: transparent; border-top: 1px solid var(--linha); }
+.nota { font-family: var(--f-num); font-weight: 800; font-size: 1.05rem; min-width: 40px; text-align: right; font-variant-numeric: tabular-nums; }
+.nota.vazia { color: var(--mudo); font-weight: 600; font-size: .86rem; }
+.disc-pe { padding: 12px 14px; background: var(--cartao-2); display: grid; gap: 3px; }
+.disc-pe .media { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.disc-pe .media b { font-family: var(--f-num); font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.disc-acoes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 10px 14px 14px; background: var(--cartao-2); }
+.disc-acoes .btn { padding: 8px 6px; }
+
+/* curso todo */
+.progresso { display: grid; gap: 10px; }
+.progresso .grande { display: flex; align-items: baseline; gap: 8px; }
+.progresso .grande b { font-family: var(--f-num); font-weight: 800; font-size: 2.3rem; letter-spacing: -.03em; line-height: 1; }
+.faltas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.falta { background: var(--cartao-2); border-radius: 12px; padding: 10px 12px; display: grid; gap: 1px; }
+.falta b { font-family: var(--f-num); font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.falta span { font-size: .78rem; color: var(--tinta-2); }
+.filtros { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.filtros::-webkit-scrollbar { display: none; }
+.filtro { flex: none; border: 1px solid var(--linha); background: var(--cartao); border-radius: 999px; padding: 6px 12px; font-size: .84rem; font-weight: 700; color: var(--tinta-2); }
 .filtro[aria-pressed="true"] { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
-
-/* abas de baixo */
-.abas { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--cartao); border-top: 1px solid var(--linha);
-  padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
-.abas-in { max-width: 720px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.periodo-grupo { display: grid; gap: 8px; }
+.periodo-grupo > h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .09em; color: var(--mudo); font-family: var(--f-texto); }
 
 /* calendário */
 .mes-cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .mes-cab h2 { font-size: 1.25rem; text-transform: capitalize; }
 .mes-nav { display: flex; gap: 6px; }
-.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
-.cal .sem-d { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--tinta-2); text-align: center; padding-bottom: 2px; }
-.dia { border: 1px solid var(--linha); background: var(--cartao); border-radius: 9px; min-height: 54px; padding: 5px 4px; display: grid; align-content: space-between; justify-items: center; gap: 4px; }
-.dia.fora { background: transparent; border-color: transparent; color: var(--tinta-2); opacity: 0.5; }
-.dia .n { font-family: var(--f-num); font-size: 0.86rem; font-weight: 600; }
-.dia.hoje .n { background: var(--uff); color: #fff; border-radius: 6px; padding: 0 5px; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .dia.hoje .n { color: #0e1524; } }
-:root[data-theme="dark"] .dia.hoje .n { color: #0e1524; }
-.dia[aria-pressed="true"] { border-color: var(--uff); box-shadow: inset 0 0 0 1px var(--uff); }
-.pontos { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; min-height: 7px; }
-.ponto { width: 7px; height: 7px; border-radius: 50%; }
+.mes-nav .btn { padding: 7px 12px; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; background: var(--cartao); border-radius: 18px; box-shadow: var(--sombra); padding: 10px 8px; }
+.cal .sem-d { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--mudo); text-align: center; padding-bottom: 4px; }
+.dia { border: 0; background: none; border-radius: 12px; min-height: 48px; padding: 6px 2px; display: grid; align-content: start; justify-items: center; gap: 4px; color: var(--tinta); }
+.dia.fora { color: var(--mudo); opacity: .45; }
+.dia .n { font-family: var(--f-num); font-size: .92rem; font-weight: 600; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; font-variant-numeric: tabular-nums; }
+.dia.hoje .n { background: var(--uff); color: #fff; font-weight: 800; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .dia.hoje .n { color: #08111F; } }
+:root[data-theme="dark"] .dia.hoje .n { color: #08111F; }
+.dia[aria-pressed="true"] { background: var(--uff-suave); }
+.dia.sem-aula .n { color: var(--mudo); text-decoration: line-through; }
+.dia.hoje.sem-aula .n { text-decoration: none; color: #fff; }
+.pontos { display: flex; gap: 3px; justify-content: center; min-height: 6px; }
+.ponto { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
 .c-prova { background: var(--marca); }
-.c-estudo { background: var(--uff); opacity: 0.45; }
+.c-estudo { background: var(--uff-2); opacity: .55; }
 .c-facul { background: var(--uff); }
 .c-ext { background: var(--ext); }
-.legenda { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.8rem; color: var(--tinta-2); }
+.c-uff { background: transparent; box-shadow: inset 0 0 0 1.5px var(--mudo); }
+.legenda { display: flex; gap: 12px; flex-wrap: wrap; font-size: .76rem; color: var(--tinta-2); }
 .legenda span { display: inline-flex; align-items: center; gap: 5px; }
-.tag-ext { background: var(--ext-suave); color: var(--ext); }
-.tag-facul { background: var(--uff-suave); color: var(--uff); }
-.hora { font-family: var(--f-num); font-size: 0.82rem; font-weight: 600; min-width: 52px; text-align: center; color: var(--tinta-2); }
-.aba { border: 0; background: none; padding: 10px 2px 12px; display: grid; justify-items: center; gap: 3px; font-size: 0.7rem; font-weight: 700; color: var(--tinta-2); min-width: 0; white-space: nowrap; letter-spacing: -0.01em; }
-.aba svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.aba[aria-current="page"] { color: var(--uff); }
 
-/* folha de edição */
-dialog { border: 0; padding: 0; width: min(560px, 100%); max-height: 92vh; border-radius: 16px 16px 0 0; margin: auto auto 0; background: var(--cartao); color: var(--tinta); }
-@media (min-width: 640px) { dialog { border-radius: 16px; margin: auto; } }
-dialog::backdrop { background: rgba(10, 16, 30, 0.5); }
-.folha { display: grid; gap: 14px; padding: 18px max(18px, env(safe-area-inset-left, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)); }
-.campo { display: grid; gap: 4px; }
-.campo label { font-size: 0.84rem; font-weight: 700; color: var(--tinta-2); }
-.campo input, .campo select, .campo textarea { width: 100%; border: 1px solid var(--linha); background: var(--papel); border-radius: 9px; padding: 10px 11px; font-size: 1rem; }
+/* "Saiba mais": explicações guardadas, abre quem quiser */
+.saiba { background: var(--cartao); border-radius: var(--raio); box-shadow: var(--sombra); }
+.saiba > summary { list-style: none; cursor: pointer; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-weight: 700; }
+.saiba > summary::-webkit-details-marker { display: none; }
+.saiba > summary::after { content: ""; width: 9px; height: 9px; border-right: 2px solid var(--mudo); border-bottom: 2px solid var(--mudo); transform: rotate(45deg); transition: transform .2s; flex: none; margin-top: -4px; }
+.saiba[open] > summary::after { transform: rotate(-135deg); margin-top: 4px; }
+.saiba-in { padding: 0 16px 16px; display: grid; gap: 10px; }
+.info-linhas { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+.info-linhas li { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: .92rem; }
+.info-linhas .quando { font-family: var(--f-num); font-size: .8rem; font-weight: 700; color: var(--uff); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.info-linhas.texto li { grid-template-columns: 1fr; gap: 1px; }
+.info-linhas strong { font-weight: 700; }
+.fonte { font-size: .76rem; color: var(--mudo); }
+.tabela-he { border-top: 1px solid var(--linha); padding-top: 8px; }
+.tabela-he summary { cursor: pointer; font-weight: 700; color: var(--uff); padding-block: 4px; }
+.tabela-he ul { margin-top: 8px; }
+
+/* certificados */
+.aneis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.anel { background: var(--cartao); border-radius: var(--raio); box-shadow: var(--sombra); padding: 14px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: center; }
+.anel svg { width: 54px; height: 54px; transform: rotate(-90deg); }
+.anel circle { fill: none; stroke-width: 6; }
+.anel .fundo-anel { stroke: var(--cartao-2); }
+.anel .cheio { stroke: var(--uff); stroke-linecap: round; }
+.anel.ext .cheio { stroke: var(--ok); }
+.anel b { font-family: var(--f-num); font-size: 1.25rem; font-weight: 800; display: block; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.anel b small { font-size: .78rem; font-weight: 600; color: var(--mudo); }
+.anel span { font-size: .76rem; color: var(--tinta-2); font-weight: 600; }
+.previa-he { font-weight: 700; color: var(--uff); }
+
+/* abas de baixo */
+.abas { position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; background: color-mix(in srgb, var(--cartao) 92%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-top: 1px solid var(--linha); padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: max(6px, env(safe-area-inset-left, 0px)); padding-right: max(6px, env(safe-area-inset-right, 0px)); }
+.abas-in { max-width: 720px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.aba { border: 0; background: none; height: var(--nav-h); display: grid; place-items: center; align-content: center; gap: 3px; font-size: .68rem; font-weight: 700; color: var(--mudo); min-width: 0; white-space: nowrap; position: relative; }
+.aba svg { width: 23px; height: 23px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.aba[aria-current="page"] { color: var(--uff); }
+.aba[aria-current="page"]::before { content: ""; position: absolute; top: 0; left: 30%; right: 30%; height: 3px; border-radius: 0 0 3px 3px; background: var(--uff); }
+
+/* folha de edição (sobe de baixo) */
+dialog { border: 0; padding: 0; width: min(560px, 100%); max-width: 100%; max-height: 92vh; max-height: 92dvh; border-radius: 22px 22px 0 0; margin: auto auto 0; background: var(--cartao); color: var(--tinta); box-shadow: 0 -20px 60px rgba(0, 0, 0, .3); }
+@media (min-width: 640px) { dialog { border-radius: 22px; margin: auto; } }
+dialog::backdrop { background: rgba(4, 10, 20, .5); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+@media (prefers-reduced-motion: no-preference) { dialog[open] { animation: subir .32s cubic-bezier(.2, .9, .2, 1) both; } }
+@keyframes subir { from { transform: translateY(40px); opacity: .4; } to { transform: none; opacity: 1; } }
+.folha { display: grid; gap: 14px; padding: 8px max(18px, env(safe-area-inset-left, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)); }
+.folha::before { content: ""; width: 42px; height: 5px; border-radius: 3px; background: var(--linha); justify-self: center; margin-bottom: 4px; }
+.folha h2 { font-size: 1.25rem; }
+.campo { display: grid; gap: 5px; }
+.campo label { font-size: .82rem; font-weight: 700; color: var(--tinta-2); }
+.campo input, .campo select, .campo textarea { width: 100%; border: 1px solid var(--linha); background: var(--papel); border-radius: 12px; padding: 10px 12px; font-size: 1rem; }
+.campo input:focus, .campo select:focus, .campo textarea:focus { border-color: var(--uff); outline: none; box-shadow: 0 0 0 3px var(--uff-suave); }
 .campo textarea { min-height: 84px; resize: vertical; }
 .campo input:not([type="file"]), .campo select { height: 46px; }
 .campos-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; align-items: end; }
 .folha-pe { display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; }
 .folha-pe .dir { display: flex; gap: 8px; margin-left: auto; }
-.ajuda { font-size: 0.84rem; color: var(--tinta-2); }
+.ajuda { font-size: .82rem; color: var(--tinta-2); }
+.plano-item { display: grid; grid-template-columns: 96px 1fr; gap: 8px; align-items: start; }
+.plano-item input { padding: 8px; height: 42px; width: 100%; border: 1px solid var(--linha); border-radius: 10px; background: var(--papel); }
+.resposta-claude { white-space: pre-wrap; background: var(--papel); border: 1px solid var(--linha); border-radius: 10px; padding: 10px; font-size: .92rem; max-height: 220px; overflow: auto; }
 
-.aviso-sistema { background: var(--marca-suave); border: 1px solid var(--marca); border-radius: 12px; padding: 12px 14px; font-size: 0.92rem; }
-.plano-item { display: grid; grid-template-columns: 74px 1fr; gap: 8px; align-items: start; }
-.plano-item input { padding: 8px; }
-.resposta-claude { white-space: pre-wrap; background: var(--papel); border: 1px solid var(--linha); border-radius: 9px; padding: 10px; font-size: 0.92rem; max-height: 220px; overflow: auto; }
-.rodape { font-size: 0.8rem; color: var(--tinta-2); }
-@media (prefers-reduced-motion: no-preference) { .linha, .btn, .aba { transition: background-color .15s, border-color .15s, color .15s; } }
-@media (max-width: 380px) { .numeros { grid-template-columns: 1fr 1fr; } .proxima .grande { font-size: 2.2rem; } }
-.hoje-data { margin: 0; font-size: 1.02rem; color: var(--tinta-2); }
-.hoje-data strong { color: var(--tinta); }
-.acoes-folha { display: flex; gap: 8px; flex-wrap: wrap; }
-.linha-cod { grid-template-columns: 74px minmax(0, 1fr) auto; }
-#conteudo { display: grid; gap: 24px; min-width: 0; }
-.secao-cab { align-items: center; }
-.secao-cab > p { flex: 1 1 220px; }
-.disc-acoes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+/* aviso rápido (toast) */
+.aviso-sistema { position: fixed; z-index: 30; left: 50%; transform: translateX(-50%); bottom: calc(var(--nav-h) + 14px + env(safe-area-inset-bottom, 0px));
+  width: min(520px, calc(100% - 32px)); background: var(--tinta); color: var(--papel); border-radius: 14px; padding: 12px 16px; font-size: .9rem; font-weight: 600; box-shadow: 0 10px 30px rgba(0, 0, 0, .25); border: 0 !important; }
+.puxar { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 62px); left: 50%; transform: translate(-50%, 0); z-index: 21;
+  background: var(--cartao); color: var(--tinta-2); border-radius: 999px; padding: 7px 14px; font-size: .84rem; font-weight: 700; box-shadow: var(--sombra); white-space: nowrap; }
+.puxar.pronto { color: var(--uff); }
 
-/* marca da UFF: o arquivo oficial vira máscara, pintada com a cor do tema */
-.marca { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.brasao { display: block; height: 60px; width: auto; flex: none; }
-.info { background: var(--uff-suave); border-radius: 12px; padding: 14px; display: grid; gap: 8px; }
-.info-cab { display: flex; align-items: center; gap: 10px; }
-.info-cab h2 { font-size: 1rem; }
-.info-linhas { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.info-linhas li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; align-items: baseline; }
-.info-linhas .quando { font-family: var(--f-num); font-size: 0.8rem; font-weight: 600; color: var(--uff); white-space: nowrap; }
-.info-linhas.texto li { grid-template-columns: 1fr; gap: 2px; }
-.info-linhas strong { font-weight: 700; }
-.fonte { font-size: 0.78rem; color: var(--tinta-2); }
-.puxar { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 8px); left: 50%; transform: translate(-50%, 0); z-index: 20;
-  background: var(--cartao); color: var(--tinta-2); border: 1px solid var(--linha); border-radius: 999px; padding: 6px 14px;
-  font-size: 0.86rem; font-weight: 700; box-shadow: 0 4px 14px rgba(10, 20, 40, 0.12); white-space: nowrap; }
-.puxar.pronto { color: var(--uff); border-color: var(--uff); }
-/* visor de certificado: tela cheia dentro do app */
+/* visor de certificado */
 .visor { position: fixed; inset: 0; z-index: 40; background: var(--papel); display: grid; grid-template-rows: auto minmax(0, 1fr); }
-.visor-barra { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; background: var(--cartao); border-bottom: 1px solid var(--linha);
+.visor-barra { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; background: color-mix(in srgb, var(--cartao) 92%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-bottom: 1px solid var(--linha);
   padding: calc(env(safe-area-inset-top, 0px) + 10px) max(12px, env(safe-area-inset-right, 0px)) 10px max(12px, env(safe-area-inset-left, 0px)); }
-.visor-barra strong { font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
-.visor-paginas { overflow: auto; -webkit-overflow-scrolling: touch; padding: 12px max(8px, env(safe-area-inset-left, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 12px; align-content: start; justify-items: center; }
-.visor-paginas canvas, .visor-paginas img { display: block; width: 100%; max-width: 900px; height: auto; background: #fff; box-shadow: 0 2px 10px rgba(10, 20, 40, 0.15); border-radius: 4px; }
-.tabela-he { border-top: 1px solid var(--linha); padding-top: 8px; }
-.tabela-he summary { cursor: pointer; font-weight: 700; color: var(--uff); padding-block: 4px; }
-.tabela-he ul { margin-top: 8px; }
-.previa-he { font-weight: 700; color: var(--uff); }
-.rodape-uff { display: grid; gap: 8px; justify-items: start; padding-top: 6px; border-top: 1px solid var(--linha); }
-.rodape-uff .rodape { margin: 0; }
-.c-uff { background: transparent; box-shadow: inset 0 0 0 2px var(--tinta-2); }
-.dia.sem-aula .n { color: var(--tinta-2); text-decoration: line-through; }
-.dia.hoje.sem-aula .n { text-decoration: none; }
-.disc-acoes .btn { text-align: center; }
-.linha .pilula, .linha .nota { justify-self: end; }
-.numero { align-content: start; }
+.visor-barra strong { font-size: .95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+.visor-paginas { overflow: auto; -webkit-overflow-scrolling: touch; padding: 14px max(10px, env(safe-area-inset-left, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 14px; align-content: start; justify-items: center; }
+.visor-paginas canvas, .visor-paginas img { display: block; width: 100%; max-width: 900px; height: auto; background: #fff; box-shadow: var(--sombra); border-radius: 6px; }
+
+.rodape-uff { display: grid; gap: 6px; justify-items: center; text-align: center; padding-top: 4px; }
+.rodape { font-size: .76rem; color: var(--mudo); margin: 0; }
+@media (prefers-reduced-motion: no-preference) { .linha, .btn, .aba, .atalho, .seg button { transition: background-color .15s, color .15s, box-shadow .15s; } }
+@media (max-width: 360px) { .vidro b { font-size: 1.05rem; } .capa .destaque { font-size: 1.35rem; } }
 </style>
 </head>
 <body>
 
-<div class="pagina" id="app">
-  <header class="topo">
-    <div class="marca">
-      <img class="brasao" src="img/brasao-uff.png" alt="Brasão da UFF" width="240" height="270">
-      <div>
-        <div class="rotulo" id="curso-nome">Graduação</div>
-        <h1 id="titulo-aba">Hoje</h1>
-      </div>
-    </div>
+<header class="topo">
+  <div class="topo-in">
+    <img class="brasao" src="img/brasao-uff.png" alt="Brasão da UFF" width="240" height="270">
+    <div class="marca-txt"><strong>Caderneta</strong><span id="curso-nome">UFF</span></div>
     <span class="sem" id="semestre">—</span>
-  </header>
-  <div id="aviso-sistema" class="aviso-sistema" hidden></div>
+  </div>
+</header>
+
+<div class="pagina" id="app">
+  <h1 class="titulo-tela" id="titulo-aba" hidden>Início</h1>
   <main id="conteudo"></main>
 </div>
+<div id="aviso-sistema" class="aviso-sistema" role="status" hidden></div>
 
 <nav class="abas" aria-label="Seções">
   <div class="abas-in">
-    <button class="aba" data-aba="hoje" aria-current="page"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>Hoje</button>
-    <button class="aba" data-aba="agenda"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Agenda</button>
-    <button class="aba" data-aba="periodo"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M9 11h6M9 15h6"/></svg>Período</button>
-    <button class="aba" data-aba="curso"><svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5-9 5z"/><path d="M7 11.5V16c0 1.5 2.5 3 5 3s5-1.5 5-3v-4.5"/></svg>Curso</button>
+    <button class="aba" data-aba="hoje" aria-current="page"><svg viewBox="0 0 24 24"><path d="M4 19V9.5l8-5.5 8 5.5V19"/><path d="M9.5 19v-5h5v5"/></svg>Início</button>
+    <button class="aba" data-aba="agenda"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Agenda</button>
+    <button class="aba" data-aba="materias"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/><path d="M7.5 14h9"/></svg>Matérias</button>
     <button class="aba" data-aba="certificados"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M9 13.2 7.5 21l4.5-2.4 4.5 2.4-1.5-7.8"/></svg>Certificados</button>
     <button class="aba" data-aba="estudo"><svg viewBox="0 0 24 24"><path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/></svg>Estudo</button>
   </div>
@@ -290,7 +366,7 @@ dialog::backdrop { background: rgba(10, 16, 30, 0.5); }
 <script>
 "use strict";
 /* ---------- estado ---------- */
-const VERSAO_APP = "2026-10-23-9"; // trocar junto com dados/versao.json a cada publicação do app
+const VERSAO_APP = "2026-10-24-10"; // trocar junto com dados/versao.json a cada publicação do app
 const S = { discs: new Map(), avals: new Map(), avisos: new Map(), eventos: new Map(), perfil: {}, aba: "hoje", filtroCurso: "todas", mes: null, diaSel: null };
 let db = null, sample = null, podeEscrever = true;
 
@@ -399,36 +475,148 @@ function itensDoDia(d) {
   }
   if (dentroDoSemestre(d) && !semAula(d)) for (const disc of S.discs.values()) {
     if (disc.situacao !== "cursando") continue;
-    for (const h of disc.horarios || []) if (h.dia === dow) out.push({ cor: "c-facul", hora: h.inicio, titulo: `Aula · ${disc.nome}`, sub: [`até ${h.fim}`, disc.professor, disc.turma ? "turma " + disc.turma : ""].filter(Boolean).join(" · "), acao: "editar-disc", id: disc.id, aula: true });
+    for (const h of disc.horarios || []) if (h.dia === dow) out.push({ cor: "c-facul", hora: h.inicio, titulo: `Aula · ${disc.nome}`, sub: [`até ${h.fim}`, disc.professor, disc.turma ? "turma " + disc.turma : ""].filter(Boolean).join(" · "), acao: "editar-disc", id: disc.id, aula: true, disc: disc.nome, fim: h.fim });
   }
   for (const v of S.avisos.values()) if (v.data === d && !v.feito) out.push({ cor: "c-estudo", hora: "", titulo: v.texto, sub: v.disciplinaId ? "Estudo · " + nomeDisc(v.disciplinaId) : "Estudo", acao: "editar-aviso", id: v.id });
   const chave = (i) => (i.cor === "c-uff" ? "00" : i.hora || "99");
   return out.sort((a, b) => (chave(a) < chave(b) ? -1 : chave(a) > chave(b) ? 1 : 0));
 }
 const ddmm = (s) => String(s).split("-").reverse().slice(0, 2).join("/");
-function cartaoUff(titulo, corpo, fonte) {
-  return `<section class="info"><div class="info-cab"><h2>${titulo}</h2></div>${corpo}${fonte ? `<div class="fonte">${fonte}</div>` : ""}</section>`;
+// "Saiba mais": explicação guardada num bloco que abre e fecha
+function saiba(titulo, corpo, fonte, aberto) {
+  return `<details class="saiba"${aberto ? " open" : ""}><summary>${titulo}</summary><div class="saiba-in">${corpo}${fonte ? `<div class="fonte">${fonte}</div>` : ""}</div></details>`;
 }
+const cartaoUff = (titulo, corpo, fonte) => saiba(titulo, corpo, fonte);
 function listaDatasUff(itens) {
   const h = hojeISO();
   return `<ul class="info-linhas">${itens.map((x) => {
     const quando = x.fim ? (x.data <= h ? "até " + ddmm(x.fim) : `${ddmm(x.data)}–${ddmm(x.fim)}`) : ddmm(x.data);
     const passou = (x.fim || x.data) < h;
-    return `<li${passou ? ' style="opacity:.55"' : ""}><span class="quando">${quando}</span><span>${esc(x.titulo)}</span></li>`;
+    return `<li${passou ? ' style="opacity:.5"' : ""}><span class="quando">${quando}</span><span>${esc(x.titulo)}</span></li>`;
   }).join("")}</ul>`;
 }
-function cartaoCalendarioHoje() {
+function proximaDataUff() {
   const h = hojeISO();
   const chave = (x) => (x.data >= h ? x.data : x.fim);
-  const prox = datasUff().filter((x) => (x.fim || x.data) >= h).sort((a, b) => (chave(a) < chave(b) ? -1 : 1)).slice(0, 3);
-  const fim = S.perfil.fimSemestre;
-  if (!prox.length && !fim) return "";
-  const resta = fim && fim >= h ? `<p style="margin:0">Faltam <strong>${diasAte(fim)} dias</strong> para o fim das aulas, em ${dataCurta(fim).replace(/ /g, " ")}.</p>` : "";
-  return cartaoUff("Calendário da UFF", resta + listaDatasUff(prox), "Fonte: " + esc(fonteUff()));
+  return datasUff().filter((x) => (x.fim || x.data) >= h).sort((a, b) => (chave(a) < chave(b) ? -1 : 1))[0] || null;
 }
+
+/* ---------- ícones (traço simples, cor por área) ---------- */
+const ICONES = {
+  mat: '<path d="M15 4.5c-1.6-1-3.4-.2-3.8 2L9.8 17.5c-.4 2.2-2.2 3-3.8 2"/><path d="M14 11h5M16.5 8.5v5"/>',
+  fis: '<ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.2"/>',
+  qui: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/><path d="M7.5 14h9"/>',
+  lab: '<path d="M5 3h6M6 3v12.5a2.5 2.5 0 0 0 5 0V3M6 9h5"/><path d="M13 3h6M14 3v12.5a2.5 2.5 0 0 0 5 0V3M14 12h5"/>',
+  flu: '<path d="M3 8c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M3 13c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M3 18c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/>',
+  termo: '<path d="M12 3a2 2 0 0 0-2 2v9.3a4 4 0 1 0 4 0V5a2 2 0 0 0-2-2z"/><path d="M12 9v7"/>',
+  reator: '<rect x="6" y="6" width="12" height="15" rx="3.5"/><path d="M12 2v12M9 14h6M3 10h3M18 17h3"/>',
+  proc: '<rect x="9" y="2.5" width="6" height="19" rx="3"/><path d="M9 7.5h6M9 12h6M9 16.5h6M15 5.5h4.5M4.5 18.5H9"/>',
+  seg: '<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
+  neg: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+  prog: '<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/>',
+  des: '<circle cx="12" cy="6" r="1.8"/><path d="M11 7.6 6 21M13 7.6 18 21M8.3 15h7.4"/>',
+  est: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/>',
+  livro: '<path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/>',
+  fabrica: '<path d="M3 21V10l5 3v-3l5 3V7l5 3v11z"/><path d="M17 21v-4h-3v4M7 17h2"/>',
+  pessoas: '<circle cx="9" cy="8" r="3"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.4"/><path d="M15 14.2a4.5 4.5 0 0 1 6 4.8"/>',
+  palco: '<rect x="3" y="4" width="18" height="11" rx="2"/><path d="M12 15v5M8 20h8M7 11l3-2 3 2 4-3"/>',
+  medalha: '<circle cx="12" cy="9" r="5"/><path d="M9 13.2 7.5 21l4.5-2.4 4.5 2.4-1.5-7.8"/>',
+  mais: '<path d="M12 5v14M5 12h14"/>',
+  prova: '<path d="M7 3h7l4 4v14H7z"/><path d="M10 12h5M10 16h5M10 8h2"/>',
+  cal: '<rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  check: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>',
+};
+const CORES_ICO = { mat: "#5B5BD6", fis: "#0E8F86", qui: "#2E8B57", lab: "#3B9C6B", flu: "#1C8FC9", termo: "#D9692B", reator: "#8A4FD1", proc: "#3E6FB0", seg: "#C4453A", neg: "#B8860B", prog: "#4C5BD4", des: "#6B7A90", est: "#1A4F9C", livro: "#1A4F9C", mic: "#D9692B", fabrica: "#3E6FB0", pessoas: "#0E8F86", palco: "#8A4FD1", medalha: "#B8860B" };
+const semAcento = (t) => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+function tipoDisc(nome) {
+  const n = semAcento(nome);
+  const regras = [["seg", /seguranca|meio ambiente|higiene/], ["neg", /empreend|administra|economia|gestao/], ["prog", /programacao|computad/], ["des", /desenho/],
+    ["lab", /experimental|laborat/], ["reator", /reac|reator|cinetica|bioquim/], ["termo", /termodin|calor/], ["flu", /fluido|massa|fenomeno|transferencia/],
+    ["proc", /operac|processo|simulac|desenvolvimento|projeto da ind|controle|instrument|instalac|materiais de constr|offshore/], ["mat", /calculo|algebra|matemat|metodos|estatistic|geometr/],
+    ["fis", /fisica|eletrotec|mecanica dos materiais/], ["qui", /quimic|organic|inorganic|analitic/], ["est", /estagio|projeto final|atividade|eletiva|optativa|extens|cidadania/]];
+  for (const [k, re] of regras) if (re.test(n)) return k;
+  return "livro";
+}
+const svgIco = (tipo) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONES[tipo] || ICONES.livro}</svg>`;
+const icone = (tipo, pequeno) => `<span class="ico${pequeno ? " p" : ""}" style="--c:${CORES_ICO[tipo] || CORES_ICO.livro}" aria-hidden="true">${svgIco(tipo)}</span>`;
+const iconeDisc = (d, pequeno) => icone(tipoDisc(d?.nome), pequeno);
+
+/* ---------- capa do Início: Niterói em camadas, com o céu da hora do dia ---------- */
+function cenaNiteroi() {
+  const h = new Date().getHours();
+  const P = h >= 5 && h < 11 ? { c1: "#5EA6EE", c2: "#F5DDB0", sol: "#FFD36B", sx: 66, sy: 74, longe: "#86A9D2", meio: "#2F5C93", perto: "#173E70", mar1: "#3E7EC0", mar2: "#1B4C88", luz: "#1A2C4A" }
+    : h >= 11 && h < 16 ? { c1: "#2A78D8", c2: "#A9D3FF", sol: "#FFE08A", sx: 300, sy: 46, longe: "#74A1D3", meio: "#2A5A97", perto: "#123869", mar1: "#2F78C8", mar2: "#164887", luz: "#1A2C4A" }
+    : h >= 16 && h < 19 ? { c1: "#26387C", c2: "#F2925A", sol: "#FFB36B", sx: 186, sy: 158, longe: "#5E4F88", meio: "#2C2F6A", perto: "#18204A", mar1: "#C8735C", mar2: "#283066", luz: "#FFD27A" }
+    : { c1: "#0A1A42", c2: "#2E559C", sol: "#F3E7C4", sx: 330, sy: 58, longe: "#4A6AA5", meio: "#24477F", perto: "#14305C", mar1: "#2A4E8C", mar2: "#0F2550", luz: "#FFD27A" };
+  const noite = h >= 19 || h < 5;
+  const estrelas = noite ? [[30, 30], [70, 58], [110, 22], [160, 46], [210, 18], [250, 64], [370, 28], [390, 80], [140, 80], [52, 96]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${i % 3 ? 0.9 : 1.4}" fill="#fff" opacity="${i % 2 ? 0.6 : 0.9}"/>`).join("") : "";
+  return `<svg class="cena" viewBox="0 34 400 234" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
+    <defs><linearGradient id="ceu-${h}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.c1}"/><stop offset="1" stop-color="${P.c2}"/></linearGradient>
+      <linearGradient id="mar-${h}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.mar1}"/><stop offset="1" stop-color="${P.mar2}"/></linearGradient></defs>
+    <rect width="400" height="268" fill="url(#ceu-${h})"/>${estrelas}
+    <circle cx="${P.sx}" cy="${P.sy}" r="34" fill="${P.sol}" opacity=".18"/><circle cx="${P.sx}" cy="${P.sy}" r="15" fill="${P.sol}"/>
+    <path d="M52 170 C74 150 96 120 114 104 L118 97 L122 104 C140 122 160 150 178 170 Z" fill="${P.longe}"/>
+    <path d="M118 84v10M114.5 88h7" stroke="${P.longe}" stroke-width="2" stroke-linecap="round"/>
+    <path d="M176 170 C184 146 196 132 208 135 C216 138 221 150 225 157 C233 140 244 113 260 111 C277 111 286 142 293 170 Z" fill="${P.longe}"/>
+    <rect y="168" width="400" height="100" fill="url(#mar-${h})"/>
+    <path d="M30 196h34M118 206h44M232 190h24M286 222h42M84 236h30" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".22"/>
+    <path d="M-10 268 L-10 150 C22 128 60 112 92 118 C122 124 142 152 166 190 C178 212 188 240 194 268 Z" fill="${P.meio}"/>
+    <path d="M140 84 L166 80 L152 91 Z" fill="#fff" opacity=".92"/><path d="M152 91 L153 98" stroke="#fff" stroke-width="1.2" opacity=".9"/>
+    <path d="M232 268 C236 230 258 210 298 207 C342 205 382 216 412 238 L412 268 Z" fill="${P.perto}"/>
+    <ellipse cx="325" cy="208" rx="40" ry="4.5" fill="${P.mar1}" opacity=".75"/>
+    <rect x="316" y="171" width="18" height="36" rx="3" fill="#E7EBF2"/>
+    <path d="M262 154 C292 145 358 145 388 154 L371 173 C350 179 300 179 279 173 Z" fill="#F4F6FA"/>
+    <path d="M268 159 C298 151 352 151 382 159 L379 163 C352 157 298 157 271 163 Z" fill="${P.luz}" opacity=".85"/>
+    <path d="M238 240 C262 236 272 224 290 216 C306 209 302 197 317 190" fill="none" stroke="#D4442F" stroke-width="3.4" stroke-linecap="round"/>
+  </svg>`;
+}
+function capaInicio(proximas, rc) {
+  const agora = new Date(), h = agora.getHours();
+  const ola = h < 5 ? "Boa noite" : h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
+  const DIAS_LONGOS = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
+  const hoje = hojeISO(), hd = deISO(hoje);
+  const hm = `${String(h).padStart(2, "0")}:${String(agora.getMinutes()).padStart(2, "0")}`;
+  const aulas = itensDoDia(hoje).filter((i) => i.aula);
+  const prox = aulas.find((i) => i.fim > hm);
+  const p = proximas[0];
+  let titulo, sub;
+  if (p && diasAte(p.data) <= 10) {
+    const n = diasAte(p.data);
+    titulo = `${esc(p.nome)} de ${esc(nomeDisc(p.disciplinaId))} ${n === 0 ? "é hoje" : n === 1 ? "é amanhã" : `em ${n} dias`}`;
+    sub = `${dataCurta(p.data)}${p.hora ? " às " + horaCurta(p.hora) : ""}`;
+  } else if (prox) {
+    titulo = prox.hora <= hm ? `Em aula até ${horaCurta(prox.fim)}` : `Próxima aula às ${horaCurta(prox.hora)}`;
+    sub = esc(prox.disc);
+  } else if (semAula(hoje)) {
+    titulo = "Hoje não tem aula";
+    sub = esc(datasUff().find((x) => x.data === hoje)?.titulo.split(" · ")[0] || "Feriado");
+  } else if (aulas.length) {
+    titulo = "As aulas de hoje acabaram";
+    sub = p ? `Próxima prova: ${esc(p.nome)} de ${esc(nomeDisc(p.disciplinaId))}, ${dataCurta(p.data)}` : "Bom momento para revisar";
+  } else {
+    titulo = "Dia sem aulas";
+    sub = p ? `Próxima prova: ${esc(p.nome)}, ${dataCurta(p.data)}` : "Aproveite para adiantar o estudo";
+  }
+  const pct = rc.chTotal ? Math.round((rc.chAprov / rc.chTotal) * 100) : null;
+  return `<section class="capa" aria-label="Resumo de hoje">${cenaNiteroi()}
+    <div class="capa-in">
+      <p class="ola">${ola} · ${DIAS_LONGOS[hd.getDay()]}, ${hd.getDate()} de ${NOMES_MES[hd.getMonth()]}</p>
+      <p class="destaque">${titulo}<small>${sub}</small></p>
+      <div class="vidros">
+        <div class="vidro"><b>${esc(rc.cr ?? "—")}</b><span>CR</span></div>
+        <div class="vidro"><b>${pct == null ? "—" : pct + "%"}</b><span>do curso</span></div>
+        <div class="vidro"><b>${rc.cursando.length}</b><span>matérias</span></div>
+      </div>
+    </div></section>`;
+}
+
 function linhaAgenda(i) {
-  return `<div class="linha ${i.acao ? "clicavel" : ""}" ${i.acao ? `data-acao="${i.acao}" data-id="${esc(i.id)}"` : ""}><span class="hora">${esc(i.hora || "—")}</span>
-    <div><div class="t"><span class="ponto ${i.cor}" style="display:inline-block;margin-right:6px;vertical-align:1px"></span>${esc(i.titulo)}</div><div class="s">${esc(i.sub)}</div></div><span></span></div>`;
+  const titulo = i.aula ? i.disc : i.titulo;
+  const sub = i.aula ? "Aula · " + i.sub : i.sub;
+  const hora = i.cor === "c-uff" ? "UFF" : i.hora ? horaCurta(i.hora) : "—";
+  return `<div class="linha ${i.acao ? "clicavel" : ""}" ${i.acao ? `data-acao="${i.acao}" data-id="${esc(i.id)}"` : ""}><span class="hora">${hora}</span><span class="fio ${i.cor}"></span>
+    <div><div class="t">${esc(titulo)}</div><div class="s">${esc(sub)}</div></div><span></span></div>`;
 }
 function resumoCurso() {
   const ds = [...S.discs.values()].filter((d) => d.tipo !== "optativa-extra");
@@ -442,13 +630,20 @@ function resumoCurso() {
 }
 
 /* ---------- telas ---------- */
-const TITULOS = { hoje: "Hoje", agenda: "Agenda", periodo: "Este período", curso: "Meu curso", certificados: "Certificados", estudo: "Plano de estudo" };
+const TITULOS = { hoje: "Início", agenda: "Agenda", materias: "Matérias", certificados: "Certificados", estudo: "Estudo" };
 function render() {
-  $("#titulo-aba").textContent = TITULOS[S.aba];
-  $("#semestre").textContent = S.perfil.semestreAtual || "semestre —";
-  $("#curso-nome").textContent = S.perfil.curso || "Graduação";
-  const el = $("#conteudo");
-  el.innerHTML = ({ hoje: telaHoje, agenda: telaAgenda, periodo: telaPeriodo, curso: telaCurso, certificados: telaCertificados, estudo: telaEstudo })[S.aba]();
+  const t = $("#titulo-aba");
+  t.textContent = TITULOS[S.aba];
+  t.hidden = S.aba === "hoje";
+  $("#semestre").textContent = S.perfil.semestreAtual || "—";
+  $("#curso-nome").textContent = S.perfil.curso ? `UFF · ${S.perfil.curso}` : "UFF";
+  $("#conteudo").innerHTML = ({ hoje: telaHoje, agenda: telaAgenda, materias: telaMaterias, certificados: telaCertificados, estudo: telaEstudo })[S.aba]();
+}
+function irPara(aba) {
+  S.aba = TITULOS[aba] ? aba : "hoje";
+  document.querySelectorAll(".aba").forEach((x) => x.dataset.aba === S.aba ? x.setAttribute("aria-current", "page") : x.removeAttribute("aria-current"));
+  try { localStorage.setItem("caderneta-aba", S.aba); } catch {}
+  render(); window.scrollTo(0, 0);
 }
 
 const NOMES_MES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
@@ -459,7 +654,7 @@ function telaAgenda() {
   const [ano, mes] = S.mes.split("-").map(Number);
   const primeiro = new Date(ano, mes - 1, 1);
   const inicio = new Date(primeiro); inicio.setDate(1 - primeiro.getDay());
-  let grade = SEMANA.map((s) => `<div class="sem-d">${s}</div>`).join("");
+  let grade = SEMANA.map((s) => `<div class="sem-d">${s.slice(0, 1).toUpperCase()}</div>`).join("");
   for (let k = 0; k < 42; k++) {
     const d = new Date(inicio); d.setDate(inicio.getDate() + k);
     if (k >= 35 && d.getMonth() !== mes - 1) break;
@@ -473,55 +668,35 @@ function telaAgenda() {
   return `<section class="secao">
     <div class="mes-cab"><h2>${NOMES_MES[mes - 1]} ${ano}</h2><div class="mes-nav"><button class="btn" data-acao="mes" data-passo="-1" aria-label="Mês anterior">‹</button><button class="btn" data-acao="mes" data-passo="0">Hoje</button><button class="btn" data-acao="mes" data-passo="1" aria-label="Próximo mês">›</button></div></div>
     <div class="cal">${grade}</div>
-    <div class="legenda"><span><i class="ponto c-prova"></i>Prova</span><span><i class="ponto c-facul"></i>Aula e faculdade</span><span><i class="ponto c-ext"></i>Fora da faculdade</span><span><i class="ponto c-estudo"></i>Estudo</span><span><i class="ponto c-uff"></i>Data da UFF</span></div>
+    <div class="legenda"><span><i class="ponto c-facul"></i>Aula</span><span><i class="ponto c-prova"></i>Prova</span><span><i class="ponto c-ext"></i>Fora da UFF</span><span><i class="ponto c-estudo"></i>Estudo</span><span><i class="ponto c-uff"></i>Data da UFF</span></div>
   </section>
-  <section class="secao"><div class="secao-cab"><h2>${dataCurta(S.diaSel)}</h2><button class="btn forte" data-acao="novo-evento">+ Compromisso</button></div>
-    ${itensSel.length ? `<div class="lista">${itensSel.map(linhaAgenda).join("")}</div>` : `<div class="vazio">Dia livre. Toque em “+ Compromisso” para marcar algo da faculdade ou de fora.</div>`}
+  <section class="secao"><div class="secao-cab"><h2 style="text-transform:capitalize">${dataCurta(S.diaSel)}</h2><button class="btn leve" data-acao="novo-evento">${svgIco("mais")} Compromisso</button></div>
+    ${itensSel.length ? `<div class="lista tempo">${itensSel.map(linhaAgenda).join("")}</div>` : `<div class="vazio">Dia livre.</div>`}
   </section>
-  ${datasUff().length ? cartaoUff(`Datas oficiais de ${esc(S.perfil.semestreAtual || "2026.2")}`, listaDatasUff(datasUff()) + `<p class="pequeno" style="margin:0">Nos feriados e pontos facultativos não há aula: o calendário já tira as aulas desses dias.</p>`, "Fonte: " + esc(fonteUff())) : ""}` + rodape();
+  ${datasUff().length ? saiba(`Datas da UFF em ${esc(S.perfil.semestreAtual || "2026.2")}`, listaDatasUff(datasUff()) + `<p class="pequeno fraco">Nos feriados e pontos facultativos o calendário já tira as aulas.</p>`, "Fonte: " + esc(fonteUff())) : ""}` + rodape();
 }
 
 function telaHoje() {
   const h = hojeISO();
   const proximas = ordenarPor([...S.avals.values()].filter((a) => a.data && a.data >= h && a.nota == null), (a) => a.data);
-  const avisos = ordenarPor([...S.avisos.values()].filter((v) => !v.feito && v.data && v.data <= somaDias(h, 1)), (v) => v.data);
-  const rc = resumoCurso();
-  const p = proximas[0];
-  const hd = deISO(h);
-  const DIAS_LONGOS = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
-  let out = `<p class="hoje-data">Hoje é <strong>${DIAS_LONGOS[hd.getDay()]}, ${hd.getDate()} de ${NOMES_MES[hd.getMonth()]}</strong>.</p>`;
-  if (p) {
-    const n = diasAte(p.data);
-    out += `<section class="proxima" aria-label="Próxima avaliação">
-      <div class="rotulo">Próxima avaliação</div>
-      <div class="grande num">${n === 0 ? "hoje" : n === 1 ? "amanhã" : `${n}<small>dias</small>`}</div>
-      <div><strong>${esc(p.nome)}</strong> · ${esc(nomeDisc(p.disciplinaId))}</div>
-      <div class="pequeno">${dataCurta(p.data)}${p.hora ? " às " + esc(p.hora) : ""}${p.conteudo ? " · " + esc(p.conteudo) : ""}</div>
-    </section>`;
-  }
-  out += `<section class="numeros" aria-label="Resumo">
-    <div class="numero"><span class="rotulo">CR</span><span class="v">${esc(rc.cr ?? "—")}</span><span class="pequeno fraco">${S.perfil.crOficial ? "do idUFF" : "estimado"}</span></div>
-    <div class="numero"><span class="rotulo">Curso feito</span><span class="v">${rc.chTotal ? Math.round((rc.chAprov / rc.chTotal) * 100) + "%" : "—"}</span><span class="pequeno fraco">${rc.chAprov} de ${rc.chTotal || "?"} h</span></div>
-    <div class="numero"><span class="rotulo">Cursando</span><span class="v">${rc.cursando.length}</span><span class="pequeno fraco">matérias</span></div>
-  </section>`;
-  out += cartaoCalendarioHoje();
-  const agendaHoje = itensDoDia(h).filter((i) => i.cor !== "c-estudo");
-  out += `<section class="secao"><div class="secao-cab"><h2>Hoje na agenda</h2><button class="btn" data-acao="novo-evento">+ Compromisso</button></div>`;
-  out += agendaHoje.length ? `<div class="lista">${agendaHoje.map(linhaAgenda).join("")}</div>` : `<div class="vazio">Nenhuma aula ou compromisso hoje.</div>`;
-  out += `</section>`;
-  out += `<section class="secao"><div class="secao-cab"><h2>Estudar hoje</h2><button class="btn" data-acao="novo-aviso">+ Aviso</button></div>`;
-  out += avisos.length ? `<div class="lista">${avisos.map(linhaAviso).join("")}</div>` : `<div class="vazio">Nada marcado para hoje. Monte o plano de uma prova na aba Estudo e os avisos aparecem aqui no dia certo.</div>`;
-  out += `</section>`;
-  out += `<section class="secao"><div class="secao-cab"><h2>Próximas avaliações</h2><button class="btn" data-acao="nova-aval">+ Prova</button></div>`;
-  out += proximas.length ? `<div class="lista">${proximas.slice(0, 8).map(linhaAval).join("")}</div>` : `<div class="vazio">Nenhuma prova marcada ainda. Toque em “+ Prova” para cadastrar a data.</div>`;
-  out += `</section>`;
+  const avisos = ordenarPor([...S.avisos.values()].filter((v) => !v.feito && v.data && v.data <= h), (v) => v.data);
+  let out = capaInicio(proximas, resumoCurso());
+  const atalho = (acao, t, ic) => `<button class="atalho" data-acao="${acao}">${svgIco(ic)}${t}</button>`;
+  out += `<div class="atalhos">${atalho("nova-aval", "Prova", "prova")}${atalho("novo-evento", "Compromisso", "cal")}${atalho("novo-aviso", "Estudo", "check")}</div>`;
+  const ud = proximaDataUff();
+  if (ud) out += `<div class="faixa clicavel" data-acao="ir" data-ir="agenda"><b>${ud.fim && ud.data <= h ? "até " + ddmm(ud.fim) : ddmm(ud.data)}</b><span>${esc(ud.titulo)}</span></div>`;
+  const agendaHoje = itensDoDia(h).filter((i) => i.cor !== "c-estudo" && i.cor !== "c-uff");
+  out += `<section class="secao"><h2>Hoje</h2>${agendaHoje.length ? `<div class="lista tempo">${agendaHoje.map(linhaAgenda).join("")}</div>` : `<div class="vazio">Nada marcado para hoje.</div>`}</section>`;
+  if (avisos.length) out += `<section class="secao"><h2>Estudar</h2><div class="lista">${avisos.map(linhaAviso).join("")}</div></section>`;
+  if (proximas.length) out += `<section class="secao"><h2>Próximas provas</h2><div class="lista">${proximas.slice(0, 4).map(linhaAval).join("")}</div></section>`;
   return out + rodape();
 }
 
 function linhaAval(a) {
-  return `<div class="linha clicavel" data-acao="editar-aval" data-id="${esc(a.id)}">${chipDias(a.data)}
-    <div><div class="t">${esc(a.nome)} · ${esc(nomeDisc(a.disciplinaId))}</div><div class="s">${dataCurta(a.data)}${a.hora ? " às " + esc(a.hora) : ""}${a.conteudo ? " · " + esc(a.conteudo) : ""}</div></div>
-    <span class="nota ${a.nota == null ? "vazia" : ""}">${a.nota == null ? "peso " + esc(a.peso ?? 1) : nota1(a.nota)}</span></div>`;
+  const d = S.discs.get(a.disciplinaId);
+  return `<div class="linha clicavel" data-acao="editar-aval" data-id="${esc(a.id)}">${iconeDisc(d, true)}
+    <div><div class="t">${esc(a.nome)} · ${esc(nomeDisc(a.disciplinaId))}</div><div class="s">${dataCurta(a.data)}${a.hora ? " às " + horaCurta(a.hora) : ""}</div></div>
+    ${a.nota == null ? chipDias(a.data) : `<span class="nota">${nota1(a.nota)}</span>`}</div>`;
 }
 function linhaAviso(v) {
   const atrasado = v.data && v.data < hojeISO() && !v.feito;
@@ -529,64 +704,73 @@ function linhaAviso(v) {
     <button class="marcar ${v.feito ? "feito" : ""}" data-acao="marcar-aviso" data-id="${esc(v.id)}" aria-label="${v.feito ? "Desmarcar" : "Marcar como feito"}">${v.feito ? "✓" : ""}</button>
     <div class="clicavel" data-acao="editar-aviso" data-id="${esc(v.id)}"><div class="t">${esc(v.texto)}</div>
     <div class="s">${atrasado ? '<strong style="color:var(--rep)">atrasado · </strong>' : ""}${dataCurta(v.data)}${v.disciplinaId ? " · " + esc(nomeDisc(v.disciplinaId)) : ""}</div></div>
-    ${chipDias(v.data)}</div>`;
+    <span></span></div>`;
+}
+
+function telaMaterias() {
+  const sub = S.subMat === "curso" ? "curso" : "periodo";
+  return `<div class="seg" role="group" aria-label="Ver"><button data-acao="sub" data-sub="periodo" aria-pressed="${sub === "periodo"}">Este período</button><button data-acao="sub" data-sub="curso" aria-pressed="${sub === "curso"}">Curso todo</button></div>`
+    + (sub === "curso" ? telaCurso() : telaPeriodo());
 }
 
 function telaPeriodo() {
   const cursando = ordenarPor([...S.discs.values()].filter((d) => d.situacao === "cursando"), (d) => d.nome);
-  let out = `<div class="secao-cab"><p class="fraco pequeno" style="margin:0">Notas de 0 a 10, uma casa decimal. Passa direto com média 6,0; de 4,0 a 5,9 vai para a VS.</p><button class="btn forte" data-acao="nova-disc" data-sit="cursando">+ Matéria</button></div>`;
-  if (!cursando.length) return out + `<div class="vazio">Nenhuma matéria marcada como “cursando”. Adicione as deste período ou mande a lista para o Claude.</div>` + rodape();
+  let out = `<div class="secao-cab"><h2>${cursando.length} ${cursando.length === 1 ? "matéria" : "matérias"}${S.perfil.semestreAtual ? " em " + esc(S.perfil.semestreAtual) : ""}</h2><button class="btn leve" data-acao="nova-disc" data-sit="cursando">${svgIco("mais")} Matéria</button></div>`;
+  if (!cursando.length) return out + `<div class="vazio">Nenhuma matéria marcada como “cursando”.</div>` + rodape();
   for (const d of cursando) {
     const r = situacaoDisc(d.id);
     const avs = ordenarPor(r.avs, (a) => (a.tipo === "vs" ? "z" : "") + (a.data || "9999"));
     out += `<article class="disc">
-      <div class="disc-cab"><div><div class="cod">${esc(d.codigo || "")}${d.cargaHoraria ? " · " + esc(d.cargaHoraria) + " h" : ""}${d.turma ? " · turma " + esc(d.turma) : ""}</div><h3>${esc(d.nome)}</h3>
-        <div class="pequeno fraco">${[d.professor ? "Prof. " + esc(d.professor) : "", esc(mostrarHorarios(d.horarios))].filter(Boolean).join(" · ")}</div></div>
-      <span class="pilula ${r.classe}">${r.rotulo}</span></div>
-      ${avs.length ? avs.map((a) => `<div class="aval linha clicavel" data-acao="editar-aval" data-id="${esc(a.id)}" style="grid-template-columns:auto 1fr auto">${a.nota == null ? chipDias(a.data) : `<span class="dmenos passou">nota</span>`}
-        <div><div class="t">${esc(a.nome)}${a.tipo === "vs" ? "" : ` <span class="fraco pequeno">peso ${esc(a.peso ?? 1)}</span>`}</div><div class="s">${dataCurta(a.data)}${a.conteudo ? " · " + esc(a.conteudo) : ""}</div></div>
-        <span class="nota ${a.nota == null ? "vazia" : ""}">${nota1(a.nota)}</span></div>`).join("") : ""}
-      <div class="disc-pe"><div class="media"><span class="rotulo">${r.media != null ? "Média parcial" : "Média até agora"}</span><span class="num" style="font-weight:600">${nota1(r.media ?? r.parcial)}</span></div><div class="pequeno">${esc(r.texto)}</div></div>
+      <div class="disc-cab">${iconeDisc(d)}<div><h3>${esc(d.nome)}</h3>
+        <div class="pequeno fraco">${[d.professor ? esc(d.professor) : "", esc(mostrarHorarios(d.horarios))].filter(Boolean).join(" · ")}</div></div>
+        <span class="pilula ${r.classe}">${r.rotulo}</span></div>
+      ${avs.length ? `<div class="lista">${avs.map((a) => `<div class="linha clicavel" data-acao="editar-aval" data-id="${esc(a.id)}">${a.nota == null ? chipDias(a.data) : `<span class="dmenos passou">feita</span>`}
+        <div><div class="t">${esc(a.nome)}${a.tipo === "vs" || Number(a.peso ?? 1) === 1 ? "" : ` <span class="fraco pequeno">peso ${esc(a.peso)}</span>`}</div><div class="s">${dataCurta(a.data)}</div></div>
+        <span class="nota ${a.nota == null ? "vazia" : ""}">${a.nota == null ? "—" : nota1(a.nota)}</span></div>`).join("")}</div>` : ""}
+      ${r.regulares.length ? `<div class="disc-pe"><div class="media"><span class="pequeno fraco">${r.media != null ? "Média" : "Média até agora"}</span><b>${nota1(r.media ?? r.parcial)}</b></div><div class="pequeno fraco">${esc(r.texto)}</div></div>` : `<div class="disc-pe"><p class="pequeno fraco">Nenhuma prova cadastrada.</p></div>`}
       <div class="disc-acoes"><button class="btn" data-acao="nova-aval" data-disc="${esc(d.id)}">+ Prova</button><button class="btn" data-acao="plano" data-disc="${esc(d.id)}">Plano</button><button class="btn" data-acao="editar-disc" data-id="${esc(d.id)}">Editar</button></div>
     </article>`;
   }
-  out += cartaoUff("Como você passa na matéria", `<ul class="info-linhas texto">
-    <li><strong>Média 6,0 ou mais</strong><span>Passa direto, se tiver ido a pelo menos 75% das aulas.</span></li>
-    <li><strong>Média de 4,0 a 5,9</strong><span>Faz a VS (verificação suplementar) e precisa tirar 6,0 nela.</span></li>
-    <li><strong>Média abaixo de 4,0</strong><span>Reprova, sem direito à VS.</span></li>
+  out += saiba("Como funciona a aprovação", `<ul class="info-linhas texto">
+    <li><strong>Média 6,0 ou mais</strong><span>Passa direto, com pelo menos 75% de presença.</span></li>
+    <li><strong>Média de 4,0 a 5,9</strong><span>Vai para a VS e precisa tirar 6,0 nela.</span></li>
+    <li><strong>Média abaixo de 4,0</strong><span>Reprova, sem VS.</span></li>
     <li><strong>Presença abaixo de 75%</strong><span>Reprova, qualquer que seja a nota.</span></li></ul>`,
-    "Fonte: Regulamento dos Cursos de Graduação da UFF (Res. CEP 001/2015), arts. 96 e 99.");
+    "Regulamento dos Cursos de Graduação da UFF (Res. CEP 001/2015), arts. 96 e 99.");
   return out + rodape();
 }
 
 function telaCurso() {
   const rc = resumoCurso();
   const pct = rc.chTotal ? Math.min(100, (rc.chAprov / rc.chTotal) * 100) : 0;
+  const fl = S.perfil.faltas || {};
   const f = S.filtroCurso;
   const todas = [...S.discs.values()].filter((d) => f === "todas" || d.situacao === f);
   const grupos = new Map();
   for (const d of todas) { const k = d.periodo ? Number(d.periodo) : 99; if (!grupos.has(k)) grupos.set(k, []); grupos.get(k).push(d); }
-  let out = `<section class="secao"><div class="secao-cab"><span class="rotulo">Carga horária cumprida</span><span class="num">${rc.chAprov} / ${rc.chTotal || "?"} h · ${Math.round(pct)}%</span></div>
+  let out = `<section class="cartao progresso"><span class="rotulo">Curso feito</span>
+    <div class="grande"><b>${Math.round(pct)}%</b><span class="fraco">${rc.chAprov} de ${rc.chTotal || "?"} h</span></div>
     <div class="barra" role="img" aria-label="${Math.round(pct)}% do curso"><i style="width:${pct}%"></i></div>
-    <div class="pequeno fraco">${rc.aprovadas} aprovadas · ${rc.cursando.length} cursando · ${rc.faltam} faltando · CR ${esc(rc.cr ?? "—")}</div>
-    ${S.perfil.faltas ? `<div class="lista">${[["Matérias obrigatórias", S.perfil.faltas.obrigatorias], ["Extensão", S.perfil.faltas.extensao], ["Optativas", S.perfil.faltas.optativas], ["Eletivas", S.perfil.faltas.eletivas], ["Atividades complementares", S.perfil.faltas.complementares]].map(([t, n]) => `<div class="linha" style="grid-template-columns:1fr auto"><div class="t">${t}</div><span class="num">${n ? "faltam " + n + " h" : "completo"}</span></div>`).join("")}</div>
-    <div class="pequeno fraco">Números do idUFF${S.perfil.atualizadoIduff ? ", lidos em " + esc(S.perfil.atualizadoIduff.split("-").reverse().join("/")) : ""}.</div>` : ""}</section>`;
-  out += cartaoUff("O que conta para se formar", `<ul class="info-linhas texto">
-    <li><strong>Matérias obrigatórias</strong><span>As do fluxograma. Faltam ${esc(S.perfil.faltas?.obrigatorias ?? "?")} h.</span></li>
-    <li><strong>Extensão (387 h)</strong><span>Projetos e ações da UFF voltados para a comunidade. Pelo menos 10% da carga do curso precisa ser de extensão.</span></li>
-    <li><strong>Optativas (150 h)</strong><span>Matérias que você escolhe numa lista do próprio currículo de Engenharia Química.</span></li>
-    <li><strong>Eletivas (30 h)</strong><span>Matérias de fora do seu currículo. Horas a mais de optativas também contam aqui.</span></li>
-    <li><strong>Atividades complementares (30 h)</strong><span>Atividades fora das aulas que a coordenação do curso aceita. Guarde os certificados na aba Certificados.</span></li></ul>`,
-    "Fonte: integralização do currículo no idUFF; extensão: Resolução CNE/CES nº 7/2018.");
-  out += `<div class="secao-cab"><div class="filtros" role="group" aria-label="Filtrar">${[["todas", "Todas"], ["aprovado", "Aprovadas"], ["cursando", "Cursando"], ["pendente", "Faltam"], ["reprovado", "Reprovadas"]].map(([k, t]) => `<button class="filtro" data-acao="filtro" data-f="${k}" aria-pressed="${f === k}">${t}</button>`).join("")}</div><button class="btn forte" data-acao="nova-disc">+ Matéria</button></div>`;
-  if (!S.discs.size) return out + `<div class="vazio">O currículo ainda não foi carregado. Ele vem do idUFF (currículo integralizado) e do fluxograma do curso.</div>` + rodape();
+    <p class="pequeno fraco">CR ${esc(rc.cr ?? "—")}${fl.obrigatorias ? ` · faltam ${fl.obrigatorias} h de matérias obrigatórias` : ""}</p></section>`;
+  if (S.perfil.faltas) out += `<div class="faltas">${[["Extensão", fl.extensao], ["Atividades complementares", fl.complementares], ["Optativas", fl.optativas], ["Eletivas", fl.eletivas]]
+    .map(([t, n]) => `<div class="falta"><b>${n ? "faltam " + n + " h" : "completo"}</b><span>${t}</span></div>`).join("")}</div>`;
+  out += saiba("O que conta para se formar", `<ul class="info-linhas texto">
+    <li><strong>Matérias obrigatórias</strong><span>As do fluxograma.</span></li>
+    <li><strong>Extensão (387 h)</strong><span>Vem da carga de extensão das matérias. As que faltam já completam.</span></li>
+    <li><strong>Optativas (150 h)</strong><span>Escolhidas na lista do currículo de Engenharia Química.</span></li>
+    <li><strong>Eletivas (30 h)</strong><span>Matérias de fora do currículo. Horas extras de optativas contam aqui.</span></li>
+    <li><strong>Atividades complementares (30 h)</strong><span>Certificados de palestras, visitas, monitoria… (aba Certificados).</span></li></ul>`,
+    `Números do idUFF${S.perfil.atualizadoIduff ? ", lidos em " + esc(S.perfil.atualizadoIduff.split("-").reverse().join("/")) : ""}.`);
+  out += `<div class="secao-cab" style="flex-wrap:nowrap"><div class="filtros" role="group" aria-label="Filtrar" style="flex:1 1 0;min-width:0">${[["todas", "Todas"], ["aprovado", "Aprovadas"], ["cursando", "Cursando"], ["pendente", "Faltam"]].map(([k, t]) => `<button class="filtro" data-acao="filtro" data-f="${k}" aria-pressed="${f === k}">${t}</button>`).join("")}</div><button class="btn leve" data-acao="nova-disc" aria-label="Nova matéria">${svgIco("mais")}</button></div>`;
+  if (!S.discs.size) return out + `<div class="vazio">O currículo ainda não foi carregado.</div>` + rodape();
   for (const k of [...grupos.keys()].sort((a, b) => a - b)) {
     const ds = ordenarPor(grupos.get(k), (d) => d.nome);
-    out += `<section class="periodo-grupo"><h2>${k === 99 ? "Optativas e sem período" : k + "º período"}</h2><div class="lista">${ds.map((d) => {
+    out += `<section class="periodo-grupo"><h2>${k === 99 ? "Optativas e outras" : k + "º período"}</h2><div class="lista">${ds.map((d) => {
       const [t, c] = SITUACOES[d.situacao] || SITUACOES.pendente;
-      return `<div class="linha clicavel linha-cod" data-acao="editar-disc" data-id="${esc(d.id)}"><span class="num pequeno fraco">${esc(d.codigo || "—")}</span>
-        <div><div class="t">${esc(d.nome)}</div><div class="s">${[d.cargaHoraria ? esc(d.cargaHoraria) + " h" : "", d.semestre ? esc(d.semestre) : "", d.notaFinal != null ? "nota " + nota1(d.notaFinal) + (d.vs != null ? " (VS " + nota1(d.vs) + ")" : "") : "", d.obs ? esc(d.obs) : "", d.requisito && d.situacao !== "aprovado" ? "requer " + esc(d.requisito) : ""].filter(Boolean).join(" · ")}</div></div>
-        <span class="pilula ${c}">${t}</span></div>`; }).join("")}</div></section>`;
+      const equiv = /equival/i.test(d.obs || "");
+      const sub = [d.cargaHoraria ? d.cargaHoraria + " h" : "", d.notaFinal != null ? "nota " + nota1(d.notaFinal) + (d.vs != null ? " (VS " + nota1(d.vs) + ")" : "") : equiv ? "por equivalência" : "", d.semestre || "", d.requisito && d.situacao !== "aprovado" ? "requer " + d.requisito : ""].filter(Boolean).join(" · ");
+      return `<div class="linha clicavel" data-acao="editar-disc" data-id="${esc(d.id)}">${iconeDisc(d, true)}
+        <div><div class="t">${esc(d.nome)}</div><div class="s">${esc(sub)}</div></div><span class="pilula ${c}">${t}</span></div>`; }).join("")}</div></section>`;
   }
   return out + rodape();
 }
@@ -598,25 +782,20 @@ function telaEstudo() {
   const hoje = todos.filter((v) => !v.feito && v.data === h);
   const semana = todos.filter((v) => !v.feito && v.data > h && v.data <= somaDias(h, 7));
   const depois = todos.filter((v) => !v.feito && (!v.data || v.data > somaDias(h, 7)));
-  const feitos = todos.filter((v) => v.feito).reverse().slice(0, 15);
-  let out = `<div class="secao-cab"><p class="fraco pequeno" style="margin:0">Cada prova vira uma sequência de revisões em dias diferentes. Os avisos de hoje aparecem na aba Hoje.</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-acao="novo-aviso">+ Aviso</button><button class="btn forte" data-acao="plano">Montar plano</button></div></div>`;
-  const bloco = (t, arr, vazio) => `<section class="secao"><h2>${t}</h2>${arr.length ? `<div class="lista">${arr.map(linhaAviso).join("")}</div>` : `<div class="vazio">${vazio}</div>`}</section>`;
-  if (atras.length) out += bloco("Atrasados", atras, "");
-  out += bloco("Hoje", hoje, "Nada para hoje.");
-  out += bloco("Próximos 7 dias", semana, "Nada marcado para a semana.");
-  if (depois.length) out += bloco("Mais adiante", depois, "");
-  if (feitos.length) out += bloco("Feitos recentemente", feitos, "");
-  out += `<section class="secao"><h2>Como estudar para prova</h2><div class="lista">
-    ${[["Tirar da memória", "Fechar o caderno e tentar resolver ou explicar. Errar e corrigir fixa mais do que reler."], ["Espaçar", "Várias sessões curtas em dias diferentes rendem mais que uma noite inteira na véspera."], ["Misturar tipos", "Alternar exercícios de assuntos diferentes treina a reconhecer qual método usar na prova."], ["Prova antiga cronometrada", "Dois ou três dias antes, simular a prova de verdade mostra onde ainda falta."]].map(([t, s]) => `<div class="linha" style="grid-template-columns:1fr"><div><div class="t">${t}</div><div class="s">${s}</div></div></div>`).join("")}
-  </div></section>`;
+  const feitos = todos.filter((v) => v.feito).reverse().slice(0, 10);
+  let out = `<section class="cartao"><h2>Plano de estudo por prova</h2><p class="pequeno fraco">Escolha uma prova e o app cria revisões em dias diferentes antes dela. Elas aparecem no Início no dia certo.</p>
+    <div class="acoes-folha"><button class="btn forte" data-acao="plano">Montar plano</button><button class="btn" data-acao="novo-aviso">${svgIco("mais")} Tarefa solta</button></div></section>`;
+  const bloco = (t, arr) => arr.length ? `<section class="secao"><h2>${t}</h2><div class="lista">${arr.map(linhaAviso).join("")}</div></section>` : "";
+  out += bloco("Atrasados", atras) + bloco("Hoje", hoje) + bloco("Próximos 7 dias", semana) + bloco("Mais adiante", depois) + bloco("Feitos", feitos);
+  if (!atras.length && !hoje.length && !semana.length && !depois.length) out += `<div class="vazio">Nenhuma revisão marcada.</div>`;
+  out += saiba("Como estudar melhor", `<ul class="info-linhas texto">
+    ${[["Tirar da memória", "Feche o caderno e tente resolver. Errar e corrigir fixa mais que reler."], ["Espaçar", "Sessões curtas em dias diferentes rendem mais que a véspera inteira."], ["Misturar", "Alternar tipos de exercício treina a reconhecer o método certo."], ["Prova antiga", "Dois ou três dias antes, simule a prova no tempo."]].map(([t, s]) => `<li><strong>${t}</strong><span>${s}</span></li>`).join("")}</ul>`);
   return out + rodape();
 }
 
 function rodape() {
-  return `<footer class="rodape-uff">
-    <p class="rodape">App pessoal de estudo. Não é um sistema oficial da UFF: notas e situação oficiais ficam no idUFF. <button class="btn" style="padding:3px 8px;font-size:0.8rem" data-acao="perfil">Ajustes</button></p>
-    <p class="rodape" style="margin:0">Versão do app: <span class="num">${VERSAO_APP}</span></p></footer>`;
+  return `<footer class="rodape-uff"><button class="btn leve" data-acao="perfil">Ajustes e cópia de segurança</button>
+    <p class="rodape">App pessoal de estudo, não é sistema oficial da UFF · Versão do app: ${VERSAO_APP}</p></footer>`;
 }
 
 /* ---------- folha de edição ---------- */
@@ -983,7 +1162,7 @@ function folhaReceber() {
     salvar: async (f) => {
       const m = await receberPacote(f.codigo);
       if (!m.startsWith("Pronto")) throw m;
-      S.aba = "certificados"; render();
+      irPara("certificados");
       mostrarAviso(m, true);
     },
   });
@@ -996,7 +1175,7 @@ document.addEventListener("change", async (ev) => {
   if (!arq) return;
   mostrarAviso("Abrindo o arquivo…", true);
   const m = await importarCopia(arq);
-  S.aba = "certificados"; render();
+  irPara("certificados");
   mostrarAviso(m, m.startsWith("Pronto"));
 });
 // Extensão vem quase toda das matérias: o idUFF mostra a carga de extensão (CHE) de cada uma
@@ -1016,56 +1195,58 @@ function blocoExtensao() {
   return `<div class="numero" style="gap:6px"><span class="rotulo">Extensão</span><span class="v">${e.feitas}<small class="pequeno fraco" style="font-family:var(--f-texto);font-weight:600">&nbsp;h de ${total} h</small></span>
     <div class="barra" role="img" aria-label="${Math.round(pct)}%"><i style="width:${pct}%"></i></div><span class="pequeno fraco">vem das matérias</span></div>`;
 }
+function anel(valor, total, rotulo, cls) {
+  const r = 22, c = 2 * Math.PI * r, pct = total ? Math.min(1, valor / total) : 0;
+  return `<div class="anel ${cls || ""}"><svg viewBox="0 0 54 54" aria-hidden="true"><circle class="fundo-anel" cx="27" cy="27" r="${r}"/><circle class="cheio" cx="27" cy="27" r="${r}" stroke-dasharray="${(c * pct).toFixed(1)} ${c.toFixed(1)}"/></svg>
+    <div><b>${umaCasa(valor)}<small> / ${total} h</small></b><span>${rotulo}</span></div></div>`;
+}
+function iconeCert(c) {
+  const id = c.cat?.id || "", g = c.cat?.grupo || "";
+  const t = id === "palestra" || id === "evento-cientifico" ? "mic" : id === "visita-tecnica" ? "fabrica" : /representacao|coletivos|empresa-junior|voluntario/.test(id) ? "pessoas"
+    : /apresentacao|artigo|resumo/.test(id) ? "palco" : g === "Ensino" ? "livro" : g === "Gestão" ? "pessoas" : g === "Extensão" ? "est" : "medalha";
+  return icone(t, true);
+}
 function telaCertificados() {
   const lista = certificadosContados();
   const tab = tabelaHoras();
   const faltas = S.perfil.faltas || {};
   const soma = (k) => lista.filter((c) => c.contaPara === k).reduce((s, c) => s + c.valida, 0);
-  const bloco = (k, meta) => {
-    const h = soma(k);
-    const pct = meta ? Math.min(100, (h / meta) * 100) : 0;
-    return `<div class="numero" style="gap:6px"><span class="rotulo">${PARA[k]}</span><span class="v">${umaCasa(h)}<small class="pequeno fraco" style="font-family:var(--f-texto);font-weight:600">&nbsp;h${meta ? ` de ${meta} h` : ""}</small></span>
-      ${meta ? `<div class="barra" role="img" aria-label="${Math.round(pct)}%"><i style="width:${pct}%"></i></div>` : ""}</div>`;
-  };
-  let out = `<section class="secao"><div class="numeros" style="grid-template-columns:repeat(2,minmax(0,1fr))">${bloco("complementares", faltas.complementares)}${blocoExtensao()}</div>
-    <p class="pequeno fraco" style="margin:0">${tab ? "Cada certificado vira horas equivalentes pela tabela do curso, e cada tipo de atividade tem um máximo." : "Somando as horas de cada certificado."} A meta é o que o idUFF diz que ainda falta.</p></section>`;
-  out += `<!--O-QUE-FALTA--><div class="secao-cab"><h2>Meus certificados</h2><button class="btn forte" data-acao="novo-cert">+ Certificado</button></div>
-    <div class="acoes-folha"><button class="btn" data-acao="receber-certs">Receber certificados (código)</button><label class="btn" for="cert-importar" style="cursor:pointer">Abrir arquivo</label><input type="file" id="cert-importar" hidden></div>`;
-  if (!lista.length) out += `<div class="vazio">Nenhum certificado guardado ainda. Toque em “+ Certificado”, escolha o PDF (ou a foto) e diga quantas horas ele vale.</div>`;
-  for (const k of ["complementares", "extensao", "outro"]) {
-    const grupo = lista.filter((c) => (c.contaPara || "outro") === k).reverse();
-    if (!grupo.length) continue;
-    out += `<section class="secao"><h2 style="font-size:1rem">${PARA[k]}</h2><div class="lista">${grupo.map((c) => `
-      <div class="linha clicavel" data-acao="${c.arquivoNome ? "ver-cert" : "editar-cert"}" data-id="${esc(c.id)}"><span class="dmenos">${umaCasa(c.valida)} h</span>
-        <div><div class="t">${esc(c.titulo)}</div><div class="s">${[c.data ? ddmm(c.data) + "/" + c.data.slice(0, 4) : "", c.cat ? esc(c.cat.nome) : tab ? '<strong style="color:var(--vs)">escolha o tipo de atividade</strong>' : esc(c.tipoAtividade || ""), c.instituicao ? esc(c.instituicao) : ""].filter(Boolean).join(" · ")}</div>
-        ${c.cat ? `<div class="s">${c.valida < c.bruta ? `Valeria ${umaCasa(c.bruta)} h, mas o máximo do tipo é ${c.cat.max} h. ` : ""}Tipo: ${umaCasa(c.usadoCat)} de ${c.cat.max} h usadas.</div>` : ""}</div>
-        ${c.arquivoNome ? `<button class="btn" data-acao="ver-cert" data-id="${esc(c.id)}" aria-label="Ver o certificado ${esc(c.titulo)}">Ver</button>` : `<button class="btn" data-acao="editar-cert" data-id="${esc(c.id)}">Pôr PDF</button>`}</div>`).join("")}</div></section>`;
-  }
+  const metaAC = Number(faltas.complementares) || 0;
+  const ext = extensaoPelasMaterias();
+  let out = `<div class="aneis">${anel(soma("complementares"), metaAC, "Complementares", "")}${anel(ext.feitas, ext.feitas + ext.faltam, "Extensão", "ext")}</div>`;
   if (tab) {
     const usadoPor = new Map();
     for (const c of lista) if (c.cat) usadoPor.set(c.cat.id, (usadoPor.get(c.cat.id) || 0) + c.valida);
     const resta = (t) => Math.max(0, t.max - (usadoPor.get(t.id) || 0));
-    const metaAC = Number(faltas.complementares) || 0;
     const faltaAC = Math.max(0, metaAC - soma("complementares"));
-    const cabem = tab.categorias.filter((t) => resta(t) > 0).sort((a, b) => b.he - a.he || resta(b) - resta(a)).slice(0, 7);
+    const cabem = tab.categorias.filter((t) => resta(t) > 0 && t.grupo !== "Extensão").sort((a, b) => b.he - a.he || resta(b) - resta(a));
     const cheios = tab.categorias.filter((t) => resta(t) === 0);
-    const ext = extensaoPelasMaterias();
-    const cartaoFalta = cartaoUff("O que falta", `
-      <p style="margin:0">${metaAC ? (faltaAC ? `Atividades complementares: <strong>faltam ${umaCasa(faltaAC)}&nbsp;h</strong> das ${metaAC}&nbsp;h.` : `Atividades complementares: <strong>as ${metaAC} h já estão cobertas</strong> pelos certificados guardados.`) : ""}</p>
-      ${faltaAC ? `<p class="pequeno" style="margin:0">Onde ainda cabem mais horas:</p>${`<ul class="info-linhas">${cabem.map((t) => `<li><span class="quando">até ${umaCasa(resta(t))} h</span><span>${esc(t.nome)} <span class="fraco">· ${t.he} h ${esc(t.unidade)}</span></span></li>`).join("")}</ul>`}` : ""}
-      ${cheios.length ? `<p class="pequeno" style="margin:0">Já no máximo: ${cheios.map((t) => esc(t.nome)).join(", ")}. Certificados novos desses tipos não somam mais.</p>` : ""}
-      ${ext.faltam ? `<p class="pequeno" style="margin:0"><strong>Extensão:</strong> faltam ${ext.faltam} h. As matérias obrigatórias que você ainda vai cursar somam ${ext.nasMaterias} h de extensão${ext.nasMaterias >= ext.faltam ? ", então terminando o currículo a extensão fecha" : ""}.</p>` : ""}`,
-      "Faltas: idUFF. Valores: tabela de horas equivalentes do curso.");
-    out = out.replace("<!--O-QUE-FALTA-->", cartaoFalta);
+    out += metaAC ? `<section class="cartao"><h2>${faltaAC ? `Faltam ${umaCasa(faltaAC)}&nbsp;h de complementares` : "Complementares completas"}</h2>
+      ${faltaAC ? `<p class="pequeno fraco">O que mais rende agora:</p><ul class="info-linhas">${cabem.slice(0, 3).map((t) => `<li><span class="quando">+${t.he} h</span><span>${esc(t.nome)} <span class="fraco">${esc(t.unidade)}</span></span></li>`).join("")}</ul>` : ""}
+      ${cheios.length ? `<p class="pequeno fraco">Já no máximo: ${cheios.map((t) => esc(t.nome.replace(/^Participação em /, ""))).join(", ")}.</p>` : ""}</section>` : "";
+  }
+  out += `<div class="secao-cab"><h2>Meus certificados</h2><button class="btn forte" data-acao="novo-cert">${svgIco("mais")} Certificado</button></div>`;
+  if (!lista.length) out += `<div class="vazio">Nenhum certificado guardado ainda.</div>`;
+  for (const k of ["complementares", "extensao", "outro"]) {
+    const grupo = lista.filter((c) => (c.contaPara || "outro") === k).reverse();
+    if (!grupo.length) continue;
+    out += `<section class="periodo-grupo"><h2>${PARA[k]}</h2><div class="lista">${grupo.map((c) => `
+      <div class="linha clicavel" data-acao="${c.arquivoNome ? "ver-cert" : "editar-cert"}" data-id="${esc(c.id)}">${iconeCert(c)}
+        <div><div class="t">${esc(c.titulo)}</div><div class="s">${[c.cat ? esc(c.cat.nome.replace(/^Participação (em|como) /, "")) : tab ? '<strong style="color:var(--vs)">escolha o tipo</strong>' : esc(c.tipoAtividade || ""), c.data ? ddmm(c.data) + "/" + c.data.slice(2, 4) : "", c.valida < c.bruta ? "acima do máximo" : ""].filter(Boolean).join(" · ")}</div></div>
+        <span class="dmenos">${umaCasa(c.valida)} h</span></div>`).join("")}</div></section>`;
+  }
+  out += `<div class="acoes-folha"><button class="btn" data-acao="receber-certs">Receber do Claude (código)</button><label class="btn" for="cert-importar" style="cursor:pointer">Abrir arquivo</label><input type="file" id="cert-importar" hidden></div>`;
+  if (tab) {
     const grupos = [...new Set(tab.categorias.map((t) => t.grupo))];
-    out += cartaoUff("Quanto vale cada atividade", `<p class="pequeno" style="margin:0">${esc(tab.observacao || "")}</p>
+    out += saiba("Quanto vale cada atividade", `<p class="pequeno fraco">${esc(tab.observacao || "")}</p>
       ${grupos.map((g) => `<details class="tabela-he"><summary>${esc(g)}</summary><ul class="info-linhas texto">${tab.categorias.filter((t) => t.grupo === g).map((t) => `<li><strong>${esc(t.nome)}</strong><span>${t.he} h ${esc(t.unidade)} · máximo ${t.max} h</span></li>`).join("")}</ul></details>`).join("")}`,
       "Fonte: " + esc(tab.fonte));
   }
-  out += cartaoUff("Onde os certificados ficam guardados", `<ul class="info-linhas texto">
-    <li><strong>Neste celular</strong><span>Os PDFs ficam guardados dentro do app, neste aparelho. Ninguém mais vê, nem quem abre o site.</span></li>
-    <li><strong>Para não perder</strong><span>De vez em quando, vá em Ajustes e toque em “Salvar cópia”: o arquivo salvo leva os certificados junto.</span></li>
-    <li><strong>Para valer no idUFF</strong><span>As horas só contam oficialmente depois que a coordenação lança. Este app é o seu controle.</span></li></ul>`, tab?.fonte ? "Tabela de horas: " + esc(tab.fonte) : "");
+  out += saiba("Onde os certificados ficam", `<ul class="info-linhas texto">
+    <li><strong>Neste celular</strong><span>Os PDFs ficam dentro do app, só neste aparelho. Quem abre o site não vê.</span></li>
+    <li><strong>Para não perder</strong><span>Em Ajustes, “Salvar cópia” leva os certificados junto.</span></li>
+    <li><strong>Extensão</strong><span>Fecha com as matérias: faltam ${ext.faltam} h e as que você ainda vai cursar têm ${ext.nasMaterias} h.</span></li>
+    <li><strong>Oficial</strong><span>As horas valem depois que a coordenação lança no idUFF.</span></li></ul>`);
   return out + rodape();
 }
 function folhaCert(id) {
@@ -1215,6 +1396,8 @@ document.addEventListener("click", async (ev) => {
   if (!alvo || alvo.closest("dialog")) return;
   const { acao, id } = alvo.dataset;
   if (acao === "filtro") { S.filtroCurso = alvo.dataset.f; render(); return; }
+  if (acao === "sub") { S.subMat = alvo.dataset.sub; try { localStorage.setItem("caderneta-sub", S.subMat); } catch {} render(); return; }
+  if (acao === "ir") { irPara(alvo.dataset.ir); return; }
   if (acao === "dia") { S.diaSel = alvo.dataset.d; if (S.diaSel.slice(0, 7) !== S.mes) S.mes = S.diaSel.slice(0, 7); render(); return; }
   if (acao === "mes") {
     const passo = Number(alvo.dataset.passo);
@@ -1244,13 +1427,13 @@ document.addEventListener("click", async (ev) => {
     finally { alvo.disabled = false; }
   }
 });
-document.querySelectorAll(".aba").forEach((b) => b.addEventListener("click", () => {
-  S.aba = b.dataset.aba;
-  document.querySelectorAll(".aba").forEach((x) => x.dataset.aba === S.aba ? x.setAttribute("aria-current", "page") : x.removeAttribute("aria-current"));
-  try { localStorage.setItem("caderneta-aba", S.aba); } catch {}
-  render(); window.scrollTo(0, 0);
-}));
-try { const a = localStorage.getItem("caderneta-aba"); if (a && TITULOS[a]) S.aba = a; } catch {}
+document.querySelectorAll(".aba").forEach((b) => b.addEventListener("click", () => irPara(b.dataset.aba)));
+try {
+  let a = localStorage.getItem("caderneta-aba");
+  if (a === "periodo" || a === "curso") { S.subMat = a; a = "materias"; }
+  if (a && TITULOS[a]) S.aba = a;
+  const sub = localStorage.getItem("caderneta-sub"); if (sub) S.subMat = sub;
+} catch {}
 document.querySelectorAll(".aba").forEach((x) => x.dataset.aba === S.aba ? x.setAttribute("aria-current", "page") : x.removeAttribute("aria-current"));
 
 /* ---------- dados: o arquivo do site + o que você mudou neste aparelho ---------- */
