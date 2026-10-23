@@ -1,5 +1,5 @@
 // Caderneta UFF: guarda o app para abrir sem internet. Página e dados vêm primeiro da rede; o resto, do cache.
-const CACHE = "caderneta-uff-1";
+const CACHE = "caderneta-uff-2";
 self.addEventListener("install", (e) => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["./", "index.html", "manifest.webmanifest", "dados/caderneta.json"]))); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k.startsWith("caderneta-uff-") && k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", (e) => {

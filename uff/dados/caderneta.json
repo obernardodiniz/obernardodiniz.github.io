@@ -16,7 +16,9 @@
    "optativas": 15
   },
   "percentualIduff": "54,73%",
-  "semestreAtual": "2026.2"
+  "semestreAtual": "2026.2",
+  "inicioSemestre": "2026-08-03",
+  "fimSemestre": "2026-12-11"
  },
  "disciplinas": {
   "ELETIVA": {
@@ -1050,5 +1052,88 @@
  },
  "avaliacoes": {},
  "avisos": {},
- "eventos": {}
+ "eventos": {},
+ "calendarioUff": {
+  "fonte": "Resolução CEPEx/UFF nº 5.309/2025 (calendário 2026) e nº 5.581/2026 (feriados)",
+  "datas": [
+   {
+    "data": "2026-08-03",
+    "titulo": "Começo das aulas de 2026.2",
+    "tipo": "semestre"
+   },
+   {
+    "data": "2026-08-03",
+    "fim": "2026-08-18",
+    "titulo": "Prazo para pedir ajustes no plano de estudos (SolicitaUFF)",
+    "tipo": "prazo"
+   },
+   {
+    "data": "2026-08-03",
+    "fim": "2026-09-17",
+    "titulo": "Prazo para trancar a matrícula",
+    "tipo": "prazo"
+   },
+   {
+    "data": "2026-09-07",
+    "titulo": "Independência do Brasil · sem aula",
+    "tipo": "feriado"
+   },
+   {
+    "data": "2026-09-17",
+    "titulo": "Último dia para cancelar matéria (SolicitaUFF)",
+    "tipo": "prazo"
+   },
+   {
+    "data": "2026-10-12",
+    "titulo": "Nossa Senhora Aparecida · sem aula",
+    "tipo": "feriado"
+   },
+   {
+    "data": "2026-10-15",
+    "titulo": "Dia do Professor · sem aula",
+    "tipo": "feriado"
+   },
+   {
+    "data": "2026-10-28",
+    "titulo": "Dia do Servidor Público · ponto facultativo, sem aula",
+    "tipo": "feriado"
+   },
+   {
+    "data": "2026-11-02",
+    "titulo": "Finados · sem aula",
+    "tipo": "feriado"
+   },
+   {
+    "data": "2026-11-15",
+    "titulo": "Proclamação da República",
+    "tipo": "feriado"
+   },
+   {
+    "data": "2026-11-20",
+    "titulo": "Consciência Negra · sem aula",
+    "tipo": "feriado"
+   },
+   {
+    "data": "2026-11-27",
+    "fim": "2026-12-17",
+    "titulo": "Professores lançam as notas no sistema",
+    "tipo": "prazo"
+   },
+   {
+    "data": "2026-12-11",
+    "titulo": "Fim das aulas de 2026.2 (inclui reposição e VS)",
+    "tipo": "semestre"
+   },
+   {
+    "data": "2026-12-24",
+    "titulo": "Véspera de Natal · ponto facultativo",
+    "tipo": "feriado"
+   },
+   {
+    "data": "2026-12-25",
+    "titulo": "Natal",
+    "tipo": "feriado"
+   }
+  ]
+ }
 }

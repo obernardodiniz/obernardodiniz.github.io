@@ -209,6 +209,27 @@ dialog::backdrop { background: rgba(10, 16, 30, 0.5); }
 .secao-cab { align-items: center; }
 .secao-cab > p { flex: 1 1 220px; }
 .disc-acoes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* marca da UFF: o arquivo oficial vira máscara, pintada com a cor do tema */
+.marca { display: grid; gap: 4px; }
+.logo-uff { display: block; width: 118px; }
+.logo-uff img { display: block; width: 100%; height: auto; }
+.info { background: var(--uff-suave); border-radius: 12px; padding: 14px; display: grid; gap: 8px; }
+.info-cab { display: flex; align-items: center; gap: 10px; }
+.info-cab .logo-uff { width: 54px; flex: none; }
+.info-cab h2 { font-size: 1rem; }
+.info-linhas { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.info-linhas li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.info-linhas .quando { font-family: var(--f-num); font-size: 0.8rem; font-weight: 600; color: var(--uff); white-space: nowrap; }
+.info-linhas.texto li { grid-template-columns: 1fr; gap: 2px; }
+.info-linhas strong { font-weight: 700; }
+.fonte { font-size: 0.78rem; color: var(--tinta-2); }
+.rodape-uff { display: grid; gap: 8px; justify-items: start; padding-top: 6px; border-top: 1px solid var(--linha); }
+.rodape-uff .logo-uff { width: 64px; opacity: 0.7; }
+.rodape-uff .rodape { margin: 0; }
+.c-uff { background: transparent; box-shadow: inset 0 0 0 2px var(--tinta-2); }
+.dia.sem-aula .n { color: var(--tinta-2); text-decoration: line-through; }
+.dia.hoje.sem-aula .n { text-decoration: none; }
 .disc-acoes .btn { text-align: center; }
 .linha .pilula, .linha .nota { justify-self: end; }
 .numero { align-content: start; }
@@ -218,8 +239,9 @@ dialog::backdrop { background: rgba(10, 16, 30, 0.5); }
 
 <div class="pagina" id="app">
   <header class="topo">
-    <div>
-      <div class="rotulo" id="curso-nome">UFF · Graduação</div>
+    <div class="marca">
+      <a class="logo-uff" href="https://www.uff.br/" target="_blank" rel="noopener"><picture><source srcset="img/logo-uff-branco.svg" media="(prefers-color-scheme: dark)"><img src="img/logo-uff.svg" alt="UFF – Universidade Federal Fluminense" width="312" height="94"></picture></a>
+      <div class="rotulo" id="curso-nome">Graduação</div>
       <h1 id="titulo-aba">Hoje</h1>
     </div>
     <span class="sem" id="semestre">—</span>
@@ -328,23 +350,59 @@ function dentroDoSemestre(d) {
   const { inicioSemestre: i, fimSemestre: f } = S.perfil;
   return (!i || d >= i) && (!f || d <= f);
 }
+/* calendário oficial da UFF (vem no arquivo de dados do site) */
+const datasUff = () => (typeof BASE !== "undefined" && BASE.calendarioUff?.datas) || [];
+const fonteUff = () => (typeof BASE !== "undefined" && BASE.calendarioUff?.fonte) || "";
+const semAula = (d) => datasUff().some((x) => x.tipo === "feriado" && x.data === d);
+function uffNoDia(d) {
+  const out = [];
+  for (const x of datasUff()) {
+    if (x.data === d) out.push(x.fim ? `${x.titulo}: começa hoje, vai até ${dataCurta(x.fim)}` : x.titulo);
+    else if (x.fim === d) out.push(`${x.titulo}: termina hoje`);
+  }
+  return out;
+}
 function itensDoDia(d) {
   const out = [];
   const dow = deISO(d).getDay();
+  for (const t of uffNoDia(d)) out.push({ cor: "c-uff", hora: "UFF", titulo: t, sub: "Calendário oficial da UFF", acao: "", id: "" });
   for (const a of S.avals.values()) if (a.data === d) out.push({ cor: "c-prova", hora: a.hora || "", titulo: `${a.nome} · ${nomeDisc(a.disciplinaId)}`, sub: a.nota != null ? "nota " + nota1(a.nota) : (a.conteudo || "Prova"), acao: "editar-aval", id: a.id });
   for (const e of S.eventos.values()) {
     const repete = e.repeteAte && d >= e.data && d <= e.repeteAte && diasAte(d) - diasAte(e.data) >= 0 && (diasAte(d) - diasAte(e.data)) % 7 === 0;
     if (e.data === d || repete) out.push({ cor: e.categoria === "externo" ? "c-ext" : "c-facul", hora: e.hora || "", titulo: e.titulo, sub: [e.horaFim ? "até " + e.horaFim : "", e.local, e.categoria === "externo" ? "Fora da faculdade" : "Faculdade"].filter(Boolean).join(" · "), acao: "editar-evento", id: e.id });
   }
-  if (dentroDoSemestre(d)) for (const disc of S.discs.values()) {
+  if (dentroDoSemestre(d) && !semAula(d)) for (const disc of S.discs.values()) {
     if (disc.situacao !== "cursando") continue;
     for (const h of disc.horarios || []) if (h.dia === dow) out.push({ cor: "c-facul", hora: h.inicio, titulo: `Aula · ${disc.nome}`, sub: [`até ${h.fim}`, disc.professor, disc.turma ? "turma " + disc.turma : ""].filter(Boolean).join(" · "), acao: "editar-disc", id: disc.id, aula: true });
   }
   for (const v of S.avisos.values()) if (v.data === d && !v.feito) out.push({ cor: "c-estudo", hora: "", titulo: v.texto, sub: v.disciplinaId ? "Estudo · " + nomeDisc(v.disciplinaId) : "Estudo", acao: "editar-aviso", id: v.id });
-  return out.sort((a, b) => (a.hora || "99") < (b.hora || "99") ? -1 : (a.hora || "99") > (b.hora || "99") ? 1 : 0);
+  const chave = (i) => (i.cor === "c-uff" ? "00" : i.hora || "99");
+  return out.sort((a, b) => (chave(a) < chave(b) ? -1 : chave(a) > chave(b) ? 1 : 0));
+}
+const ddmm = (s) => String(s).split("-").reverse().slice(0, 2).join("/");
+const logoUff = () => `<span class="logo-uff"><picture><source srcset="img/logo-uff-branco.svg" media="(prefers-color-scheme: dark)"><img src="img/logo-uff.svg" alt="" width="312" height="94"></picture></span>`;
+function cartaoUff(titulo, corpo, fonte) {
+  return `<section class="info"><div class="info-cab">${logoUff()}<h2>${titulo}</h2></div>${corpo}${fonte ? `<div class="fonte">${fonte}</div>` : ""}</section>`;
+}
+function listaDatasUff(itens) {
+  const h = hojeISO();
+  return `<ul class="info-linhas">${itens.map((x) => {
+    const quando = x.fim ? (x.data <= h ? "até " + ddmm(x.fim) : `${ddmm(x.data)}–${ddmm(x.fim)}`) : ddmm(x.data);
+    const passou = (x.fim || x.data) < h;
+    return `<li${passou ? ' style="opacity:.55"' : ""}><span class="quando">${quando}</span><span>${esc(x.titulo)}</span></li>`;
+  }).join("")}</ul>`;
+}
+function cartaoCalendarioHoje() {
+  const h = hojeISO();
+  const chave = (x) => (x.data >= h ? x.data : x.fim);
+  const prox = datasUff().filter((x) => (x.fim || x.data) >= h).sort((a, b) => (chave(a) < chave(b) ? -1 : 1)).slice(0, 3);
+  const fim = S.perfil.fimSemestre;
+  if (!prox.length && !fim) return "";
+  const resta = fim && fim >= h ? `<p style="margin:0">Faltam <strong>${diasAte(fim)} dias</strong> para o fim das aulas, em ${dataCurta(fim).replace(/ /g, " ")}.</p>` : "";
+  return cartaoUff("Calendário da UFF", resta + listaDatasUff(prox), "Fonte: " + esc(fonteUff()));
 }
 function linhaAgenda(i) {
-  return `<div class="linha clicavel" data-acao="${i.acao}" data-id="${esc(i.id)}"><span class="hora">${esc(i.hora || "—")}</span>
+  return `<div class="linha ${i.acao ? "clicavel" : ""}" ${i.acao ? `data-acao="${i.acao}" data-id="${esc(i.id)}"` : ""}><span class="hora">${esc(i.hora || "—")}</span>
     <div><div class="t"><span class="ponto ${i.cor}" style="display:inline-block;margin-right:6px;vertical-align:1px"></span>${esc(i.titulo)}</div><div class="s">${esc(i.sub)}</div></div><span></span></div>`;
 }
 function resumoCurso() {
@@ -363,7 +421,7 @@ const TITULOS = { hoje: "Hoje", agenda: "Agenda", periodo: "Este período", curs
 function render() {
   $("#titulo-aba").textContent = TITULOS[S.aba];
   $("#semestre").textContent = S.perfil.semestreAtual || "semestre —";
-  $("#curso-nome").textContent = S.perfil.curso ? `UFF · ${S.perfil.curso}` : "UFF · Graduação";
+  $("#curso-nome").textContent = S.perfil.curso || "Graduação";
   const el = $("#conteudo");
   el.innerHTML = ({ hoje: telaHoje, agenda: telaAgenda, periodo: telaPeriodo, curso: telaCurso, estudo: telaEstudo })[S.aba]();
 }
@@ -383,18 +441,19 @@ function telaAgenda() {
     const di = iso(d);
     const itens = itensDoDia(di);
     const cores = [...new Set(itens.map((i) => i.cor))].slice(0, 4);
-    grade += `<button class="dia ${d.getMonth() !== mes - 1 ? "fora" : ""} ${di === h ? "hoje" : ""}" data-acao="dia" data-d="${di}" aria-pressed="${di === S.diaSel}" aria-label="${d.getDate()} de ${NOMES_MES[d.getMonth()]}, ${itens.length} itens">
+    grade += `<button class="dia ${d.getMonth() !== mes - 1 ? "fora" : ""} ${di === h ? "hoje" : ""} ${semAula(di) ? "sem-aula" : ""}" data-acao="dia" data-d="${di}" aria-pressed="${di === S.diaSel}" aria-label="${d.getDate()} de ${NOMES_MES[d.getMonth()]}, ${itens.length} itens">
       <span class="n">${d.getDate()}</span><span class="pontos">${cores.map((c) => `<i class="ponto ${c}"></i>`).join("")}</span></button>`;
   }
   const itensSel = itensDoDia(S.diaSel);
   return `<section class="secao">
     <div class="mes-cab"><h2>${NOMES_MES[mes - 1]} ${ano}</h2><div class="mes-nav"><button class="btn" data-acao="mes" data-passo="-1" aria-label="Mês anterior">‹</button><button class="btn" data-acao="mes" data-passo="0">Hoje</button><button class="btn" data-acao="mes" data-passo="1" aria-label="Próximo mês">›</button></div></div>
     <div class="cal">${grade}</div>
-    <div class="legenda"><span><i class="ponto c-prova"></i>Prova</span><span><i class="ponto c-facul"></i>Aula e faculdade</span><span><i class="ponto c-ext"></i>Fora da faculdade</span><span><i class="ponto c-estudo"></i>Estudo</span></div>
+    <div class="legenda"><span><i class="ponto c-prova"></i>Prova</span><span><i class="ponto c-facul"></i>Aula e faculdade</span><span><i class="ponto c-ext"></i>Fora da faculdade</span><span><i class="ponto c-estudo"></i>Estudo</span><span><i class="ponto c-uff"></i>Data da UFF</span></div>
   </section>
   <section class="secao"><div class="secao-cab"><h2>${dataCurta(S.diaSel)}</h2><button class="btn forte" data-acao="novo-evento">+ Compromisso</button></div>
     ${itensSel.length ? `<div class="lista">${itensSel.map(linhaAgenda).join("")}</div>` : `<div class="vazio">Dia livre. Toque em “+ Compromisso” para marcar algo da faculdade ou de fora.</div>`}
-  </section>` + rodape();
+  </section>
+  ${datasUff().length ? cartaoUff(`Datas oficiais de ${esc(S.perfil.semestreAtual || "2026.2")}`, listaDatasUff(datasUff()) + `<p class="pequeno" style="margin:0">Nos feriados e pontos facultativos não há aula: o calendário já tira as aulas desses dias.</p>`, "Fonte: " + esc(fonteUff())) : ""}` + rodape();
 }
 
 function telaHoje() {
@@ -420,6 +479,7 @@ function telaHoje() {
     <div class="numero"><span class="rotulo">Curso feito</span><span class="v">${rc.chTotal ? Math.round((rc.chAprov / rc.chTotal) * 100) + "%" : "—"}</span><span class="pequeno fraco">${rc.chAprov} de ${rc.chTotal || "?"} h</span></div>
     <div class="numero"><span class="rotulo">Cursando</span><span class="v">${rc.cursando.length}</span><span class="pequeno fraco">matérias</span></div>
   </section>`;
+  out += cartaoCalendarioHoje();
   const agendaHoje = itensDoDia(h).filter((i) => i.cor !== "c-estudo");
   out += `<section class="secao"><div class="secao-cab"><h2>Hoje na agenda</h2><button class="btn" data-acao="novo-evento">+ Compromisso</button></div>`;
   out += agendaHoje.length ? `<div class="lista">${agendaHoje.map(linhaAgenda).join("")}</div>` : `<div class="vazio">Nenhuma aula ou compromisso hoje.</div>`;
@@ -465,6 +525,12 @@ function telaPeriodo() {
       <div class="disc-acoes"><button class="btn" data-acao="nova-aval" data-disc="${esc(d.id)}">+ Prova</button><button class="btn" data-acao="plano" data-disc="${esc(d.id)}">Plano</button><button class="btn" data-acao="editar-disc" data-id="${esc(d.id)}">Editar</button></div>
     </article>`;
   }
+  out += cartaoUff("Como você passa na matéria", `<ul class="info-linhas texto">
+    <li><strong>Média 6,0 ou mais</strong><span>Passa direto, se tiver ido a pelo menos 75% das aulas.</span></li>
+    <li><strong>Média de 4,0 a 5,9</strong><span>Faz a VS (verificação suplementar) e precisa tirar 6,0 nela.</span></li>
+    <li><strong>Média abaixo de 4,0</strong><span>Reprova, sem direito à VS.</span></li>
+    <li><strong>Presença abaixo de 75%</strong><span>Reprova, qualquer que seja a nota.</span></li></ul>`,
+    "Fonte: Regulamento dos Cursos de Graduação da UFF (Res. CEP 001/2015), arts. 96 e 99.");
   return out + rodape();
 }
 
@@ -480,6 +546,13 @@ function telaCurso() {
     <div class="pequeno fraco">${rc.aprovadas} aprovadas · ${rc.cursando.length} cursando · ${rc.faltam} faltando · CR ${esc(rc.cr ?? "—")}</div>
     ${S.perfil.faltas ? `<div class="lista">${[["Matérias obrigatórias", S.perfil.faltas.obrigatorias], ["Extensão", S.perfil.faltas.extensao], ["Optativas", S.perfil.faltas.optativas], ["Eletivas", S.perfil.faltas.eletivas], ["Atividades complementares", S.perfil.faltas.complementares]].map(([t, n]) => `<div class="linha" style="grid-template-columns:1fr auto"><div class="t">${t}</div><span class="num">${n ? "faltam " + n + " h" : "completo"}</span></div>`).join("")}</div>
     <div class="pequeno fraco">Números do idUFF${S.perfil.atualizadoIduff ? ", lidos em " + esc(S.perfil.atualizadoIduff.split("-").reverse().join("/")) : ""}.</div>` : ""}</section>`;
+  out += cartaoUff("O que conta para se formar", `<ul class="info-linhas texto">
+    <li><strong>Matérias obrigatórias</strong><span>As do fluxograma. Faltam ${esc(S.perfil.faltas?.obrigatorias ?? "?")} h.</span></li>
+    <li><strong>Extensão (387 h)</strong><span>Projetos e ações da UFF voltados para a comunidade. Pelo menos 10% da carga do curso precisa ser de extensão.</span></li>
+    <li><strong>Optativas (150 h)</strong><span>Matérias que você escolhe numa lista do próprio currículo de Engenharia Química.</span></li>
+    <li><strong>Eletivas (30 h)</strong><span>Matérias de fora do seu currículo. Horas a mais de optativas também contam aqui.</span></li>
+    <li><strong>Atividades complementares (30 h)</strong><span>Atividades fora das aulas que a coordenação do curso aceita.</span></li></ul>`,
+    "Fonte: integralização do currículo no idUFF; extensão: Resolução CNE/CES nº 7/2018.");
   out += `<div class="secao-cab"><div class="filtros" role="group" aria-label="Filtrar">${[["todas", "Todas"], ["aprovado", "Aprovadas"], ["cursando", "Cursando"], ["pendente", "Faltam"], ["reprovado", "Reprovadas"]].map(([k, t]) => `<button class="filtro" data-acao="filtro" data-f="${k}" aria-pressed="${f === k}">${t}</button>`).join("")}</div><button class="btn forte" data-acao="nova-disc">+ Matéria</button></div>`;
   if (!S.discs.size) return out + `<div class="vazio">O currículo ainda não foi carregado. Ele vem do idUFF (currículo integralizado) e do fluxograma do curso.</div>` + rodape();
   for (const k of [...grupos.keys()].sort((a, b) => a - b)) {
@@ -516,7 +589,8 @@ function telaEstudo() {
 }
 
 function rodape() {
-  return `<p class="rodape">Regras de aprovação: Regulamento dos Cursos de Graduação da UFF (Res. CEP 001/2015), arts. 96 e 99. Frequência mínima de 75% em todas as matérias. <button class="btn" style="padding:3px 8px;font-size:0.8rem" data-acao="perfil">Ajustes</button></p>`;
+  return `<footer class="rodape-uff">${logoUff()}
+    <p class="rodape">App pessoal de estudo. Não é um sistema oficial da UFF: notas e situação oficiais ficam no idUFF. <button class="btn" style="padding:3px 8px;font-size:0.8rem" data-acao="perfil">Ajustes</button></p></footer>`;
 }
 
 /* ---------- folha de edição ---------- */
