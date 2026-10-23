@@ -1135,5 +1135,254 @@
     "tipo": "feriado"
    }
   ]
+ },
+ "tabelaHoras": {
+  "fonte": "Anexo A, Tabela 1 (conversão de horas dedicadas às AC ou ACE em hora equivalente, Art. 3º), publicada pela coordenação em engenhariaquimica.uff.br",
+  "observacao": "he = hora equivalente. Máx = o máximo de he aproveitado em cada categoria.",
+  "categorias": [
+   {
+    "id": "disc-eletivas",
+    "grupo": "Ensino",
+    "nome": "Cursar disciplinas eletivas e optativas extras",
+    "he": 5,
+    "cadaHoras": 30,
+    "unidade": "por cada 30 h de CH",
+    "max": 10
+   },
+   {
+    "id": "lingua",
+    "grupo": "Ensino",
+    "nome": "Curso de língua estrangeira",
+    "he": 2,
+    "unidade": "por semestre",
+    "contar": "semestres",
+    "max": 4
+   },
+   {
+    "id": "estagio-interno",
+    "grupo": "Ensino",
+    "nome": "Estágio não obrigatório interno de caráter não extensionista",
+    "he": 1,
+    "cadaHoras": 60,
+    "unidade": "por 60 h de estágio",
+    "max": 10
+   },
+   {
+    "id": "monitoria",
+    "grupo": "Ensino",
+    "nome": "Monitoria",
+    "he": 5,
+    "unidade": "por termo de compromisso",
+    "contar": "termos de compromisso",
+    "max": 10
+   },
+   {
+    "id": "curso-ead",
+    "grupo": "Ensino",
+    "nome": "Participação em curso a distância",
+    "he": 1,
+    "cadaHoras": 15,
+    "unidade": "por 15 h de curso",
+    "max": 8
+   },
+   {
+    "id": "curso-presencial",
+    "grupo": "Ensino",
+    "nome": "Participação em curso presencial ou semipresencial",
+    "he": 1,
+    "cadaHoras": 10,
+    "unidade": "por 10 h de curso",
+    "max": 10
+   },
+   {
+    "id": "evento-cientifico",
+    "grupo": "Ensino",
+    "nome": "Participação em evento científico",
+    "he": 1,
+    "unidade": "por participação",
+    "contar": "participações",
+    "max": 5
+   },
+   {
+    "id": "palestra",
+    "grupo": "Ensino",
+    "nome": "Participação em palestra",
+    "he": 1,
+    "unidade": "por palestra",
+    "contar": "palestras",
+    "max": 5
+   },
+   {
+    "id": "projeto-ensino",
+    "grupo": "Ensino",
+    "nome": "Participação em projeto de ensino",
+    "he": 5,
+    "unidade": "por ano",
+    "contar": "anos",
+    "max": 10
+   },
+   {
+    "id": "visita-tecnica",
+    "grupo": "Ensino",
+    "nome": "Participação em visita técnica",
+    "he": 2,
+    "unidade": "por visita",
+    "contar": "visitas",
+    "max": 6
+   },
+   {
+    "id": "apresentacao-trabalho",
+    "grupo": "Pesquisa",
+    "nome": "Apresentação de trabalho em evento acadêmico",
+    "he": 4,
+    "unidade": "por trabalho",
+    "contar": "trabalhos",
+    "max": 10
+   },
+   {
+    "id": "iniciacao-cientifica",
+    "grupo": "Pesquisa",
+    "nome": "Iniciação científica e iniciação tecnológica",
+    "he": 5,
+    "unidade": "por termo de compromisso",
+    "contar": "termos de compromisso",
+    "max": 10
+   },
+   {
+    "id": "artigo",
+    "grupo": "Pesquisa",
+    "nome": "Publicação de artigo científico em revista",
+    "he": 4,
+    "unidade": "por trabalho",
+    "contar": "trabalhos",
+    "max": 10
+   },
+   {
+    "id": "resumo-evento",
+    "grupo": "Pesquisa",
+    "nome": "Publicação de resumo ou trabalho completo em evento científico",
+    "he": 2,
+    "unidade": "por trabalho",
+    "contar": "trabalhos",
+    "max": 8
+   },
+   {
+    "id": "organizacao-eventos",
+    "grupo": "Gestão",
+    "nome": "Organização de eventos",
+    "he": 4,
+    "unidade": "por evento",
+    "contar": "eventos",
+    "max": 8
+   },
+   {
+    "id": "coletivos-uff",
+    "grupo": "Gestão",
+    "nome": "Membro de equipe de coletivos da UFF",
+    "he": 5,
+    "unidade": "por ano",
+    "contar": "anos",
+    "max": 10
+   },
+   {
+    "id": "empresa-junior",
+    "grupo": "Gestão",
+    "nome": "Membro de equipe de empresa júnior",
+    "he": 5,
+    "unidade": "por ano",
+    "contar": "anos",
+    "max": 10
+   },
+   {
+    "id": "representacao",
+    "grupo": "Gestão",
+    "nome": "Representação estudantil",
+    "he": 2,
+    "unidade": "por semestre",
+    "contar": "semestres",
+    "max": 8
+   },
+   {
+    "id": "voluntario",
+    "grupo": "Gestão",
+    "nome": "Trabalho voluntário",
+    "he": 2,
+    "unidade": "por ano",
+    "contar": "anos",
+    "max": 10
+   },
+   {
+    "id": "consultoria",
+    "grupo": "Extensão",
+    "nome": "Consultoria ou elaboração de projetos",
+    "he": 4,
+    "unidade": "por consultoria ou projeto realizado",
+    "contar": "consultorias ou projetos",
+    "max": 10
+   },
+   {
+    "id": "disc-extensionista",
+    "grupo": "Extensão",
+    "nome": "Disciplinas eletivas e optativas extras com CH extensionista",
+    "he": 1,
+    "cadaHoras": 1,
+    "unidade": "por hora de CH extensionista",
+    "max": 10
+   },
+   {
+    "id": "divulgacao",
+    "grupo": "Extensão",
+    "nome": "Divulgação científica ou tecnológica",
+    "he": 1,
+    "unidade": "por material",
+    "contar": "materiais",
+    "max": 6
+   },
+   {
+    "id": "estagio-nao-obrigatorio",
+    "grupo": "Extensão",
+    "nome": "Estágio curricular não obrigatório",
+    "he": 1,
+    "cadaHoras": 60,
+    "unidade": "por 60 h de estágio",
+    "max": 10
+   },
+   {
+    "id": "ministrar-cursos",
+    "grupo": "Extensão",
+    "nome": "Ministrar cursos, oficinas ou treinamentos",
+    "he": 1,
+    "cadaHoras": 4,
+    "unidade": "por cada 4 h de curso ministrado",
+    "max": 6
+   },
+   {
+    "id": "mesario",
+    "grupo": "Extensão",
+    "nome": "Participação como mesário",
+    "he": 2,
+    "unidade": "por dia trabalhado",
+    "contar": "dias trabalhados",
+    "max": 6
+   },
+   {
+    "id": "projetos-extensao",
+    "grupo": "Extensão",
+    "nome": "Participação em comissões, programas e projetos de extensão",
+    "he": 6,
+    "unidade": "por ano de participação no projeto",
+    "contar": "anos de participação",
+    "max": 10
+   },
+   {
+    "id": "vivencia-profissional",
+    "grupo": "Extensão",
+    "nome": "Vivência profissional complementar",
+    "he": 1,
+    "cadaHoras": 60,
+    "unidade": "por 60 h de trabalho",
+    "max": 10
+   }
+  ]
  }
 }

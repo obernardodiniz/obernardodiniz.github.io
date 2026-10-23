@@ -189,7 +189,8 @@ dialog::backdrop { background: rgba(10, 16, 30, 0.5); }
 .campo label { font-size: 0.84rem; font-weight: 700; color: var(--tinta-2); }
 .campo input, .campo select, .campo textarea { width: 100%; border: 1px solid var(--linha); background: var(--papel); border-radius: 9px; padding: 10px 11px; font-size: 1rem; }
 .campo textarea { min-height: 84px; resize: vertical; }
-.campos-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.campo input:not([type="file"]), .campo select { height: 46px; }
+.campos-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; align-items: end; }
 .folha-pe { display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; }
 .folha-pe .dir { display: flex; gap: 8px; margin-left: auto; }
 .ajuda { font-size: 0.84rem; color: var(--tinta-2); }
@@ -228,6 +229,10 @@ dialog::backdrop { background: rgba(10, 16, 30, 0.5); }
   background: var(--cartao); color: var(--tinta-2); border: 1px solid var(--linha); border-radius: 999px; padding: 6px 14px;
   font-size: 0.86rem; font-weight: 700; box-shadow: 0 4px 14px rgba(10, 20, 40, 0.12); white-space: nowrap; }
 .puxar.pronto { color: var(--uff); border-color: var(--uff); }
+.tabela-he { border-top: 1px solid var(--linha); padding-top: 8px; }
+.tabela-he summary { cursor: pointer; font-weight: 700; color: var(--uff); padding-block: 4px; }
+.tabela-he ul { margin-top: 8px; }
+.previa-he { font-weight: 700; color: var(--uff); }
 .rodape-uff { display: grid; gap: 8px; justify-items: start; padding-top: 6px; border-top: 1px solid var(--linha); }
 .rodape-uff .logo-uff { width: 64px; opacity: 0.7; }
 .rodape-uff .rodape { margin: 0; }
@@ -606,7 +611,12 @@ function campo(c) {
   const v = c.valor ?? "";
   const id = "f-" + c.id;
   let input;
-  if (c.tipo === "select") input = `<select id="${id}" name="${c.id}">${c.opcoes.map(([k, t]) => `<option value="${esc(k)}" ${String(k) === String(v) ? "selected" : ""}>${esc(t)}</option>`).join("")}</select>`;
+  if (c.tipo === "select") {
+    const opcao = ([k, t]) => `<option value="${esc(k)}" ${String(k) === String(v) ? "selected" : ""}>${esc(t)}</option>`;
+    const grupos = [];
+    for (const o of c.opcoes) { const g = o[2] || ""; if (!grupos.length || grupos.at(-1)[0] !== g) grupos.push([g, []]); grupos.at(-1)[1].push(o); }
+    input = `<select id="${id}" name="${c.id}">${grupos.map(([g, os]) => g ? `<optgroup label="${esc(g)}">${os.map(opcao).join("")}</optgroup>` : os.map(opcao).join("")).join("")}</select>`;
+  }
   else if (c.tipo === "file") input = `<input id="${id}" name="${c.id}" type="file" accept="${esc(c.accept || "")}">`;
   else if (c.tipo === "textarea") input = `<textarea id="${id}" name="${c.id}" placeholder="${esc(c.dica || "")}">${esc(v)}</textarea>`;
   else input = `<input id="${id}" name="${c.id}" type="${c.tipo || "text"}" value="${esc(v)}" ${c.inputmode ? `inputmode="${c.inputmode}"` : ""} placeholder="${esc(c.dica || "")}" ${c.obrig ? "required" : ""}>`;
@@ -846,16 +856,27 @@ const idb = (() => {
 })();
 const PARA = { complementares: "Atividades complementares", extensao: "Extensão", outro: "Ainda não sei" };
 const tabelaHoras = () => (typeof BASE !== "undefined" && BASE.tabelaHoras) || null;
+// Hora equivalente (he) de um certificado, antes do teto da categoria
+function heBruta(cat, horas, quantidade) {
+  if (!cat) return 0;
+  const v = cat.cadaHoras ? (cat.he * (Number(horas) || 0)) / cat.cadaHoras : cat.he * (Number(quantidade) || 1);
+  return Math.round(v * 10) / 10;
+}
+const umaCasa = (n) => (Math.round(n * 10) / 10).toString().replace(".", ",");
+// Aplica o teto (Máx) de cada categoria na ordem das datas: o que passar do teto não conta
 function certificadosContados() {
   const cats = tabelaHoras()?.categorias || [];
   const usado = new Map();
-  return ordenarPor([...S.certs.values()], (c) => c.data || "9999").map((c) => {
+  const lista = ordenarPor([...S.certs.values()], (c) => c.data || "9999").map((c) => {
     const cat = cats.find((t) => t.id === c.categoria);
-    let h = Number(c.horas) || 0;
-    if (cat?.limitePorCertificado != null) h = Math.min(h, cat.limitePorCertificado);
-    if (cat?.limiteTotal != null) { const u = usado.get(cat.id) || 0; h = Math.max(0, Math.min(h, cat.limiteTotal - u)); usado.set(cat.id, u + h); }
-    return { ...c, cat, valida: cats.length ? (cat ? h : 0) : h };
+    if (!cats.length) return { ...c, cat: null, bruta: Number(c.horas) || 0, valida: Number(c.horas) || 0 };
+    const bruta = heBruta(cat, c.horas, c.quantidade);
+    let valida = bruta;
+    if (cat) { const u = usado.get(cat.id) || 0; valida = Math.round(Math.max(0, Math.min(bruta, cat.max - u)) * 10) / 10; usado.set(cat.id, u + valida); }
+    return { ...c, cat, bruta, valida };
   });
+  for (const c of lista) if (c.cat) c.usadoCat = usado.get(c.cat.id);
+  return lista;
 }
 async function verArquivo(id) {
   let b;
@@ -875,20 +896,27 @@ function telaCertificados() {
   const bloco = (k, meta) => {
     const h = soma(k);
     const pct = meta ? Math.min(100, (h / meta) * 100) : 0;
-    return `<div class="numero" style="gap:6px"><span class="rotulo">${PARA[k]}</span><span class="v">${h} h${meta ? `<small class="pequeno fraco" style="font-family:var(--f-texto);font-weight:600"> de ${meta} h</small>` : ""}</span>
+    return `<div class="numero" style="gap:6px"><span class="rotulo">${PARA[k]}</span><span class="v">${umaCasa(h)} h${meta ? `<small class="pequeno fraco" style="font-family:var(--f-texto);font-weight:600"> de ${meta} h</small>` : ""}</span>
       ${meta ? `<div class="barra" role="img" aria-label="${Math.round(pct)}%"><i style="width:${pct}%"></i></div>` : ""}</div>`;
   };
   let out = `<section class="secao"><div class="numeros" style="grid-template-columns:repeat(2,minmax(0,1fr))">${bloco("complementares", faltas.complementares)}${bloco("extensao", faltas.extensao)}</div>
-    <p class="pequeno fraco" style="margin:0">${tab ? "Horas contadas pela tabela do curso." : "Somando as horas de cada certificado. Quando a tabela do curso chegar, cada tipo de atividade passa a contar pelo limite dela."} A meta é o que o idUFF diz que ainda falta.</p></section>`;
+    <p class="pequeno fraco" style="margin:0">${tab ? "Cada certificado vira horas equivalentes pela tabela do curso, e cada tipo de atividade tem um máximo." : "Somando as horas de cada certificado."} A meta é o que o idUFF diz que ainda falta.</p></section>`;
   out += `<div class="secao-cab"><h2>Meus certificados</h2><button class="btn forte" data-acao="novo-cert">+ Certificado</button></div>`;
   if (!lista.length) out += `<div class="vazio">Nenhum certificado guardado ainda. Toque em “+ Certificado”, escolha o PDF (ou a foto) e diga quantas horas ele vale.</div>`;
   for (const k of ["complementares", "extensao", "outro"]) {
     const grupo = lista.filter((c) => (c.contaPara || "outro") === k).reverse();
     if (!grupo.length) continue;
     out += `<section class="secao"><h2 style="font-size:1rem">${PARA[k]}</h2><div class="lista">${grupo.map((c) => `
-      <div class="linha clicavel" data-acao="editar-cert" data-id="${esc(c.id)}"><span class="dmenos">${c.valida} h</span>
-        <div><div class="t">${esc(c.titulo)}</div><div class="s">${[c.data ? ddmm(c.data) + "/" + c.data.slice(0, 4) : "", c.cat ? esc(c.cat.nome) : esc(c.tipoAtividade || ""), c.instituicao ? esc(c.instituicao) : "", c.valida !== (Number(c.horas) || 0) ? `certificado diz ${esc(c.horas)} h` : ""].filter(Boolean).join(" · ")}</div></div>
+      <div class="linha clicavel" data-acao="editar-cert" data-id="${esc(c.id)}"><span class="dmenos">${umaCasa(c.valida)} h</span>
+        <div><div class="t">${esc(c.titulo)}</div><div class="s">${[c.data ? ddmm(c.data) + "/" + c.data.slice(0, 4) : "", c.cat ? esc(c.cat.nome) : tab ? '<strong style="color:var(--vs)">escolha o tipo de atividade</strong>' : esc(c.tipoAtividade || ""), c.instituicao ? esc(c.instituicao) : ""].filter(Boolean).join(" · ")}</div>
+        ${c.cat ? `<div class="s">${c.valida < c.bruta ? `Valeria ${umaCasa(c.bruta)} h, mas o máximo do tipo é ${c.cat.max} h. ` : ""}Tipo: ${umaCasa(c.usadoCat)} de ${c.cat.max} h usadas.</div>` : ""}</div>
         ${c.arquivoNome ? `<button class="btn" data-acao="ver-cert" data-id="${esc(c.id)}" aria-label="Abrir o arquivo de ${esc(c.titulo)}">Ver</button>` : `<span class="pequeno fraco">sem arquivo</span>`}</div>`).join("")}</div></section>`;
+  }
+  if (tab) {
+    const grupos = [...new Set(tab.categorias.map((t) => t.grupo))];
+    out += cartaoUff("Quanto vale cada atividade", `<p class="pequeno" style="margin:0">${esc(tab.observacao || "")}</p>
+      ${grupos.map((g) => `<details class="tabela-he"><summary>${esc(g)}</summary><ul class="info-linhas texto">${tab.categorias.filter((t) => t.grupo === g).map((t) => `<li><strong>${esc(t.nome)}</strong><span>${t.he} h ${esc(t.unidade)} · máximo ${t.max} h</span></li>`).join("")}</ul></details>`).join("")}`,
+      "Fonte: " + esc(tab.fonte));
   }
   out += cartaoUff("Onde os certificados ficam guardados", `<ul class="info-linhas texto">
     <li><strong>Neste celular</strong><span>Os PDFs ficam guardados dentro do app, neste aparelho. Ninguém mais vê, nem quem abre o site.</span></li>
@@ -903,35 +931,64 @@ function folhaCert(id) {
     titulo: id ? "Editar certificado" : "Novo certificado",
     campos: [
       { id: "titulo", rotulo: "Nome do evento ou curso", valor: c.titulo, obrig: true, dica: "Palestra de segurança de processos…" },
+      ...(cats.length
+        ? [{ id: "categoria", rotulo: "Tipo de atividade (tabela do curso)", valor: c.categoria || "", tipo: "select", opcoes: [["", "Escolha…"], ...cats.map((t) => [t.id, t.nome, t.grupo])] }]
+        : [{ id: "tipoAtividade", rotulo: "Tipo de atividade", valor: c.tipoAtividade, dica: "Palestra, curso, monitoria…" }]),
       { id: "data", rotulo: "Data", valor: c.data, tipo: "date", par: true },
       { id: "horas", rotulo: "Horas no certificado", valor: c.horas, inputmode: "decimal", dica: "ex.: 4" },
-      { id: "contaPara", rotulo: "Conta para", valor: c.contaPara, tipo: "select", opcoes: Object.entries(PARA), par: !cats.length },
-      cats.length
-        ? { id: "categoria", rotulo: "Tipo de atividade (tabela do curso)", valor: c.categoria || "", tipo: "select", opcoes: [["", "Escolha…"], ...cats.map((t) => [t.id, t.nome])] }
-        : { id: "tipoAtividade", rotulo: "Tipo de atividade", valor: c.tipoAtividade, dica: "Palestra, curso, monitoria…" },
+      ...(cats.length ? [{ id: "quantidade", rotulo: "Quantidade", valor: c.quantidade ?? 1, inputmode: "numeric" }] : []),
+      { id: "contaPara", rotulo: "Conta para", valor: c.contaPara, tipo: "select", opcoes: Object.entries(PARA) },
       { id: "instituicao", rotulo: "Quem emitiu", valor: c.instituicao, dica: "UFF, CRQ, empresa…" },
       { id: "arquivo", rotulo: id && c.arquivoNome ? `Trocar arquivo (agora: ${c.arquivoNome})` : "Arquivo do certificado (PDF ou foto)", tipo: "file", accept: "application/pdf,image/*" },
       { id: "obs", rotulo: "Anotações", valor: c.obs, tipo: "textarea" },
     ],
-    extra: id && c.arquivoNome ? `<div class="acoes-folha"><button type="button" class="btn" id="cert-ver">Ver o certificado</button></div>` : "",
+    extra: (cats.length ? `<p class="previa-he" id="cert-previa" aria-live="polite" style="margin:0"></p>` : "") + (id && c.arquivoNome ? `<div class="acoes-folha"><button type="button" class="btn" id="cert-ver">Ver o certificado</button></div>` : ""),
     salvar: async (f) => {
       const arq = f.arquivo && f.arquivo.size ? f.arquivo : null;
       if (!id && !arq) throw "Escolha o PDF ou a foto do certificado.";
       if (arq && arq.size > 25 * 1024 * 1024) throw "Esse arquivo passa de 25 MB. Tente um PDF menor.";
-      const horas = Number(String(f.horas).replace(",", "."));
-      if (!(horas > 0)) throw "Diga quantas horas o certificado tem.";
+      const horas = Number(String(f.horas || "").replace(",", ".")) || null;
+      const cat = cats.find((t) => t.id === f.categoria);
+      if (cats.length && !cat) throw "Escolha o tipo de atividade da tabela.";
+      if ((!cats.length || cat?.cadaHoras) && !(horas > 0)) throw "Diga quantas horas o certificado tem.";
+      const quantidade = cats.length ? Math.max(1, Math.round(Number(f.quantidade) || 1)) : null;
       const novo = id || novoId();
       if (arq) {
         try { await idb.set(novo, arq); } catch { throw "O celular não deixou guardar o arquivo. Libere espaço e tente de novo."; }
         try { await navigator.storage?.persist?.(); } catch {}
       }
-      const doc = { titulo: f.titulo.trim(), data: f.data || null, horas, contaPara: f.contaPara, instituicao: f.instituicao.trim(), obs: f.obs.trim(),
+      const doc = { titulo: f.titulo.trim(), data: f.data || null, horas, quantidade, contaPara: f.contaPara, instituicao: f.instituicao.trim(), obs: f.obs.trim(),
         arquivoNome: arq ? arq.name : c.arquivoNome || null, arquivoTipo: arq ? arq.type : c.arquivoTipo || null, arquivoTamanho: arq ? arq.size : c.arquivoTamanho || null };
       if (cats.length) doc.categoria = f.categoria || null; else doc.tipoAtividade = f.tipoAtividade.trim();
       await db.collection("certificados").doc(novo).set(doc);
     },
     apagar: id ? async () => { try { await idb.del(id); } catch {} await db.collection("certificados").doc(id).delete(); } : null,
   });
+  // mostra, enquanto preenche, quanto o certificado vale pela tabela
+  const selCat = $("#f-categoria");
+  if (selCat) {
+    selCat.closest(".campo").after($("#cert-previa"));
+    const campoDe = (nome) => $("#f-" + nome)?.closest(".campo");
+    let paraMexido = !!id;
+    $("#f-contaPara").addEventListener("change", () => { paraMexido = true; });
+    const previa = () => {
+      const cat = cats.find((t) => t.id === selCat.value);
+      const q = campoDe("quantidade"), hcampo = campoDe("horas");
+      if (q) q.hidden = !cat || !!cat.cadaHoras;
+      if (q && cat?.contar) q.querySelector("label").textContent = `Quantidade de ${cat.contar}`;
+      if (hcampo) hcampo.querySelector("label").textContent = cat && !cat.cadaHoras ? "Horas (opcional)" : "Horas no certificado";
+      if (cat && !paraMexido) $("#f-contaPara").value = cat.grupo === "Extensão" ? "extensao" : "complementares";
+      const p = $("#cert-previa");
+      if (!cat) { p.textContent = "Escolha o tipo de atividade para ver quanto vale."; return; }
+      const bruta = heBruta(cat, String($("#f-horas").value).replace(",", "."), $("#f-quantidade")?.value);
+      const outros = certificadosContados().filter((x) => x.cat?.id === cat.id && x.id !== id).reduce((s, x) => s + x.valida, 0);
+      const vale = Math.max(0, Math.min(bruta, cat.max - outros));
+      p.textContent = `Vale ${umaCasa(vale)} h (${cat.he} h ${cat.unidade}). Neste tipo você já tem ${umaCasa(outros)} de ${cat.max} h.`;
+    };
+    for (const n of ["categoria", "horas", "quantidade"]) $("#f-" + n)?.addEventListener("input", previa);
+    selCat.addEventListener("change", previa);
+    previa();
+  }
   const bv = $("#cert-ver");
   if (bv) bv.onclick = () => verArquivo(id);
 }
@@ -1125,7 +1182,7 @@ S.certs = new Map();
 ouvir("disciplinas", S.discs); ouvir("avaliacoes", S.avals); ouvir("avisos", S.avisos); ouvir("eventos", S.eventos); ouvir("certificados", S.certs);
 db.doc("config/perfil").onSnapshot((d) => { S.perfil = d.exists ? d.data() : {}; render(); });
 /* ---------- atualizar: ao abrir, ao voltar para o app, a cada 5 minutos e ao puxar a tela no topo ---------- */
-const VERSAO_APP = "2026-10-23-4";
+const VERSAO_APP = "2026-10-23-5";
 let atualizando = false, recarregarDepois = false;
 const buscar = (arq) => fetch(`${arq}?v=${Date.now()}`, { cache: "no-store" }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
 async function atualizar(manual) {
