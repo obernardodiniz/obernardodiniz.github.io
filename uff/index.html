@@ -275,7 +275,7 @@ dialog::backdrop { background: rgba(10, 16, 30, 0.5); }
 <script>
 "use strict";
 /* ---------- estado ---------- */
-const VERSAO_APP = "2026-10-23-7"; // trocar junto com dados/versao.json a cada publicação do app
+const VERSAO_APP = "2026-10-23-8"; // trocar junto com dados/versao.json a cada publicação do app
 const S = { discs: new Map(), avals: new Map(), avisos: new Map(), eventos: new Map(), perfil: {}, aba: "hoje", filtroCurso: "todas", mes: null, diaSel: null };
 let db = null, sample = null, podeEscrever = true;
 
@@ -895,6 +895,42 @@ async function importarCopia(arq) {
   const certs = Object.keys(j.alteracoes).filter((k) => k.startsWith("certificados/")).length;
   return certs ? `Pronto: ${certs} certificado(s) entraram no app, ${n} com arquivo.` : "Cópia aberta: suas alterações voltaram para este aparelho.";
 }
+// Recebe um pacote trancado que o Claude põe no site (dados/entregas). O código abre o pacote; sem ele não dá.
+async function receberPacote(codigo) {
+  const limpo = String(codigo).toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (limpo.length !== 10) return "O código tem 10 letras e números (pode digitar com ou sem o tracinho).";
+  if (!crypto?.subtle) return "Este navegador não consegue abrir o pacote. Abra a Caderneta pelo endereço https://obernardodiniz.github.io/uff/.";
+  const enc = new TextEncoder();
+  const hash = [...new Uint8Array(await crypto.subtle.digest("SHA-256", enc.encode("caderneta:" + limpo)))].map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 24);
+  let buf;
+  try {
+    const r = await fetch(`dados/entregas/${hash}.bin?v=${Date.now()}`, { cache: "no-store" });
+    if (r.status === 404) return "Não achei nenhum pacote com esse código. Confira as letras.";
+    if (!r.ok) throw 0;
+    buf = new Uint8Array(await r.arrayBuffer());
+  } catch { return "Sem internet agora. Tente de novo com o celular conectado."; }
+  const base = await crypto.subtle.importKey("raw", enc.encode(limpo), "PBKDF2", false, ["deriveKey"]);
+  const chave = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: buf.slice(0, 16), iterations: 200000, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+  let claro;
+  try { claro = await crypto.subtle.decrypt({ name: "AES-GCM", iv: buf.slice(16, 28) }, chave, buf.slice(28)); }
+  catch { return "Código errado. Confira as letras."; }
+  return importarCopia(new File([claro], "pacote.json", { type: "application/json" }));
+}
+function folhaReceber() {
+  abrirFolha({
+    titulo: "Receber certificados",
+    campos: [{ id: "codigo", rotulo: "Código que o Claude te passou", dica: "ABCDE-12345", obrig: true }],
+    extra: `<p class="ajuda" style="margin:0">Os certificados vêm trancados no site. Só abrem com este código, e depois ficam guardados neste celular.</p>`,
+    salvar: async (f) => {
+      const m = await receberPacote(f.codigo);
+      if (!m.startsWith("Pronto")) throw m;
+      S.aba = "certificados"; render();
+      mostrarAviso(m, true);
+    },
+  });
+  const c = $("#f-codigo"); c.autocapitalize = "characters"; c.autocomplete = "off"; c.spellcheck = false;
+  $("#folha-form [type=submit]").textContent = "Receber";
+}
 document.addEventListener("change", async (ev) => {
   if (ev.target.id !== "cert-importar") return;
   const arq = ev.target.files?.[0]; ev.target.value = "";
@@ -935,7 +971,7 @@ function telaCertificados() {
   let out = `<section class="secao"><div class="numeros" style="grid-template-columns:repeat(2,minmax(0,1fr))">${bloco("complementares", faltas.complementares)}${blocoExtensao()}</div>
     <p class="pequeno fraco" style="margin:0">${tab ? "Cada certificado vira horas equivalentes pela tabela do curso, e cada tipo de atividade tem um máximo." : "Somando as horas de cada certificado."} A meta é o que o idUFF diz que ainda falta.</p></section>`;
   out += `<!--O-QUE-FALTA--><div class="secao-cab"><h2>Meus certificados</h2><button class="btn forte" data-acao="novo-cert">+ Certificado</button></div>
-    <div class="acoes-folha"><label class="btn" for="cert-importar" style="cursor:pointer">Abrir arquivo de certificados do Claude</label><input type="file" id="cert-importar" hidden></div>`;
+    <div class="acoes-folha"><button class="btn" data-acao="receber-certs">Receber certificados (código)</button><label class="btn" for="cert-importar" style="cursor:pointer">Abrir arquivo</label><input type="file" id="cert-importar" hidden></div>`;
   if (!lista.length) out += `<div class="vazio">Nenhum certificado guardado ainda. Toque em “+ Certificado”, escolha o PDF (ou a foto) e diga quantas horas ele vale.</div>`;
   for (const k of ["complementares", "extensao", "outro"]) {
     const grupo = lista.filter((c) => (c.contaPara || "outro") === k).reverse();
@@ -1139,6 +1175,7 @@ document.addEventListener("click", async (ev) => {
   else if (acao === "novo-evento") folhaEvento(null);
   else if (acao === "editar-evento") folhaEvento(id);
   else if (acao === "novo-cert") folhaCert(null);
+  else if (acao === "receber-certs") folhaReceber();
   else if (acao === "editar-cert") folhaCert(id);
   else if (acao === "ver-cert") verArquivo(id);
   else if (acao === "marcar-aviso") {
