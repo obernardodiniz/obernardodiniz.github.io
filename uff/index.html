@@ -888,6 +888,23 @@ async function verArquivo(id) {
   document.body.append(a); a.click();
   setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 60000);
 }
+// Extensão vem quase toda das matérias: o idUFF mostra a carga de extensão (CHE) de cada uma
+function extensaoPelasMaterias() {
+  const ds = [...S.discs.values()];
+  return {
+    faltam: Number(S.perfil.faltas?.extensao) || 0,
+    feitas: ds.filter((d) => d.situacao === "aprovado" && d.che).reduce((s, d) => s + d.che, 0),
+    nasMaterias: ds.filter((d) => d.situacao !== "aprovado" && d.che).reduce((s, d) => s + d.che, 0),
+    lista: ds.filter((d) => d.situacao !== "aprovado" && d.che),
+  };
+}
+function blocoExtensao() {
+  const e = extensaoPelasMaterias();
+  const total = e.feitas + e.faltam;
+  const pct = total ? Math.min(100, (e.feitas / total) * 100) : 0;
+  return `<div class="numero" style="gap:6px"><span class="rotulo">Extensão</span><span class="v">${e.feitas}<small class="pequeno fraco" style="font-family:var(--f-texto);font-weight:600">&nbsp;h de ${total} h</small></span>
+    <div class="barra" role="img" aria-label="${Math.round(pct)}%"><i style="width:${pct}%"></i></div><span class="pequeno fraco">vem das matérias</span></div>`;
+}
 function telaCertificados() {
   const lista = certificadosContados();
   const tab = tabelaHoras();
@@ -896,12 +913,12 @@ function telaCertificados() {
   const bloco = (k, meta) => {
     const h = soma(k);
     const pct = meta ? Math.min(100, (h / meta) * 100) : 0;
-    return `<div class="numero" style="gap:6px"><span class="rotulo">${PARA[k]}</span><span class="v">${umaCasa(h)} h${meta ? `<small class="pequeno fraco" style="font-family:var(--f-texto);font-weight:600"> de ${meta} h</small>` : ""}</span>
+    return `<div class="numero" style="gap:6px"><span class="rotulo">${PARA[k]}</span><span class="v">${umaCasa(h)}<small class="pequeno fraco" style="font-family:var(--f-texto);font-weight:600">&nbsp;h${meta ? ` de ${meta} h` : ""}</small></span>
       ${meta ? `<div class="barra" role="img" aria-label="${Math.round(pct)}%"><i style="width:${pct}%"></i></div>` : ""}</div>`;
   };
-  let out = `<section class="secao"><div class="numeros" style="grid-template-columns:repeat(2,minmax(0,1fr))">${bloco("complementares", faltas.complementares)}${bloco("extensao", faltas.extensao)}</div>
+  let out = `<section class="secao"><div class="numeros" style="grid-template-columns:repeat(2,minmax(0,1fr))">${bloco("complementares", faltas.complementares)}${blocoExtensao()}</div>
     <p class="pequeno fraco" style="margin:0">${tab ? "Cada certificado vira horas equivalentes pela tabela do curso, e cada tipo de atividade tem um máximo." : "Somando as horas de cada certificado."} A meta é o que o idUFF diz que ainda falta.</p></section>`;
-  out += `<div class="secao-cab"><h2>Meus certificados</h2><button class="btn forte" data-acao="novo-cert">+ Certificado</button></div>`;
+  out += `<!--O-QUE-FALTA--><div class="secao-cab"><h2>Meus certificados</h2><button class="btn forte" data-acao="novo-cert">+ Certificado</button></div>`;
   if (!lista.length) out += `<div class="vazio">Nenhum certificado guardado ainda. Toque em “+ Certificado”, escolha o PDF (ou a foto) e diga quantas horas ele vale.</div>`;
   for (const k of ["complementares", "extensao", "outro"]) {
     const grupo = lista.filter((c) => (c.contaPara || "outro") === k).reverse();
@@ -913,6 +930,21 @@ function telaCertificados() {
         ${c.arquivoNome ? `<button class="btn" data-acao="ver-cert" data-id="${esc(c.id)}" aria-label="Abrir o arquivo de ${esc(c.titulo)}">Ver</button>` : `<span class="pequeno fraco">sem arquivo</span>`}</div>`).join("")}</div></section>`;
   }
   if (tab) {
+    const usadoPor = new Map();
+    for (const c of lista) if (c.cat) usadoPor.set(c.cat.id, (usadoPor.get(c.cat.id) || 0) + c.valida);
+    const resta = (t) => Math.max(0, t.max - (usadoPor.get(t.id) || 0));
+    const metaAC = Number(faltas.complementares) || 0;
+    const faltaAC = Math.max(0, metaAC - soma("complementares"));
+    const cabem = tab.categorias.filter((t) => resta(t) > 0).sort((a, b) => b.he - a.he || resta(b) - resta(a)).slice(0, 7);
+    const cheios = tab.categorias.filter((t) => resta(t) === 0);
+    const ext = extensaoPelasMaterias();
+    const cartaoFalta = cartaoUff("O que falta", `
+      <p style="margin:0">${metaAC ? (faltaAC ? `Atividades complementares: <strong>faltam ${umaCasa(faltaAC)}&nbsp;h</strong> das ${metaAC}&nbsp;h.` : `Atividades complementares: <strong>as ${metaAC} h já estão cobertas</strong> pelos certificados guardados.`) : ""}</p>
+      ${faltaAC ? `<p class="pequeno" style="margin:0">Onde ainda cabem mais horas:</p>${`<ul class="info-linhas">${cabem.map((t) => `<li><span class="quando">até ${umaCasa(resta(t))} h</span><span>${esc(t.nome)} <span class="fraco">· ${t.he} h ${esc(t.unidade)}</span></span></li>`).join("")}</ul>`}` : ""}
+      ${cheios.length ? `<p class="pequeno" style="margin:0">Já no máximo: ${cheios.map((t) => esc(t.nome)).join(", ")}. Certificados novos desses tipos não somam mais.</p>` : ""}
+      ${ext.faltam ? `<p class="pequeno" style="margin:0"><strong>Extensão:</strong> faltam ${ext.faltam} h. As matérias obrigatórias que você ainda vai cursar somam ${ext.nasMaterias} h de extensão${ext.nasMaterias >= ext.faltam ? ", então terminando o currículo a extensão fecha" : ""}.</p>` : ""}`,
+      "Faltas: idUFF. Valores: tabela de horas equivalentes do curso.");
+    out = out.replace("<!--O-QUE-FALTA-->", cartaoFalta);
     const grupos = [...new Set(tab.categorias.map((t) => t.grupo))];
     out += cartaoUff("Quanto vale cada atividade", `<p class="pequeno" style="margin:0">${esc(tab.observacao || "")}</p>
       ${grupos.map((g) => `<details class="tabela-he"><summary>${esc(g)}</summary><ul class="info-linhas texto">${tab.categorias.filter((t) => t.grupo === g).map((t) => `<li><strong>${esc(t.nome)}</strong><span>${t.he} h ${esc(t.unidade)} · máximo ${t.max} h</span></li>`).join("")}</ul></details>`).join("")}`,
@@ -1182,7 +1214,7 @@ S.certs = new Map();
 ouvir("disciplinas", S.discs); ouvir("avaliacoes", S.avals); ouvir("avisos", S.avisos); ouvir("eventos", S.eventos); ouvir("certificados", S.certs);
 db.doc("config/perfil").onSnapshot((d) => { S.perfil = d.exists ? d.data() : {}; render(); });
 /* ---------- atualizar: ao abrir, ao voltar para o app, a cada 5 minutos e ao puxar a tela no topo ---------- */
-const VERSAO_APP = "2026-10-23-5";
+const VERSAO_APP = "2026-10-23-6";
 let atualizando = false, recarregarDepois = false;
 const buscar = (arq) => fetch(`${arq}?v=${Date.now()}`, { cache: "no-store" }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
 async function atualizar(manual) {

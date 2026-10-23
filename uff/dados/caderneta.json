@@ -285,7 +285,8 @@
    "situacao": "aprovado",
    "tipo": "obrigatoria",
    "turma": "AB",
-   "vs": null
+   "vs": null,
+   "che": 6
   },
   "GQA00055": {
    "cargaHoraria": 60,
@@ -299,7 +300,8 @@
    "situacao": "aprovado",
    "tipo": "obrigatoria",
    "turma": "AC",
-   "vs": null
+   "vs": null,
+   "che": 8
   },
   "GQI00024": {
    "cargaHoraria": 60,
@@ -371,7 +373,8 @@
    "situacao": "aprovado",
    "tipo": "obrigatoria",
    "turma": "EB",
-   "vs": null
+   "vs": null,
+   "che": 20
   },
   "GQO00053": {
    "cargaHoraria": 60,
@@ -585,7 +588,8 @@
    "situacao": "aprovado",
    "tipo": "optativa",
    "turma": "A1",
-   "vs": null
+   "vs": null,
+   "che": 15
   },
   "TEE00113": {
    "cargaHoraria": 60,
@@ -697,7 +701,8 @@
    "requisito": "",
    "semestre": "",
    "situacao": "pendente",
-   "tipo": "obrigatoria"
+   "tipo": "obrigatoria",
+   "che": 38
   },
   "TEQ00098": {
    "cargaHoraria": 60,
@@ -709,7 +714,8 @@
    "requisito": "",
    "semestre": "",
    "situacao": "pendente",
-   "tipo": "obrigatoria"
+   "tipo": "obrigatoria",
+   "che": 36
   },
   "TEQ00101": {
    "cargaHoraria": 60,
@@ -807,7 +813,8 @@
    "requisito": "1500 h cursadas",
    "semestre": "",
    "situacao": "pendente",
-   "tipo": "obrigatoria"
+   "tipo": "obrigatoria",
+   "che": 36
   },
   "TEQ00130": {
    "cargaHoraria": 60,
@@ -843,7 +850,8 @@
    "requisito": "Estatística",
    "semestre": "",
    "situacao": "pendente",
-   "tipo": "obrigatoria"
+   "tipo": "obrigatoria",
+   "che": 30
   },
   "TEQ00133": {
    "cargaHoraria": 60,
@@ -857,7 +865,8 @@
    "situacao": "aprovado",
    "tipo": "obrigatoria",
    "turma": "A1",
-   "vs": null
+   "vs": null,
+   "che": 36
   },
   "TEQ00134": {
    "cargaHoraria": 60,
@@ -869,7 +878,8 @@
    "requisito": "",
    "semestre": "",
    "situacao": "pendente",
-   "tipo": "obrigatoria"
+   "tipo": "obrigatoria",
+   "che": 36
   },
   "TEQ00135": {
    "cargaHoraria": 60,
@@ -989,7 +999,8 @@
    "requisito": "2000 h cursadas",
    "semestre": "",
    "situacao": "pendente",
-   "tipo": "obrigatoria"
+   "tipo": "obrigatoria",
+   "che": 60
   },
   "TEQ00155": {
    "cargaHoraria": 60,
@@ -1001,7 +1012,8 @@
    "requisito": "2500 h cursadas",
    "semestre": "",
    "situacao": "pendente",
-   "tipo": "obrigatoria"
+   "tipo": "obrigatoria",
+   "che": 40
   },
   "TEQ00191": {
    "cargaHoraria": 60,
@@ -1021,7 +1033,8 @@
    "semestre": "2026.2",
    "situacao": "cursando",
    "tipo": "obrigatoria",
-   "turma": "A1"
+   "turma": "A1",
+   "che": 36
   },
   "TGQ00001": {
    "cargaHoraria": 30,
