@@ -66,7 +66,13 @@
 html { -webkit-text-size-adjust: 100%; }
 [hidden] { display: none !important; }
 img { max-width: 100%; }
-body { margin: 0; background: var(--papel); color: var(--tinta); font: 400 15.5px/1.5 var(--f-texto); -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--papel); color: var(--tinta); font: 400 15.5px/1.5 var(--f-texto); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+@supports (overflow-x: clip) { html, body { overflow-x: clip; } }
+/* nada pode ficar mais largo que a tela: colunas que encolhem e textos que quebram ou cortam com "…" */
+.pagina, #conteudo, .folha, .secao, .cartao, .saiba-in, .capa, .capa-in, .disc, .periodo-grupo, .progresso { grid-template-columns: minmax(0, 1fr); }
+.pagina > *, #conteudo > *, .folha > *, .secao > *, .cartao > *, .capa-in > *, .campo, .campos-2 > *, .faixa > * { min-width: 0; }
+.campo input, .campo select, .campo textarea { max-width: 100%; min-width: 0; }
+.t, .s, .destaque, h1, h2, h3 { overflow-wrap: anywhere; }
 h1, h2, h3 { font-family: var(--f-titulo); text-wrap: balance; margin: 0; letter-spacing: -.015em; }
 h2 { font-size: 1.08rem; font-weight: 700; }
 h3 { font-size: 1rem; font-weight: 700; }
@@ -145,7 +151,7 @@ a { color: var(--uff); }
 
 /* capa do Início: Niterói em camadas */
 .capa { position: relative; isolation: isolate; border-radius: 22px; overflow: hidden; color: #fff; min-height: 312px; display: grid; align-content: end; box-shadow: var(--sombra);
-  margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px)) + 8px); }
+  max-width: 100%; }
 .capa svg.cena { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; display: block; }
 .capa::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(5, 12, 26, .05) 0%, rgba(5, 12, 26, .12) 38%, rgba(5, 12, 26, .78) 100%); }
 .capa-in { padding: 18px; display: grid; gap: 10px; }
@@ -163,7 +169,7 @@ a { color: var(--uff); }
 .atalho svg { width: 22px; height: 22px; stroke: var(--uff); fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 
 /* faixa com a próxima data da UFF */
-.faixa { display: flex; align-items: center; gap: 10px; background: var(--marca-suave); border-radius: 14px; padding: 10px 14px; font-size: .88rem; }
+.faixa { display: flex; align-items: center; gap: 10px; min-width: 0; background: var(--marca-suave); border-radius: 14px; padding: 10px 14px; font-size: .88rem; }
 .faixa b { font-family: var(--f-num); color: var(--tinta); white-space: nowrap; }
 .faixa span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--tinta-2); }
 
@@ -210,8 +216,7 @@ a { color: var(--uff); }
 .falta { background: var(--cartao-2); border-radius: 12px; padding: 10px 12px; display: grid; gap: 1px; }
 .falta b { font-family: var(--f-num); font-size: 1.05rem; font-variant-numeric: tabular-nums; }
 .falta span { font-size: .78rem; color: var(--tinta-2); }
-.filtros { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
-.filtros::-webkit-scrollbar { display: none; }
+.filtros { display: flex; gap: 6px; flex-wrap: wrap; }
 .filtro { flex: none; border: 1px solid var(--linha); background: var(--cartao); border-radius: 999px; padding: 6px 12px; font-size: .84rem; font-weight: 700; color: var(--tinta-2); }
 .filtro[aria-pressed="true"] { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
 .periodo-grupo { display: grid; gap: 8px; }
@@ -366,7 +371,7 @@ dialog::backdrop { background: rgba(4, 10, 20, .5); -webkit-backdrop-filter: blu
 <script>
 "use strict";
 /* ---------- estado ---------- */
-const VERSAO_APP = "2026-10-24-10"; // trocar junto com dados/versao.json a cada publicação do app
+const VERSAO_APP = "2026-10-24-11"; // trocar junto com dados/versao.json a cada publicação do app
 const S = { discs: new Map(), avals: new Map(), avisos: new Map(), eventos: new Map(), perfil: {}, aba: "hoje", filtroCurso: "todas", mes: null, diaSel: null };
 let db = null, sample = null, podeEscrever = true;
 
