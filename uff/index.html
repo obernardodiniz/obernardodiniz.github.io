@@ -1,0 +1,926 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Caderneta UFF</title>
+<meta name="description" content="Provas, notas, aulas, agenda e plano de estudo da graduação em Engenharia Química na UFF.">
+<meta name="theme-color" content="#1d4f9e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Caderneta">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="img/icone-180.png">
+<link rel="icon" type="image/png" href="img/icone-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: app de celular — cabeçalho fino, conteúdo em uma coluna, barra de abas fixa embaixo */
+:root {
+  --papel: #f2f4f8;
+  --cartao: #ffffff;
+  --tinta: #14213d;
+  --tinta-2: #55617f;
+  --linha: #d8deea;
+  --uff: #1d4f9e;
+  --uff-suave: #e3ebf8;
+  --marca: #f2b632;
+  --marca-suave: #fdf1cf;
+  --ok: #1d7f53;
+  --vs: #b86a00;
+  --rep: #bf3326;
+  --ok-suave: #ddf1e6;
+  --vs-suave: #fbecd3;
+  --rep-suave: #f9e0dc;
+  --ext: #a3367a;
+  --ext-suave: #f7e1ee;
+  --f-titulo: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-texto: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-num: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --papel: #0e1524; --cartao: #161f34; --tinta: #e7ecf6; --tinta-2: #9ca8c4; --linha: #27324d;
+  --uff: #82a9ff; --uff-suave: #1c2a4a; --marca: #f5c451; --marca-suave: #3a3018;
+  --ok: #52c590; --vs: #f0a640; --rep: #ff7f70; --ok-suave: #15342a; --vs-suave: #3a2a12; --rep-suave: #3d1d1a;
+  --ext: #f08cc4; --ext-suave: #3a1a2e;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --papel: #0e1524; --cartao: #161f34; --tinta: #e7ecf6; --tinta-2: #9ca8c4; --linha: #27324d;
+  --uff: #82a9ff; --uff-suave: #1c2a4a; --marca: #f5c451; --marca-suave: #3a3018;
+  --ok: #52c590; --vs: #f0a640; --rep: #ff7f70; --ok-suave: #15342a; --vs-suave: #3a2a12; --rep-suave: #3d1d1a;
+  --ext: #f08cc4; --ext-suave: #3a1a2e;
+  color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+[hidden] { display: none !important; }
+img { max-width: 100%; }
+body { margin: 0; background: var(--papel); color: var(--tinta); font: 400 16px/1.45 var(--f-texto); padding-top: env(safe-area-inset-top, 0px); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--papel); }
+.pagina { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 18px calc(96px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 22px; }
+h1, h2, h3 { font-family: var(--f-titulo); text-wrap: balance; margin: 0; }
+h1 { font-size: 1.55rem; font-weight: 800; letter-spacing: -0.01em; }
+h2 { font-size: 1.12rem; font-weight: 600; }
+h3 { font-size: 1rem; font-weight: 600; }
+.num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+.rotulo { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--tinta-2); font-weight: 700; }
+.fraco { color: var(--tinta-2); }
+.pequeno { font-size: 0.86rem; }
+button, select, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--uff); outline-offset: 2px; }
+
+.topo { display: flex; align-items: end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.topo .sem { font-family: var(--f-num); font-size: 0.85rem; color: var(--uff); background: var(--uff-suave); padding: 3px 9px; border-radius: 6px; }
+
+.secao { display: grid; gap: 10px; }
+.secao-cab { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+
+.lista { display: grid; background: var(--cartao); border: 1px solid var(--linha); border-radius: 12px; overflow: hidden; }
+.linha { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; border-top: 1px solid var(--linha); min-width: 0; }
+.linha:first-child { border-top: 0; }
+.linha > div { min-width: 0; }
+.linha.clicavel { cursor: pointer; }
+.linha.clicavel:hover { background: var(--uff-suave); }
+.linha .t { font-weight: 600; overflow-wrap: anywhere; }
+.linha .s { font-size: 0.86rem; color: var(--tinta-2); overflow-wrap: anywhere; }
+.vazio { padding: 18px 14px; color: var(--tinta-2); background: var(--cartao); border: 1px dashed var(--linha); border-radius: 12px; }
+
+.dmenos { font-family: var(--f-num); font-weight: 600; font-size: 0.82rem; min-width: 52px; text-align: center; padding: 4px 6px; border-radius: 6px; background: var(--uff-suave); color: var(--uff); }
+.dmenos.urgente { background: var(--marca); color: #2a2100; }
+.dmenos.perto { background: var(--marca-suave); color: var(--tinta); }
+.dmenos.passou { background: transparent; color: var(--tinta-2); border: 1px solid var(--linha); }
+
+.pilula { font-size: 0.78rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+.p-ok { background: var(--ok-suave); color: var(--ok); }
+.p-vs { background: var(--vs-suave); color: var(--vs); }
+.p-rep { background: var(--rep-suave); color: var(--rep); }
+.p-cur { background: var(--uff-suave); color: var(--uff); }
+.p-pen { background: transparent; color: var(--tinta-2); border: 1px solid var(--linha); }
+
+/* destaque da próxima prova */
+.proxima { background: var(--uff); color: #fff; border-radius: 14px; padding: 18px; display: grid; gap: 6px; }
+.proxima .rotulo { color: rgba(255,255,255,0.78); }
+.proxima .grande { font-family: var(--f-titulo); font-weight: 800; font-size: 2.6rem; line-height: 1; }
+.proxima .grande small { font-size: 1rem; font-weight: 600; margin-left: 6px; }
+:root[data-theme="dark"] .proxima, :root:not([data-theme="light"]) .proxima { color: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .proxima { background: #23407c; } }
+:root[data-theme="dark"] .proxima { background: #23407c; }
+
+.numeros { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.numero { background: var(--cartao); border: 1px solid var(--linha); border-radius: 12px; padding: 12px; display: grid; gap: 2px; }
+.numero .v { font-family: var(--f-num); font-size: 1.35rem; font-weight: 600; }
+
+.barra { height: 10px; border-radius: 999px; background: var(--linha); overflow: hidden; }
+.barra > i { display: block; height: 100%; background: var(--ok); }
+
+/* cartão de disciplina no período */
+.disc { background: var(--cartao); border: 1px solid var(--linha); border-radius: 12px; overflow: hidden; }
+.disc-cab { padding: 14px; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; border-bottom: 1px solid var(--linha); }
+.disc-cab > div { min-width: 0; }
+.disc-cab .cod { font-family: var(--f-num); font-size: 0.8rem; color: var(--tinta-2); }
+.aval { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 10px 14px; border-top: 1px solid var(--linha); }
+.aval:first-of-type { border-top: 0; }
+.aval > div { min-width: 0; }
+.nota { font-family: var(--f-num); font-weight: 600; font-size: 1.05rem; min-width: 44px; text-align: right; }
+.nota.vazia { color: var(--tinta-2); font-weight: 500; }
+.disc-pe { padding: 12px 14px; background: var(--papel); border-top: 1px solid var(--linha); display: grid; gap: 4px; }
+.disc-pe .media { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.disc-acoes { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-top: 1px solid var(--linha); }
+
+.btn { border: 1px solid var(--linha); background: var(--cartao); padding: 8px 12px; border-radius: 9px; font-weight: 600; font-size: 0.92rem; }
+.btn:hover { border-color: var(--uff); }
+.btn.forte { background: var(--uff); border-color: var(--uff); color: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.forte { color: #0e1524; } }
+:root[data-theme="dark"] .btn.forte { color: #0e1524; }
+.btn.perigo { color: var(--rep); }
+.btn.perigo.armado { background: var(--rep); color: #fff; border-color: var(--rep); }
+.btn:disabled { opacity: 0.55; cursor: default; }
+
+.marcar { width: 26px; height: 26px; border-radius: 7px; border: 2px solid var(--linha); background: var(--cartao); display: grid; place-items: center; padding: 0; }
+.marcar.feito { background: var(--ok); border-color: var(--ok); color: #fff; }
+.feito-txt .t { text-decoration: line-through; color: var(--tinta-2); }
+
+.periodo-grupo { display: grid; gap: 6px; }
+.filtros { display: flex; gap: 6px; flex-wrap: wrap; }
+.filtro { border: 1px solid var(--linha); background: var(--cartao); border-radius: 999px; padding: 5px 11px; font-size: 0.86rem; font-weight: 600; }
+.filtro[aria-pressed="true"] { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+
+/* abas de baixo */
+.abas { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--cartao); border-top: 1px solid var(--linha);
+  padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+.abas-in { max-width: 720px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
+
+/* calendário */
+.mes-cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mes-cab h2 { font-size: 1.25rem; text-transform: capitalize; }
+.mes-nav { display: flex; gap: 6px; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.cal .sem-d { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--tinta-2); text-align: center; padding-bottom: 2px; }
+.dia { border: 1px solid var(--linha); background: var(--cartao); border-radius: 9px; min-height: 54px; padding: 5px 4px; display: grid; align-content: space-between; justify-items: center; gap: 4px; }
+.dia.fora { background: transparent; border-color: transparent; color: var(--tinta-2); opacity: 0.5; }
+.dia .n { font-family: var(--f-num); font-size: 0.86rem; font-weight: 600; }
+.dia.hoje .n { background: var(--uff); color: #fff; border-radius: 6px; padding: 0 5px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .dia.hoje .n { color: #0e1524; } }
+:root[data-theme="dark"] .dia.hoje .n { color: #0e1524; }
+.dia[aria-pressed="true"] { border-color: var(--uff); box-shadow: inset 0 0 0 1px var(--uff); }
+.pontos { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; min-height: 7px; }
+.ponto { width: 7px; height: 7px; border-radius: 50%; }
+.c-prova { background: var(--marca); }
+.c-estudo { background: var(--uff); opacity: 0.45; }
+.c-facul { background: var(--uff); }
+.c-ext { background: var(--ext); }
+.legenda { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.8rem; color: var(--tinta-2); }
+.legenda span { display: inline-flex; align-items: center; gap: 5px; }
+.tag-ext { background: var(--ext-suave); color: var(--ext); }
+.tag-facul { background: var(--uff-suave); color: var(--uff); }
+.hora { font-family: var(--f-num); font-size: 0.82rem; font-weight: 600; min-width: 52px; text-align: center; color: var(--tinta-2); }
+.aba { border: 0; background: none; padding: 10px 4px 12px; display: grid; justify-items: center; gap: 3px; font-size: 0.78rem; font-weight: 700; color: var(--tinta-2); }
+.aba svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.aba[aria-current="page"] { color: var(--uff); }
+
+/* folha de edição */
+dialog { border: 0; padding: 0; width: min(560px, 100%); max-height: 92vh; border-radius: 16px 16px 0 0; margin: auto auto 0; background: var(--cartao); color: var(--tinta); }
+@media (min-width: 640px) { dialog { border-radius: 16px; margin: auto; } }
+dialog::backdrop { background: rgba(10, 16, 30, 0.5); }
+.folha { display: grid; gap: 14px; padding: 18px max(18px, env(safe-area-inset-left, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)); }
+.campo { display: grid; gap: 4px; }
+.campo label { font-size: 0.84rem; font-weight: 700; color: var(--tinta-2); }
+.campo input, .campo select, .campo textarea { width: 100%; border: 1px solid var(--linha); background: var(--papel); border-radius: 9px; padding: 10px 11px; font-size: 1rem; }
+.campo textarea { min-height: 84px; resize: vertical; }
+.campos-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.folha-pe { display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; }
+.folha-pe .dir { display: flex; gap: 8px; margin-left: auto; }
+.ajuda { font-size: 0.84rem; color: var(--tinta-2); }
+
+.aviso-sistema { background: var(--marca-suave); border: 1px solid var(--marca); border-radius: 12px; padding: 12px 14px; font-size: 0.92rem; }
+.plano-item { display: grid; grid-template-columns: 74px 1fr; gap: 8px; align-items: start; }
+.plano-item input { padding: 8px; }
+.resposta-claude { white-space: pre-wrap; background: var(--papel); border: 1px solid var(--linha); border-radius: 9px; padding: 10px; font-size: 0.92rem; max-height: 220px; overflow: auto; }
+.rodape { font-size: 0.8rem; color: var(--tinta-2); }
+@media (prefers-reduced-motion: no-preference) { .linha, .btn, .aba { transition: background-color .15s, border-color .15s, color .15s; } }
+@media (max-width: 380px) { .numeros { grid-template-columns: 1fr 1fr; } .proxima .grande { font-size: 2.2rem; } }
+.hoje-data { margin: 0; font-size: 1.02rem; color: var(--tinta-2); }
+.hoje-data strong { color: var(--tinta); }
+.acoes-folha { display: flex; gap: 8px; flex-wrap: wrap; }
+.linha-cod { grid-template-columns: 74px minmax(0, 1fr) auto; }
+#conteudo { display: grid; gap: 24px; min-width: 0; }
+.secao-cab { align-items: center; }
+.secao-cab > p { flex: 1 1 220px; }
+.disc-acoes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.disc-acoes .btn { text-align: center; }
+.linha .pilula, .linha .nota { justify-self: end; }
+.numero { align-content: start; }
+</style>
+</head>
+<body>
+
+<div class="pagina" id="app">
+  <header class="topo">
+    <div>
+      <div class="rotulo" id="curso-nome">UFF · Graduação</div>
+      <h1 id="titulo-aba">Hoje</h1>
+    </div>
+    <span class="sem" id="semestre">—</span>
+  </header>
+  <div id="aviso-sistema" class="aviso-sistema" hidden></div>
+  <main id="conteudo"></main>
+</div>
+
+<nav class="abas" aria-label="Seções">
+  <div class="abas-in">
+    <button class="aba" data-aba="hoje" aria-current="page"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>Hoje</button>
+    <button class="aba" data-aba="agenda"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Agenda</button>
+    <button class="aba" data-aba="periodo"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M9 11h6M9 15h6"/></svg>Período</button>
+    <button class="aba" data-aba="curso"><svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5-9 5z"/><path d="M7 11.5V16c0 1.5 2.5 3 5 3s5-1.5 5-3v-4.5"/></svg>Curso</button>
+    <button class="aba" data-aba="estudo"><svg viewBox="0 0 24 24"><path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/></svg>Estudo</button>
+  </div>
+</nav>
+
+<dialog id="folha"><form class="folha" id="folha-form" method="dialog"></form></dialog>
+
+<script>
+"use strict";
+/* ---------- estado ---------- */
+const S = { discs: new Map(), avals: new Map(), avisos: new Map(), eventos: new Map(), perfil: {}, aba: "hoje", filtroCurso: "todas", mes: null, diaSel: null };
+let db = null, sample = null, podeEscrever = true;
+
+/* ---------- utilidades ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const hojeISO = () => { const d = new Date(); return iso(d); };
+const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const deISO = (s) => { const [a, m, d] = String(s).split("-").map(Number); return new Date(a, (m || 1) - 1, d || 1); };
+const diasAte = (s) => Math.round((deISO(s) - deISO(hojeISO())) / 86400000);
+const somaDias = (s, n) => { const d = deISO(s); d.setDate(d.getDate() + n); return iso(d); };
+const SEMANA = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
+const MESES = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+const dataCurta = (s) => { if (!s) return "sem data"; const d = deISO(s); return `${SEMANA[d.getDay()]}, ${d.getDate()} ${MESES[d.getMonth()]}`; };
+const nota1 = (n) => (n == null || n === "" || Number.isNaN(Number(n))) ? "—" : Number(n).toFixed(1).replace(".", ",");
+const lerNota = (t) => { if (t == null) return null; const s = String(t).trim().replace(",", "."); if (s === "") return null; const n = Number(s); return Number.isFinite(n) && n >= 0 && n <= 10 ? Math.round(n * 10) / 10 : NaN; };
+function chipDias(s) {
+  if (!s) return `<span class="dmenos passou">s/ data</span>`;
+  const n = diasAte(s);
+  if (n < 0) return `<span class="dmenos passou">há ${-n} d</span>`;
+  if (n === 0) return `<span class="dmenos urgente">HOJE</span>`;
+  if (n === 1) return `<span class="dmenos urgente">amanhã</span>`;
+  return `<span class="dmenos ${n <= 3 ? "urgente" : n <= 7 ? "perto" : ""}">D-${n}</span>`;
+}
+const nomeDisc = (id) => S.discs.get(id)?.nome || "Disciplina";
+const ordenarPor = (arr, f) => arr.slice().sort((a, b) => (f(a) < f(b) ? -1 : f(a) > f(b) ? 1 : 0));
+
+/* ---------- regras da UFF (Regulamento dos Cursos de Graduação, Res. CEP 001/2015, arts. 96 e 99) ---------- */
+function situacaoDisc(id) {
+  const avs = [...S.avals.values()].filter((a) => a.disciplinaId === id);
+  const regulares = avs.filter((a) => a.tipo !== "vs");
+  const vs = avs.find((a) => a.tipo === "vs");
+  const pesoTotal = regulares.reduce((s, a) => s + (Number(a.peso) || 1), 0);
+  const comNota = regulares.filter((a) => a.nota != null);
+  const pesoFeito = comNota.reduce((s, a) => s + (Number(a.peso) || 1), 0);
+  const pontos = comNota.reduce((s, a) => s + (Number(a.peso) || 1) * a.nota, 0);
+  const r = { avs, regulares, vs, pesoTotal, pesoFeito, media: null, parcial: null, texto: "", classe: "p-cur", rotulo: "Cursando" };
+  if (!regulares.length) { r.texto = "Cadastre as provas e trabalhos desta matéria para acompanhar a média."; return r; }
+  if (pesoFeito > 0) r.parcial = pontos / pesoFeito;
+  if (pesoFeito < pesoTotal) {
+    const falta = pesoTotal - pesoFeito;
+    const precisa6 = (6 * pesoTotal - pontos) / falta;
+    const precisa4 = (4 * pesoTotal - pontos) / falta;
+    if (!comNota.length) r.texto = "Para passar direto, a média das avaliações precisa ficar em 6,0 ou mais.";
+    else if (precisa6 <= 0) { r.texto = "Você já garantiu a média 6,0, mesmo tirando zero no que falta."; r.classe = "p-ok"; r.rotulo = "Garantido"; }
+    else if (precisa6 <= 10) r.texto = `Para passar direto, precisa de média ${nota1(precisa6)} no que falta.`;
+    else if (precisa4 <= 10) { r.texto = `Não dá mais para passar direto. Para ir à VS, precisa de média ${nota1(Math.max(precisa4, 0))} no que falta.`; r.classe = "p-vs"; r.rotulo = "Rumo à VS"; }
+    else { r.texto = "Mesmo com 10 no que falta, a média não chega a 4,0."; r.classe = "p-rep"; r.rotulo = "Em risco"; }
+    return r;
+  }
+  r.media = pontos / pesoTotal;
+  if (r.media >= 6) { r.texto = "Média 6,0 ou mais: aprovado direto (com frequência de 75%)."; r.classe = "p-ok"; r.rotulo = "Aprovado"; }
+  else if (r.media >= 4) {
+    if (vs && vs.nota != null) {
+      if (vs.nota >= 6) { r.texto = `VS ${nota1(vs.nota)}: aprovado (a VS precisa de 6,0).`; r.classe = "p-ok"; r.rotulo = "Aprovado na VS"; }
+      else { r.texto = `VS ${nota1(vs.nota)}: abaixo de 6,0.`; r.classe = "p-rep"; r.rotulo = "Reprovado"; }
+    } else { r.texto = "Média entre 4,0 e 5,9: vai para a VS e precisa tirar 6,0 nela."; r.classe = "p-vs"; r.rotulo = "VS"; }
+  } else { r.texto = "Média abaixo de 4,0: reprovado sem direito a VS."; r.classe = "p-rep"; r.rotulo = "Reprovado"; }
+  return r;
+}
+
+const SITUACOES = { "a-conferir": ["A conferir", "p-pen"], aprovado: ["Aprovado", "p-ok"], cursando: ["Cursando", "p-cur"], pendente: ["Falta cursar", "p-pen"], reprovado: ["Reprovado", "p-rep"], trancado: ["Trancado", "p-pen"] };
+
+/* ---------- horários de aula: "seg 14:00-16:00; qua 14:00-16:00" ---------- */
+const DIAS_TXT = { dom: 0, seg: 1, ter: 2, qua: 3, qui: 4, sex: 5, sab: 6, "sáb": 6 };
+function lerHorarios(t) {
+  const out = [];
+  for (const m of String(t || "").toLowerCase().matchAll(/(dom|seg|ter|qua|qui|sex|s[aá]b)\D*?(\d{1,2})[:h](\d{2})\s*(?:-|–|\/|a|às)\s*(\d{1,2})[:h](\d{2})/g)) {
+    out.push({ dia: DIAS_TXT[m[1]], inicio: `${m[2].padStart(2, "0")}:${m[3]}`, fim: `${m[4].padStart(2, "0")}:${m[5]}` });
+  }
+  return out;
+}
+const escreverHorarios = (hs) => (hs || []).map((h) => `${SEMANA[h.dia]} ${h.inicio}-${h.fim}`).join("; ");
+const horaCurta = (t) => { const [h, m] = String(t).split(":"); return `${Number(h)}h${m && m !== "00" ? m : ""}`; };
+function mostrarHorarios(hs) {
+  const grupos = new Map();
+  for (const h of hs || []) { const k = `${horaCurta(h.inicio)}–${horaCurta(h.fim)}`; if (!grupos.has(k)) grupos.set(k, []); grupos.get(k).push(SEMANA[h.dia]); }
+  return [...grupos].map(([k, dias]) => `${dias.join(" e ")}, ${k}`).join(" · ");
+}
+
+/* ---------- agenda: tudo o que cai num dia ---------- */
+function dentroDoSemestre(d) {
+  const { inicioSemestre: i, fimSemestre: f } = S.perfil;
+  return (!i || d >= i) && (!f || d <= f);
+}
+function itensDoDia(d) {
+  const out = [];
+  const dow = deISO(d).getDay();
+  for (const a of S.avals.values()) if (a.data === d) out.push({ cor: "c-prova", hora: a.hora || "", titulo: `${a.nome} · ${nomeDisc(a.disciplinaId)}`, sub: a.nota != null ? "nota " + nota1(a.nota) : (a.conteudo || "Prova"), acao: "editar-aval", id: a.id });
+  for (const e of S.eventos.values()) {
+    const repete = e.repeteAte && d >= e.data && d <= e.repeteAte && diasAte(d) - diasAte(e.data) >= 0 && (diasAte(d) - diasAte(e.data)) % 7 === 0;
+    if (e.data === d || repete) out.push({ cor: e.categoria === "externo" ? "c-ext" : "c-facul", hora: e.hora || "", titulo: e.titulo, sub: [e.horaFim ? "até " + e.horaFim : "", e.local, e.categoria === "externo" ? "Fora da faculdade" : "Faculdade"].filter(Boolean).join(" · "), acao: "editar-evento", id: e.id });
+  }
+  if (dentroDoSemestre(d)) for (const disc of S.discs.values()) {
+    if (disc.situacao !== "cursando") continue;
+    for (const h of disc.horarios || []) if (h.dia === dow) out.push({ cor: "c-facul", hora: h.inicio, titulo: `Aula · ${disc.nome}`, sub: [`até ${h.fim}`, disc.professor, disc.turma ? "turma " + disc.turma : ""].filter(Boolean).join(" · "), acao: "editar-disc", id: disc.id, aula: true });
+  }
+  for (const v of S.avisos.values()) if (v.data === d && !v.feito) out.push({ cor: "c-estudo", hora: "", titulo: v.texto, sub: v.disciplinaId ? "Estudo · " + nomeDisc(v.disciplinaId) : "Estudo", acao: "editar-aviso", id: v.id });
+  return out.sort((a, b) => (a.hora || "99") < (b.hora || "99") ? -1 : (a.hora || "99") > (b.hora || "99") ? 1 : 0);
+}
+function linhaAgenda(i) {
+  return `<div class="linha clicavel" data-acao="${i.acao}" data-id="${esc(i.id)}"><span class="hora">${esc(i.hora || "—")}</span>
+    <div><div class="t"><span class="ponto ${i.cor}" style="display:inline-block;margin-right:6px;vertical-align:1px"></span>${esc(i.titulo)}</div><div class="s">${esc(i.sub)}</div></div><span></span></div>`;
+}
+function resumoCurso() {
+  const ds = [...S.discs.values()].filter((d) => d.tipo !== "optativa-extra");
+  const ch = (d) => Number(d.cargaHoraria) || 0;
+  const chTotal = Number(S.perfil.chTotal) || ds.filter((d) => d.tipo !== "optativa").reduce((s, d) => s + ch(d), 0);
+  const chAprov = Number(S.perfil.chObtida) || ds.filter((d) => d.situacao === "aprovado").reduce((s, d) => s + ch(d), 0);
+  const comNota = ds.filter((d) => (d.situacao === "aprovado" || d.situacao === "reprovado") && d.notaFinal != null && ch(d) > 0);
+  const chN = comNota.reduce((s, d) => s + ch(d), 0);
+  const cr = S.perfil.crOficial || (chN ? (comNota.reduce((s, d) => s + d.notaFinal * ch(d), 0) / chN).toFixed(1).replace(".", ",") : null);
+  return { chTotal, chAprov, cr, aprovadas: ds.filter((d) => d.situacao === "aprovado").length, faltam: ds.filter((d) => d.situacao === "pendente").length, cursando: ds.filter((d) => d.situacao === "cursando") };
+}
+
+/* ---------- telas ---------- */
+const TITULOS = { hoje: "Hoje", agenda: "Agenda", periodo: "Este período", curso: "Meu curso", estudo: "Plano de estudo" };
+function render() {
+  $("#titulo-aba").textContent = TITULOS[S.aba];
+  $("#semestre").textContent = S.perfil.semestreAtual || "semestre —";
+  $("#curso-nome").textContent = S.perfil.curso ? `UFF · ${S.perfil.curso}` : "UFF · Graduação";
+  const el = $("#conteudo");
+  el.innerHTML = ({ hoje: telaHoje, agenda: telaAgenda, periodo: telaPeriodo, curso: telaCurso, estudo: telaEstudo })[S.aba]();
+}
+
+const NOMES_MES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+function telaAgenda() {
+  const h = hojeISO();
+  if (!S.mes) S.mes = h.slice(0, 7);
+  if (!S.diaSel) S.diaSel = h;
+  const [ano, mes] = S.mes.split("-").map(Number);
+  const primeiro = new Date(ano, mes - 1, 1);
+  const inicio = new Date(primeiro); inicio.setDate(1 - primeiro.getDay());
+  let grade = SEMANA.map((s) => `<div class="sem-d">${s}</div>`).join("");
+  for (let k = 0; k < 42; k++) {
+    const d = new Date(inicio); d.setDate(inicio.getDate() + k);
+    if (k >= 35 && d.getMonth() !== mes - 1) break;
+    const di = iso(d);
+    const itens = itensDoDia(di);
+    const cores = [...new Set(itens.map((i) => i.cor))].slice(0, 4);
+    grade += `<button class="dia ${d.getMonth() !== mes - 1 ? "fora" : ""} ${di === h ? "hoje" : ""}" data-acao="dia" data-d="${di}" aria-pressed="${di === S.diaSel}" aria-label="${d.getDate()} de ${NOMES_MES[d.getMonth()]}, ${itens.length} itens">
+      <span class="n">${d.getDate()}</span><span class="pontos">${cores.map((c) => `<i class="ponto ${c}"></i>`).join("")}</span></button>`;
+  }
+  const itensSel = itensDoDia(S.diaSel);
+  return `<section class="secao">
+    <div class="mes-cab"><h2>${NOMES_MES[mes - 1]} ${ano}</h2><div class="mes-nav"><button class="btn" data-acao="mes" data-passo="-1" aria-label="Mês anterior">‹</button><button class="btn" data-acao="mes" data-passo="0">Hoje</button><button class="btn" data-acao="mes" data-passo="1" aria-label="Próximo mês">›</button></div></div>
+    <div class="cal">${grade}</div>
+    <div class="legenda"><span><i class="ponto c-prova"></i>Prova</span><span><i class="ponto c-facul"></i>Aula e faculdade</span><span><i class="ponto c-ext"></i>Fora da faculdade</span><span><i class="ponto c-estudo"></i>Estudo</span></div>
+  </section>
+  <section class="secao"><div class="secao-cab"><h2>${dataCurta(S.diaSel)}</h2><button class="btn forte" data-acao="novo-evento">+ Compromisso</button></div>
+    ${itensSel.length ? `<div class="lista">${itensSel.map(linhaAgenda).join("")}</div>` : `<div class="vazio">Dia livre. Toque em “+ Compromisso” para marcar algo da faculdade ou de fora.</div>`}
+  </section>` + rodape();
+}
+
+function telaHoje() {
+  const h = hojeISO();
+  const proximas = ordenarPor([...S.avals.values()].filter((a) => a.data && a.data >= h && a.nota == null), (a) => a.data);
+  const avisos = ordenarPor([...S.avisos.values()].filter((v) => !v.feito && v.data && v.data <= somaDias(h, 1)), (v) => v.data);
+  const rc = resumoCurso();
+  const p = proximas[0];
+  const hd = deISO(h);
+  const DIAS_LONGOS = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
+  let out = `<p class="hoje-data">Hoje é <strong>${DIAS_LONGOS[hd.getDay()]}, ${hd.getDate()} de ${NOMES_MES[hd.getMonth()]}</strong>.</p>`;
+  if (p) {
+    const n = diasAte(p.data);
+    out += `<section class="proxima" aria-label="Próxima avaliação">
+      <div class="rotulo">Próxima avaliação</div>
+      <div class="grande num">${n === 0 ? "hoje" : n === 1 ? "amanhã" : `${n}<small>dias</small>`}</div>
+      <div><strong>${esc(p.nome)}</strong> · ${esc(nomeDisc(p.disciplinaId))}</div>
+      <div class="pequeno">${dataCurta(p.data)}${p.hora ? " às " + esc(p.hora) : ""}${p.conteudo ? " · " + esc(p.conteudo) : ""}</div>
+    </section>`;
+  }
+  out += `<section class="numeros" aria-label="Resumo">
+    <div class="numero"><span class="rotulo">CR</span><span class="v">${esc(rc.cr ?? "—")}</span><span class="pequeno fraco">${S.perfil.crOficial ? "do idUFF" : "estimado"}</span></div>
+    <div class="numero"><span class="rotulo">Curso feito</span><span class="v">${rc.chTotal ? Math.round((rc.chAprov / rc.chTotal) * 100) + "%" : "—"}</span><span class="pequeno fraco">${rc.chAprov} de ${rc.chTotal || "?"} h</span></div>
+    <div class="numero"><span class="rotulo">Cursando</span><span class="v">${rc.cursando.length}</span><span class="pequeno fraco">matérias</span></div>
+  </section>`;
+  const agendaHoje = itensDoDia(h).filter((i) => i.cor !== "c-estudo");
+  out += `<section class="secao"><div class="secao-cab"><h2>Hoje na agenda</h2><button class="btn" data-acao="novo-evento">+ Compromisso</button></div>`;
+  out += agendaHoje.length ? `<div class="lista">${agendaHoje.map(linhaAgenda).join("")}</div>` : `<div class="vazio">Nenhuma aula ou compromisso hoje.</div>`;
+  out += `</section>`;
+  out += `<section class="secao"><div class="secao-cab"><h2>Estudar hoje</h2><button class="btn" data-acao="novo-aviso">+ Aviso</button></div>`;
+  out += avisos.length ? `<div class="lista">${avisos.map(linhaAviso).join("")}</div>` : `<div class="vazio">Nada marcado para hoje. Monte o plano de uma prova na aba Estudo e os avisos aparecem aqui no dia certo.</div>`;
+  out += `</section>`;
+  out += `<section class="secao"><div class="secao-cab"><h2>Próximas avaliações</h2><button class="btn" data-acao="nova-aval">+ Prova</button></div>`;
+  out += proximas.length ? `<div class="lista">${proximas.slice(0, 8).map(linhaAval).join("")}</div>` : `<div class="vazio">Nenhuma prova marcada ainda. Toque em “+ Prova” para cadastrar a data.</div>`;
+  out += `</section>`;
+  return out + rodape();
+}
+
+function linhaAval(a) {
+  return `<div class="linha clicavel" data-acao="editar-aval" data-id="${esc(a.id)}">${chipDias(a.data)}
+    <div><div class="t">${esc(a.nome)} · ${esc(nomeDisc(a.disciplinaId))}</div><div class="s">${dataCurta(a.data)}${a.hora ? " às " + esc(a.hora) : ""}${a.conteudo ? " · " + esc(a.conteudo) : ""}</div></div>
+    <span class="nota ${a.nota == null ? "vazia" : ""}">${a.nota == null ? "peso " + esc(a.peso ?? 1) : nota1(a.nota)}</span></div>`;
+}
+function linhaAviso(v) {
+  const atrasado = v.data && v.data < hojeISO() && !v.feito;
+  return `<div class="linha ${v.feito ? "feito-txt" : ""}">
+    <button class="marcar ${v.feito ? "feito" : ""}" data-acao="marcar-aviso" data-id="${esc(v.id)}" aria-label="${v.feito ? "Desmarcar" : "Marcar como feito"}">${v.feito ? "✓" : ""}</button>
+    <div class="clicavel" data-acao="editar-aviso" data-id="${esc(v.id)}"><div class="t">${esc(v.texto)}</div>
+    <div class="s">${atrasado ? '<strong style="color:var(--rep)">atrasado · </strong>' : ""}${dataCurta(v.data)}${v.disciplinaId ? " · " + esc(nomeDisc(v.disciplinaId)) : ""}</div></div>
+    ${chipDias(v.data)}</div>`;
+}
+
+function telaPeriodo() {
+  const cursando = ordenarPor([...S.discs.values()].filter((d) => d.situacao === "cursando"), (d) => d.nome);
+  let out = `<div class="secao-cab"><p class="fraco pequeno" style="margin:0">Notas de 0 a 10, uma casa decimal. Passa direto com média 6,0; de 4,0 a 5,9 vai para a VS.</p><button class="btn forte" data-acao="nova-disc" data-sit="cursando">+ Matéria</button></div>`;
+  if (!cursando.length) return out + `<div class="vazio">Nenhuma matéria marcada como “cursando”. Adicione as deste período ou mande a lista para o Claude.</div>` + rodape();
+  for (const d of cursando) {
+    const r = situacaoDisc(d.id);
+    const avs = ordenarPor(r.avs, (a) => (a.tipo === "vs" ? "z" : "") + (a.data || "9999"));
+    out += `<article class="disc">
+      <div class="disc-cab"><div><div class="cod">${esc(d.codigo || "")}${d.cargaHoraria ? " · " + esc(d.cargaHoraria) + " h" : ""}${d.turma ? " · turma " + esc(d.turma) : ""}</div><h3>${esc(d.nome)}</h3>
+        <div class="pequeno fraco">${[d.professor ? "Prof. " + esc(d.professor) : "", esc(mostrarHorarios(d.horarios))].filter(Boolean).join(" · ")}</div></div>
+      <span class="pilula ${r.classe}">${r.rotulo}</span></div>
+      ${avs.length ? avs.map((a) => `<div class="aval linha clicavel" data-acao="editar-aval" data-id="${esc(a.id)}" style="grid-template-columns:auto 1fr auto">${a.nota == null ? chipDias(a.data) : `<span class="dmenos passou">nota</span>`}
+        <div><div class="t">${esc(a.nome)}${a.tipo === "vs" ? "" : ` <span class="fraco pequeno">peso ${esc(a.peso ?? 1)}</span>`}</div><div class="s">${dataCurta(a.data)}${a.conteudo ? " · " + esc(a.conteudo) : ""}</div></div>
+        <span class="nota ${a.nota == null ? "vazia" : ""}">${nota1(a.nota)}</span></div>`).join("") : ""}
+      <div class="disc-pe"><div class="media"><span class="rotulo">${r.media != null ? "Média parcial" : "Média até agora"}</span><span class="num" style="font-weight:600">${nota1(r.media ?? r.parcial)}</span></div><div class="pequeno">${esc(r.texto)}</div></div>
+      <div class="disc-acoes"><button class="btn" data-acao="nova-aval" data-disc="${esc(d.id)}">+ Prova</button><button class="btn" data-acao="plano" data-disc="${esc(d.id)}">Plano</button><button class="btn" data-acao="editar-disc" data-id="${esc(d.id)}">Editar</button></div>
+    </article>`;
+  }
+  return out + rodape();
+}
+
+function telaCurso() {
+  const rc = resumoCurso();
+  const pct = rc.chTotal ? Math.min(100, (rc.chAprov / rc.chTotal) * 100) : 0;
+  const f = S.filtroCurso;
+  const todas = [...S.discs.values()].filter((d) => f === "todas" || d.situacao === f);
+  const grupos = new Map();
+  for (const d of todas) { const k = d.periodo ? Number(d.periodo) : 99; if (!grupos.has(k)) grupos.set(k, []); grupos.get(k).push(d); }
+  let out = `<section class="secao"><div class="secao-cab"><span class="rotulo">Carga horária cumprida</span><span class="num">${rc.chAprov} / ${rc.chTotal || "?"} h · ${Math.round(pct)}%</span></div>
+    <div class="barra" role="img" aria-label="${Math.round(pct)}% do curso"><i style="width:${pct}%"></i></div>
+    <div class="pequeno fraco">${rc.aprovadas} aprovadas · ${rc.cursando.length} cursando · ${rc.faltam} faltando · CR ${esc(rc.cr ?? "—")}</div>
+    ${S.perfil.faltas ? `<div class="lista">${[["Matérias obrigatórias", S.perfil.faltas.obrigatorias], ["Extensão", S.perfil.faltas.extensao], ["Optativas", S.perfil.faltas.optativas], ["Eletivas", S.perfil.faltas.eletivas], ["Atividades complementares", S.perfil.faltas.complementares]].map(([t, n]) => `<div class="linha" style="grid-template-columns:1fr auto"><div class="t">${t}</div><span class="num">${n ? "faltam " + n + " h" : "completo"}</span></div>`).join("")}</div>
+    <div class="pequeno fraco">Números do idUFF${S.perfil.atualizadoIduff ? ", lidos em " + esc(S.perfil.atualizadoIduff.split("-").reverse().join("/")) : ""}.</div>` : ""}</section>`;
+  out += `<div class="secao-cab"><div class="filtros" role="group" aria-label="Filtrar">${[["todas", "Todas"], ["aprovado", "Aprovadas"], ["cursando", "Cursando"], ["pendente", "Faltam"], ["reprovado", "Reprovadas"]].map(([k, t]) => `<button class="filtro" data-acao="filtro" data-f="${k}" aria-pressed="${f === k}">${t}</button>`).join("")}</div><button class="btn forte" data-acao="nova-disc">+ Matéria</button></div>`;
+  if (!S.discs.size) return out + `<div class="vazio">O currículo ainda não foi carregado. Ele vem do idUFF (currículo integralizado) e do fluxograma do curso.</div>` + rodape();
+  for (const k of [...grupos.keys()].sort((a, b) => a - b)) {
+    const ds = ordenarPor(grupos.get(k), (d) => d.nome);
+    out += `<section class="periodo-grupo"><h2>${k === 99 ? "Optativas e sem período" : k + "º período"}</h2><div class="lista">${ds.map((d) => {
+      const [t, c] = SITUACOES[d.situacao] || SITUACOES.pendente;
+      return `<div class="linha clicavel linha-cod" data-acao="editar-disc" data-id="${esc(d.id)}"><span class="num pequeno fraco">${esc(d.codigo || "—")}</span>
+        <div><div class="t">${esc(d.nome)}</div><div class="s">${[d.cargaHoraria ? esc(d.cargaHoraria) + " h" : "", d.semestre ? esc(d.semestre) : "", d.notaFinal != null ? "nota " + nota1(d.notaFinal) + (d.vs != null ? " (VS " + nota1(d.vs) + ")" : "") : "", d.obs ? esc(d.obs) : "", d.requisito && d.situacao !== "aprovado" ? "requer " + esc(d.requisito) : ""].filter(Boolean).join(" · ")}</div></div>
+        <span class="pilula ${c}">${t}</span></div>`; }).join("")}</div></section>`;
+  }
+  return out + rodape();
+}
+
+function telaEstudo() {
+  const h = hojeISO();
+  const todos = ordenarPor([...S.avisos.values()], (v) => v.data || "9999");
+  const atras = todos.filter((v) => !v.feito && v.data && v.data < h);
+  const hoje = todos.filter((v) => !v.feito && v.data === h);
+  const semana = todos.filter((v) => !v.feito && v.data > h && v.data <= somaDias(h, 7));
+  const depois = todos.filter((v) => !v.feito && (!v.data || v.data > somaDias(h, 7)));
+  const feitos = todos.filter((v) => v.feito).reverse().slice(0, 15);
+  let out = `<div class="secao-cab"><p class="fraco pequeno" style="margin:0">Cada prova vira uma sequência de revisões em dias diferentes. Os avisos de hoje aparecem na aba Hoje.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-acao="novo-aviso">+ Aviso</button><button class="btn forte" data-acao="plano">Montar plano</button></div></div>`;
+  const bloco = (t, arr, vazio) => `<section class="secao"><h2>${t}</h2>${arr.length ? `<div class="lista">${arr.map(linhaAviso).join("")}</div>` : `<div class="vazio">${vazio}</div>`}</section>`;
+  if (atras.length) out += bloco("Atrasados", atras, "");
+  out += bloco("Hoje", hoje, "Nada para hoje.");
+  out += bloco("Próximos 7 dias", semana, "Nada marcado para a semana.");
+  if (depois.length) out += bloco("Mais adiante", depois, "");
+  if (feitos.length) out += bloco("Feitos recentemente", feitos, "");
+  out += `<section class="secao"><h2>Como estudar para prova</h2><div class="lista">
+    ${[["Tirar da memória", "Fechar o caderno e tentar resolver ou explicar. Errar e corrigir fixa mais do que reler."], ["Espaçar", "Várias sessões curtas em dias diferentes rendem mais que uma noite inteira na véspera."], ["Misturar tipos", "Alternar exercícios de assuntos diferentes treina a reconhecer qual método usar na prova."], ["Prova antiga cronometrada", "Dois ou três dias antes, simular a prova de verdade mostra onde ainda falta."]].map(([t, s]) => `<div class="linha" style="grid-template-columns:1fr"><div><div class="t">${t}</div><div class="s">${s}</div></div></div>`).join("")}
+  </div></section>`;
+  return out + rodape();
+}
+
+function rodape() {
+  return `<p class="rodape">Regras de aprovação: Regulamento dos Cursos de Graduação da UFF (Res. CEP 001/2015), arts. 96 e 99. Frequência mínima de 75% em todas as matérias. <button class="btn" style="padding:3px 8px;font-size:0.8rem" data-acao="perfil">Ajustes</button></p>`;
+}
+
+/* ---------- folha de edição ---------- */
+const folha = $("#folha"), form = $("#folha-form");
+let aoSalvar = null;
+function campo(c) {
+  const v = c.valor ?? "";
+  const id = "f-" + c.id;
+  let input;
+  if (c.tipo === "select") input = `<select id="${id}" name="${c.id}">${c.opcoes.map(([k, t]) => `<option value="${esc(k)}" ${String(k) === String(v) ? "selected" : ""}>${esc(t)}</option>`).join("")}</select>`;
+  else if (c.tipo === "textarea") input = `<textarea id="${id}" name="${c.id}" placeholder="${esc(c.dica || "")}">${esc(v)}</textarea>`;
+  else input = `<input id="${id}" name="${c.id}" type="${c.tipo || "text"}" value="${esc(v)}" ${c.inputmode ? `inputmode="${c.inputmode}"` : ""} placeholder="${esc(c.dica || "")}" ${c.obrig ? "required" : ""}>`;
+  return `<div class="campo"><label for="${id}">${esc(c.rotulo)}</label>${input}${c.ajuda ? `<span class="ajuda">${esc(c.ajuda)}</span>` : ""}</div>`;
+}
+function abrirFolha({ titulo, campos, extra = "", salvar, apagar }) {
+  const linhas = [];
+  for (let i = 0; i < campos.length; i++) {
+    const c = campos[i];
+    if (c.par && campos[i + 1]) { linhas.push(`<div class="campos-2">${campo(c)}${campo(campos[i + 1])}</div>`); i++; }
+    else linhas.push(campo(c));
+  }
+  form.innerHTML = `<h2>${esc(titulo)}</h2>${linhas.join("")}${extra}<p class="ajuda" id="folha-erro" role="alert" hidden></p>
+    <div class="folha-pe">${apagar ? `<button type="button" class="btn perigo" id="folha-apagar">Apagar</button>` : ""}<div class="dir"><button type="button" class="btn" id="folha-fechar">Cancelar</button><button type="submit" class="btn forte" ${podeEscrever ? "" : "disabled"}>Salvar</button></div></div>`;
+  aoSalvar = salvar;
+  $("#folha-fechar").onclick = () => folha.close();
+  const ap = $("#folha-apagar");
+  if (ap) ap.onclick = async () => {
+    if (!ap.classList.contains("armado")) { ap.classList.add("armado"); ap.textContent = "Toque de novo para apagar"; return; }
+    ap.disabled = true;
+    try { await apagar(); folha.close(); } catch (e) { erroFolha(e); ap.disabled = false; }
+  };
+  folha.showModal();
+}
+function erroFolha(e) { const p = $("#folha-erro"); p.hidden = false; p.style.color = "var(--rep)"; p.textContent = typeof e === "string" ? e : "Não consegui salvar agora. Confira a conexão e tente de novo."; }
+form.addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  if (!aoSalvar) return;
+  const dados = Object.fromEntries(new FormData(form).entries());
+  const btn = form.querySelector('[type="submit"]');
+  btn.disabled = true;
+  try { const r = await aoSalvar(dados); if (r !== false) folha.close(); }
+  catch (e) { erroFolha(e); }
+  finally { btn.disabled = false; }
+});
+
+const opcoesDisc = (vazio) => [...(vazio ? [["", vazio]] : []), ...ordenarPor([...S.discs.values()].filter((d) => d.situacao === "cursando"), (d) => d.nome).map((d) => [d.id, d.nome])];
+
+function folhaDisc(id, sitPadrao) {
+  const d = id ? S.discs.get(id) : { situacao: sitPadrao || "pendente" };
+  abrirFolha({
+    titulo: id ? "Editar matéria" : "Nova matéria",
+    campos: [
+      { id: "nome", rotulo: "Nome", valor: d.nome, obrig: true },
+      { id: "codigo", rotulo: "Código", valor: d.codigo, dica: "ex.: GMA00108", par: true },
+      { id: "cargaHoraria", rotulo: "Carga horária (h)", valor: d.cargaHoraria, tipo: "number", inputmode: "numeric" },
+      { id: "periodo", rotulo: "Período no fluxograma", valor: d.periodo, tipo: "number", inputmode: "numeric", par: true },
+      { id: "tipo", rotulo: "Tipo", valor: d.tipo || "obrigatoria", tipo: "select", opcoes: [["obrigatoria", "Obrigatória"], ["optativa", "Optativa"]] },
+      { id: "situacao", rotulo: "Situação", valor: d.situacao, tipo: "select", opcoes: Object.entries(SITUACOES).map(([k, [t]]) => [k, t]), par: true },
+      { id: "notaFinal", rotulo: "Nota final", valor: d.notaFinal == null ? "" : nota1(d.notaFinal), inputmode: "decimal", dica: "ex.: 7,5" },
+      { id: "semestre", rotulo: "Semestre cursado", valor: d.semestre, dica: "ex.: 2026.2", par: true },
+      { id: "professor", rotulo: "Professor(a)", valor: d.professor, par: true },
+      { id: "turma", rotulo: "Turma", valor: d.turma },
+      { id: "horarios", rotulo: "Horário das aulas", valor: escreverHorarios(d.horarios), dica: "seg 14:00-16:00; qua 14:00-16:00", ajuda: "As aulas aparecem na Agenda toda semana enquanto a matéria estiver como “cursando”." },
+    ],
+    salvar: async (f) => {
+      const nf = lerNota(f.notaFinal);
+      if (Number.isNaN(nf)) throw "A nota final precisa ser um número de 0 a 10.";
+      const horarios = lerHorarios(f.horarios);
+      if (f.horarios.trim() && !horarios.length) throw "Não entendi o horário. Escreva assim: seg 14:00-16:00; qua 14:00-16:00";
+      const doc = { nome: f.nome.trim(), codigo: f.codigo.trim().toUpperCase(), cargaHoraria: f.cargaHoraria ? Number(f.cargaHoraria) : null, periodo: f.periodo ? Number(f.periodo) : null,
+        tipo: f.tipo, situacao: f.situacao, notaFinal: nf, semestre: f.semestre.trim(), professor: f.professor.trim(), turma: f.turma.trim(), horarios };
+      const novoId = id || (doc.codigo || "d") .replace(/[^A-Za-z0-9_-]/g, "") + "-" + Math.random().toString(36).slice(2, 6);
+      const corpo = { ...(id ? S.discs.get(id) : {}), ...doc };
+      delete corpo.id;
+      await db.collection("disciplinas").doc(novoId).set(corpo);
+    },
+    apagar: id ? async () => { await db.collection("disciplinas").doc(id).delete(); } : null,
+  });
+}
+
+function folhaAval(id, discPadrao) {
+  const a = id ? S.avals.get(id) : { disciplinaId: discPadrao || "", tipo: "prova", peso: 1 };
+  if (!opcoesDisc().length) { mostrarAviso("Primeiro cadastre uma matéria como “cursando” na aba Período."); return; }
+  abrirFolha({
+    titulo: id ? "Editar avaliação" : "Nova prova ou trabalho",
+    extra: id ? `<div class="acoes-folha"><button type="button" class="btn" id="lembrete-ics">Pôr no calendário do iPhone</button></div><span class="ajuda">O calendário do celular avisa 3 dias e 1 dia antes da prova.</span>` : "",
+    campos: [
+      { id: "disciplinaId", rotulo: "Matéria", valor: a.disciplinaId, tipo: "select", opcoes: opcoesDisc() },
+      { id: "nome", rotulo: "Nome", valor: a.nome, dica: "P1, P2, Trabalho, VS…", obrig: true, par: true },
+      { id: "tipo", rotulo: "Tipo", valor: a.tipo, tipo: "select", opcoes: [["prova", "Prova"], ["trabalho", "Trabalho"], ["vs", "VS (verificação suplementar)"]] },
+      { id: "data", rotulo: "Data", valor: a.data, tipo: "date", par: true },
+      { id: "hora", rotulo: "Horário", valor: a.hora, tipo: "time" },
+      { id: "peso", rotulo: "Peso na média", valor: a.peso ?? 1, inputmode: "decimal", ajuda: "Se o professor faz média simples, deixe 1 em todas.", par: true },
+      { id: "nota", rotulo: "Nota", valor: a.nota == null ? "" : nota1(a.nota), inputmode: "decimal", dica: "em branco até sair" },
+      { id: "conteudo", rotulo: "Conteúdo cobrado", valor: a.conteudo, tipo: "textarea", dica: "Capítulos, listas, tópicos…" },
+    ],
+    salvar: async (f) => {
+      const n = lerNota(f.nota);
+      if (Number.isNaN(n)) throw "A nota precisa ser um número de 0 a 10, com uma casa decimal.";
+      const peso = Number(String(f.peso).replace(",", "."));
+      if (!(peso > 0)) throw "O peso precisa ser maior que zero.";
+      const doc = { disciplinaId: f.disciplinaId, nome: f.nome.trim(), tipo: f.tipo, data: f.data || null, hora: f.hora || null, peso, nota: n, conteudo: f.conteudo.trim() };
+      const ref = id ? db.collection("avaliacoes").doc(id) : db.collection("avaliacoes").doc();
+      await ref.set(doc);
+      if (id && a.data && doc.data && a.data !== doc.data) await moverAvisosDaProva(id, a.data, doc.data);
+    },
+    apagar: id ? async () => { await db.collection("avaliacoes").doc(id).delete(); } : null,
+  });
+  const bl = $("#lembrete-ics");
+  if (bl) bl.onclick = () => {
+    const x = S.avals.get(id);
+    if (!x?.data) { erroFolha("Ponha a data da prova e salve antes de criar o lembrete."); return; }
+    lembreteIcs({ id: x.id, titulo: `${x.nome} · ${nomeDisc(x.disciplinaId)}`, data: x.data, hora: x.hora, notas: x.conteudo, alarmes: ["-P3D", "-P1D"] });
+  };
+}
+async function moverAvisosDaProva(avalId, antiga, nova) {
+  const delta = diasAte(nova) - diasAte(antiga);
+  for (const v of S.avisos.values()) if (v.avaliacaoId === avalId && !v.feito && v.data) await db.collection("avisos").doc(v.id).update({ data: somaDias(v.data, delta) });
+}
+
+function folhaAviso(id) {
+  const v = id ? S.avisos.get(id) : { data: hojeISO() };
+  abrirFolha({
+    titulo: id ? "Editar aviso" : "Novo aviso de estudo",
+    campos: [
+      { id: "texto", rotulo: "O que fazer", valor: v.texto, tipo: "textarea", dica: "ex.: Refazer a lista 3 de Cálculo sem olhar a resolução" },
+      { id: "data", rotulo: "Dia", valor: v.data, tipo: "date", par: true },
+      { id: "disciplinaId", rotulo: "Matéria", valor: v.disciplinaId || "", tipo: "select", opcoes: opcoesDisc("Nenhuma") },
+    ],
+    salvar: async (f) => {
+      if (!f.texto.trim()) throw "Escreva o que precisa ser feito.";
+      const doc = { ...(id ? v : { feito: false }), texto: f.texto.trim(), data: f.data || null, disciplinaId: f.disciplinaId || null };
+      delete doc.id;
+      await (id ? db.collection("avisos").doc(id) : db.collection("avisos").doc()).set(doc);
+    },
+    apagar: id ? async () => { await db.collection("avisos").doc(id).delete(); } : null,
+  });
+}
+
+function folhaPerfil() {
+  const p = S.perfil;
+  abrirFolha({
+    titulo: "Ajustes",
+    campos: [
+      { id: "curso", rotulo: "Curso", valor: p.curso, dica: "ex.: Engenharia Química" },
+      { id: "semestreAtual", rotulo: "Semestre atual", valor: p.semestreAtual, dica: "2026.2", par: true },
+      { id: "crOficial", rotulo: "CR no idUFF", valor: p.crOficial, inputmode: "decimal" },
+      { id: "chTotal", rotulo: "Carga horária total do curso (h)", valor: p.chTotal, tipo: "number", inputmode: "numeric", ajuda: "Está no currículo do idUFF. Em branco, soma as obrigatórias cadastradas." },
+      { id: "inicioSemestre", rotulo: "Início das aulas", valor: p.inicioSemestre, tipo: "date", par: true },
+      { id: "fimSemestre", rotulo: "Fim das aulas", valor: p.fimSemestre, tipo: "date" },
+    ],
+    extra: `<div class="secao"><span class="rotulo">Suas alterações neste aparelho</span>
+      <p class="ajuda" style="margin:0">${alteracoesLocais() ? `Você fez ${alteracoesLocais()} alteração(ões) neste celular. Elas ficam guardadas só aqui. Para não perder, salve uma cópia ou mande para o Claude incluir no site.` : "Nenhuma alteração feita neste aparelho ainda."}</p>
+      <div class="acoes-folha"><button type="button" class="btn" id="bk-copiar">Copiar para mandar ao Claude</button><button type="button" class="btn" id="bk-salvar">Salvar cópia</button><label class="btn" for="bk-abrir" style="cursor:pointer">Abrir cópia</label><input type="file" id="bk-abrir" accept=".json,application/json" hidden></div>
+      <p class="ajuda" id="bk-msg" style="margin:0" hidden></p>
+      <p class="ajuda" style="margin:0">Dados do site atualizados em ${esc((BASE.atualizado || "—").split("-").reverse().join("/"))}.</p></div>`,
+    salvar: async (f) => {
+      await db.doc("config/perfil").set({ ...p, curso: f.curso.trim(), semestreAtual: f.semestreAtual.trim(), crOficial: f.crOficial.trim(), chTotal: f.chTotal ? Number(f.chTotal) : null, inicioSemestre: f.inicioSemestre || null, fimSemestre: f.fimSemestre || null });
+    },
+  });
+  const msg = (t) => { const m = $("#bk-msg"); m.hidden = false; m.textContent = t; };
+  const pacote = () => JSON.stringify({ caderneta: "uff", exportado: hojeISO(), alteracoes: ALT });
+  $("#bk-copiar").onclick = async () => {
+    try { await navigator.clipboard.writeText(pacote()); msg("Copiado. Cole numa conversa com o Claude e peça para incluir no site."); }
+    catch { msg("O celular não deixou copiar. Use “Salvar cópia” e mande o arquivo."); }
+  };
+  $("#bk-salvar").onclick = () => { baixar(pacote(), "application/json", `caderneta-uff-${hojeISO()}.json`); msg("Cópia salva nos arquivos do celular."); };
+  $("#bk-abrir").onchange = async (ev) => {
+    const arq = ev.target.files?.[0]; if (!arq) return;
+    try {
+      const j = JSON.parse(await arq.text());
+      if (j.caderneta !== "uff" || typeof j.alteracoes !== "object") throw 0;
+      ALT = { ...ALT, ...j.alteracoes }; guardarAlt();
+      for (const c of ["disciplinas", "avaliacoes", "avisos", "eventos", "config"]) avisarMudanca(c);
+      msg("Cópia aberta: as alterações dela voltaram para este aparelho.");
+    } catch { msg("Esse arquivo não é uma cópia da Caderneta."); }
+  };
+}
+
+function folhaEvento(id) {
+  const e = id ? S.eventos.get(id) : { data: S.diaSel || hojeISO(), categoria: "faculdade", avisarDias: 1 };
+  abrirFolha({
+    titulo: id ? "Editar compromisso" : "Novo compromisso",
+    extra: id ? `<div class="acoes-folha"><button type="button" class="btn" id="lembrete-ics">Pôr no calendário do iPhone</button></div><span class="ajuda">O aviso do celular segue o que você escolheu em “Avisar no celular”.</span>` : "",
+    campos: [
+      { id: "titulo", rotulo: "O quê", valor: e.titulo, obrig: true, dica: "Monitoria, dentista, entrega do relatório…" },
+      { id: "categoria", rotulo: "É da faculdade?", valor: e.categoria, tipo: "select", opcoes: [["faculdade", "Da faculdade"], ["externo", "Fora da faculdade"]], par: true },
+      { id: "data", rotulo: "Dia", valor: e.data, tipo: "date" },
+      { id: "hora", rotulo: "Começa", valor: e.hora, tipo: "time", par: true },
+      { id: "horaFim", rotulo: "Termina", valor: e.horaFim, tipo: "time" },
+      { id: "local", rotulo: "Onde", valor: e.local, dica: "Bloco E, sala 208…", par: true },
+      { id: "avisarDias", rotulo: "Avisar no celular", valor: e.avisarDias ?? 1, tipo: "select", opcoes: [["0", "No dia"], ["1", "Na véspera"], ["3", "3 dias antes"], ["7", "1 semana antes"], ["-1", "Não avisar"]] },
+      { id: "repeteAte", rotulo: "Repetir toda semana até", valor: e.repeteAte, tipo: "date", ajuda: "Deixe em branco se acontece uma vez só." },
+      { id: "notas", rotulo: "Anotações", valor: e.notas, tipo: "textarea" },
+    ],
+    salvar: async (f) => {
+      if (!f.data) throw "Escolha o dia.";
+      if (f.repeteAte && f.repeteAte < f.data) throw "A data final da repetição precisa ser depois do primeiro dia.";
+      const doc = { titulo: f.titulo.trim(), categoria: f.categoria, data: f.data, hora: f.hora || null, horaFim: f.horaFim || null, local: f.local.trim(), avisarDias: Number(f.avisarDias), repeteAte: f.repeteAte || null, notas: f.notas.trim() };
+      await (id ? db.collection("eventos").doc(id) : db.collection("eventos").doc()).set(doc);
+      S.diaSel = f.data;
+    },
+    apagar: id ? async () => { await db.collection("eventos").doc(id).delete(); } : null,
+  });
+  const bl = $("#lembrete-ics");
+  if (bl) bl.onclick = () => {
+    const x = S.eventos.get(id);
+    const alarme = ALARME_DIAS[String(x.avisarDias)];
+    lembreteIcs({ id: x.id, titulo: x.titulo, data: x.data, hora: x.hora, horaFim: x.horaFim, local: x.local, notas: x.notas, alarmes: alarme ? [alarme] : [], ate: x.repeteAte });
+  };
+}
+
+/* ---------- plano de estudo ---------- */
+const ETAPAS = [
+  [10, "Mapear o conteúdo de {p}: listar os tópicos e separar listas e provas antigas"],
+  [7, "1ª rodada de {p}: resolver exercícios de cada tópico sem olhar a resolução"],
+  [4, "Revisão ativa de {p}: refazer só o que errou e escrever as fórmulas de memória"],
+  [2, "Simulado de {p}: prova antiga cronometrada, depois corrigir"],
+  [1, "Véspera de {p}: revisão leve da folha de fórmulas e dormir cedo"],
+];
+function folhaPlano(discId) {
+  const h = hojeISO();
+  const futuras = ordenarPor([...S.avals.values()].filter((a) => a.data && a.data >= h && a.nota == null && (!discId || a.disciplinaId === discId)), (a) => a.data);
+  if (!futuras.length) { mostrarAviso("Cadastre primeiro a data da prova (aba Período, “+ Prova/trabalho”). O plano é montado contando os dias até ela."); return; }
+  abrirFolha({
+    titulo: "Plano de estudo",
+    campos: [{ id: "aval", rotulo: "Para qual prova?", valor: futuras[0].id, tipo: "select", opcoes: futuras.map((a) => [a.id, `${a.nome} · ${nomeDisc(a.disciplinaId)} · ${dataCurta(a.data)}`]) }],
+    extra: `<div class="secao"><div class="secao-cab"><span class="rotulo">Avisos que serão criados</span>${sample ? `<button type="button" class="btn" id="plano-claude">Pedir plano ao Claude</button>` : ""}</div>
+      <div id="plano-itens" class="secao"></div><div id="plano-resp" class="resposta-claude" hidden></div>
+      <span class="ajuda">Edite os textos e as datas antes de salvar. Datas que já passaram ficam de fora.</span></div>`,
+    salvar: async (f) => {
+      const a = S.avals.get(f.aval);
+      const itens = [...form.querySelectorAll(".plano-item")].map((el) => ({ data: el.querySelector('[type="date"]').value, texto: el.querySelector('[type="text"]').value.trim() })).filter((i) => i.texto && i.data);
+      if (!itens.length) throw "Não sobrou nenhum aviso com data e texto.";
+      for (const i of itens) await db.collection("avisos").doc().set({ texto: i.texto, data: i.data, disciplinaId: a.disciplinaId, avaliacaoId: a.id, feito: false });
+      mostrarAviso(`${itens.length} avisos criados para ${a.nome} de ${nomeDisc(a.disciplinaId)}.`, true);
+    },
+  });
+  const sel = $("#f-aval");
+  const pintar = (lista) => {
+    $("#plano-itens").innerHTML = lista.map((i, k) => `<div class="plano-item"><input type="date" id="pl-d-${k}" value="${esc(i.data)}" aria-label="Dia"><input type="text" id="pl-t-${k}" value="${esc(i.texto)}" aria-label="Tarefa"></div>`).join("") || `<div class="vazio">A prova é muito perto para um plano em etapas. Crie um aviso solto.</div>`;
+  };
+  const padrao = () => {
+    const a = S.avals.get(sel.value);
+    const p = `${a.nome} de ${nomeDisc(a.disciplinaId)}`;
+    return ETAPAS.map(([d, t]) => ({ data: somaDias(a.data, -d), texto: t.replace("{p}", p) })).filter((i) => i.data >= h);
+  };
+  pintar(padrao());
+  sel.onchange = () => { $("#plano-resp").hidden = true; pintar(padrao()); };
+  const bc = $("#plano-claude");
+  if (bc) bc.onclick = async () => {
+    const a = S.avals.get(sel.value);
+    const d = S.discs.get(a.disciplinaId) || {};
+    const resp = $("#plano-resp");
+    resp.hidden = false; resp.textContent = "Pensando…"; bc.disabled = true;
+    const prompt = `Sou aluno de graduação da UFF (${S.perfil.curso || "curso não informado"}). Monte um plano de estudo para a avaliação abaixo, usando prática de recuperação (resolver sem consultar), repetição espaçada e simulado cronometrado.
+Matéria: ${d.nome || "?"} (${d.codigo || ""})
+Avaliação: ${a.nome}, no dia ${a.data} (hoje é ${h}, faltam ${diasAte(a.data)} dias).
+Conteúdo cobrado: ${a.conteudo || "não informado"}
+Responda SOMENTE com um array JSON de 3 a 7 objetos {"diasAntes": número inteiro entre 1 e ${Math.max(1, diasAte(a.data))}, "tarefa": "texto curto e concreto em português, até 120 caracteres"}, em ordem decrescente de diasAntes.`;
+    try {
+      const lista = await sample.json(prompt, { onText: ({ text }) => { resp.textContent = text; } });
+      if (!Array.isArray(lista)) throw { code: "invalid_json" };
+      const itens = lista.filter((i) => Number.isFinite(Number(i?.diasAntes)) && i?.tarefa).map((i) => ({ data: somaDias(a.data, -Math.round(Number(i.diasAntes))), texto: String(i.tarefa).slice(0, 200) })).filter((i) => i.data >= h);
+      pintar(itens); resp.hidden = true;
+    } catch (e) {
+      const msg = { not_granted: "O Claude não foi liberado para esta página.", rate_limited: "Muitos pedidos seguidos. Tente de novo daqui a pouco.", invalid_json: "A resposta veio fora do formato. Toque de novo para tentar.", cancelled: "" }[e?.code] ?? "Não consegui falar com o Claude agora.";
+      resp.textContent = msg; if (!msg) resp.hidden = true;
+      if (e?.code === "not_granted" || e?.code === "sampling_disabled") bc.hidden = true;
+    } finally { bc.disabled = false; }
+  };
+}
+
+/* ---------- ações ---------- */
+let avisoTimer;
+function mostrarAviso(t, bom) {
+  const el = $("#aviso-sistema");
+  el.textContent = t; el.hidden = false; el.style.borderColor = bom ? "var(--ok)" : "var(--marca)";
+  clearTimeout(avisoTimer); avisoTimer = setTimeout(() => { el.hidden = true; }, 6000);
+}
+function exigeBanco() {
+  if (db && podeEscrever) return true;
+  mostrarAviso(db ? "Esta conta só pode ver a caderneta, não editar." : "Abra a caderneta pelo app ou site do Claude, conectado à sua conta, para ver e editar seus dados.");
+  return false;
+}
+document.addEventListener("click", async (ev) => {
+  const alvo = ev.target.closest("[data-acao]");
+  if (!alvo || alvo.closest("dialog")) return;
+  const { acao, id } = alvo.dataset;
+  if (acao === "filtro") { S.filtroCurso = alvo.dataset.f; render(); return; }
+  if (acao === "dia") { S.diaSel = alvo.dataset.d; if (S.diaSel.slice(0, 7) !== S.mes) S.mes = S.diaSel.slice(0, 7); render(); return; }
+  if (acao === "mes") {
+    const passo = Number(alvo.dataset.passo);
+    if (passo === 0) { S.mes = hojeISO().slice(0, 7); S.diaSel = hojeISO(); }
+    else { const [a, m] = S.mes.split("-").map(Number); const d = new Date(a, m - 1 + passo, 1); S.mes = iso(d).slice(0, 7); }
+    render(); return;
+  }
+  if (!exigeBanco()) return;
+  if (acao === "nova-disc") folhaDisc(null, alvo.dataset.sit);
+  else if (acao === "editar-disc") folhaDisc(id);
+  else if (acao === "nova-aval") folhaAval(null, alvo.dataset.disc);
+  else if (acao === "editar-aval") folhaAval(id);
+  else if (acao === "novo-aviso") folhaAviso(null);
+  else if (acao === "editar-aviso") folhaAviso(id);
+  else if (acao === "plano") folhaPlano(alvo.dataset.disc);
+  else if (acao === "perfil") folhaPerfil();
+  else if (acao === "novo-evento") folhaEvento(null);
+  else if (acao === "editar-evento") folhaEvento(id);
+  else if (acao === "marcar-aviso") {
+    const v = S.avisos.get(id); if (!v) return;
+    alvo.disabled = true;
+    try { await db.collection("avisos").doc(id).update({ feito: !v.feito }); } catch { mostrarAviso("Não consegui marcar agora. Tente de novo."); }
+    finally { alvo.disabled = false; }
+  }
+});
+document.querySelectorAll(".aba").forEach((b) => b.addEventListener("click", () => {
+  S.aba = b.dataset.aba;
+  document.querySelectorAll(".aba").forEach((x) => x.dataset.aba === S.aba ? x.setAttribute("aria-current", "page") : x.removeAttribute("aria-current"));
+  try { localStorage.setItem("caderneta-aba", S.aba); } catch {}
+  render(); window.scrollTo(0, 0);
+}));
+try { const a = localStorage.getItem("caderneta-aba"); if (a && TITULOS[a]) S.aba = a; } catch {}
+document.querySelectorAll(".aba").forEach((x) => x.dataset.aba === S.aba ? x.setAttribute("aria-current", "page") : x.removeAttribute("aria-current"));
+
+/* ---------- dados: o arquivo do site + o que você mudou neste aparelho ---------- */
+const CHAVE = "caderneta-uff-alteracoes-v1";
+let BASE = { perfil: {}, disciplinas: {}, avaliacoes: {}, avisos: {}, eventos: {} };
+let ALT = {};
+try { ALT = JSON.parse(localStorage.getItem(CHAVE) || "{}") || {}; } catch { ALT = {}; }
+const ouvintes = new Map();
+function guardarAlt() {
+  try { localStorage.setItem(CHAVE, JSON.stringify(ALT)); }
+  catch { throw "O navegador não deixou guardar neste aparelho. Saia do modo anônimo e tente de novo."; }
+}
+function colecao(col) {
+  const out = { ...(col === "config" ? { perfil: BASE.perfil || {} } : BASE[col] || {}) };
+  for (const [k, v] of Object.entries(ALT)) {
+    const [c, id] = k.split("/");
+    if (c !== col) continue;
+    if (v === null) delete out[id]; else out[id] = v;
+  }
+  return out;
+}
+const avisarMudanca = (col) => { for (const fn of ouvintes.get(col) || []) fn(); };
+const ouvirCol = (col, fn) => { if (!ouvintes.has(col)) ouvintes.set(col, []); ouvintes.get(col).push(fn); fn(); return () => {}; };
+const novoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+function refDoc(col, id) {
+  const gravar = (v) => { ALT[col + "/" + id] = v; guardarAlt(); avisarMudanca(col); };
+  return {
+    id,
+    async set(data) { gravar(JSON.parse(JSON.stringify(data))); },
+    async update(data) { gravar({ ...(colecao(col)[id] || {}), ...JSON.parse(JSON.stringify(data)) }); },
+    async delete() { gravar(null); },
+    onSnapshot(fn) { return ouvirCol(col, () => { const d = colecao(col)[id]; fn({ exists: !!d, data: () => d }); }); },
+  };
+}
+db = {
+  collection: (col) => ({
+    doc: (id) => refDoc(col, id || novoId()),
+    onSnapshot: (fn) => ouvirCol(col, () => fn({ docs: Object.entries(colecao(col)).map(([id, d]) => ({ id, exists: true, data: () => d })) })),
+  }),
+  doc: (p) => { const [c, id] = p.split("/"); return refDoc(c, id); },
+};
+const alteracoesLocais = () => Object.keys(ALT).length;
+
+/* ---------- arquivos: lembrete para o calendário do iPhone e cópia de segurança ---------- */
+function baixar(conteudo, tipo, nome) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([conteudo], { type: tipo }));
+  a.download = nome;
+  document.body.append(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+}
+const icsTexto = (t) => String(t || "").replace(/\\/g, "\\\\").replace(/[,;]/g, (c) => "\\" + c).replace(/\n/g, "\\n");
+const icsData = (d, h) => d.replace(/-/g, "") + (h ? "T" + h.replace(":", "") + "00" : "");
+function lembreteIcs({ id, titulo, data, hora, horaFim, local, notas, alarmes, ate }) {
+  const fimPadrao = hora ? (() => { const [hh, mm] = hora.split(":").map(Number); return `${String(Math.min(hh + 2, 23)).padStart(2, "0")}:${String(mm).padStart(2, "0")}`; })() : null;
+  const linhas = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Caderneta UFF//PT-BR", "CALSCALE:GREGORIAN", "BEGIN:VEVENT",
+    `UID:${id}@caderneta-uff`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}Z`,
+    hora ? `DTSTART:${icsData(data, hora)}` : `DTSTART;VALUE=DATE:${icsData(data)}`,
+    hora ? `DTEND:${icsData(data, horaFim || fimPadrao)}` : `DTEND;VALUE=DATE:${icsData(somaDias(data, 1))}`,
+    `SUMMARY:${icsTexto(titulo)}`];
+  if (ate) linhas.push(`RRULE:FREQ=WEEKLY;UNTIL=${icsData(ate)}T235959`);
+  if (local) linhas.push(`LOCATION:${icsTexto(local)}`);
+  if (notas) linhas.push(`DESCRIPTION:${icsTexto(notas)}`);
+  for (const a of alarmes) linhas.push("BEGIN:VALARM", "ACTION:DISPLAY", `DESCRIPTION:${icsTexto(titulo)}`, `TRIGGER:${a}`, "END:VALARM");
+  linhas.push("END:VEVENT", "END:VCALENDAR");
+  baixar(linhas.join("\r\n"), "text/calendar;charset=utf-8", "lembrete.ics");
+}
+const ALARME_DIAS = { "0": "-PT2H", "1": "-P1D", "3": "-P3D", "7": "-P7D" };
+
+/* ---------- carregar ---------- */
+const ouvir = (col, mapa) => db.collection(col).onSnapshot((snap) => { mapa.clear(); for (const d of snap.docs) mapa.set(d.id, { ...d.data(), id: d.id }); render(); });
+ouvir("disciplinas", S.discs); ouvir("avaliacoes", S.avals); ouvir("avisos", S.avisos); ouvir("eventos", S.eventos);
+db.doc("config/perfil").onSnapshot((d) => { S.perfil = d.exists ? d.data() : {}; render(); });
+(async () => {
+  try {
+    const r = await fetch("dados/caderneta.json", { cache: "no-cache" });
+    if (!r.ok) throw new Error(r.status);
+    BASE = await r.json();
+  } catch { mostrarAviso("Não consegui baixar os dados agora. Confira a internet e abra de novo."); }
+  for (const c of ["disciplinas", "avaliacoes", "avisos", "eventos", "config"]) avisarMudanca(c);
+})();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js", { scope: "./" }).catch(() => {});
+</script>
+</body>
+</html>
