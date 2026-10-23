@@ -150,7 +150,7 @@ button { cursor: pointer; }
 /* abas de baixo */
 .abas { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--cartao); border-top: 1px solid var(--linha);
   padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
-.abas-in { max-width: 720px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
+.abas-in { max-width: 720px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
 
 /* calendário */
 .mes-cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -176,7 +176,7 @@ button { cursor: pointer; }
 .tag-ext { background: var(--ext-suave); color: var(--ext); }
 .tag-facul { background: var(--uff-suave); color: var(--uff); }
 .hora { font-family: var(--f-num); font-size: 0.82rem; font-weight: 600; min-width: 52px; text-align: center; color: var(--tinta-2); }
-.aba { border: 0; background: none; padding: 10px 4px 12px; display: grid; justify-items: center; gap: 3px; font-size: 0.78rem; font-weight: 700; color: var(--tinta-2); }
+.aba { border: 0; background: none; padding: 10px 2px 12px; display: grid; justify-items: center; gap: 3px; font-size: 0.7rem; font-weight: 700; color: var(--tinta-2); min-width: 0; white-space: nowrap; letter-spacing: -0.01em; }
 .aba svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .aba[aria-current="page"] { color: var(--uff); }
 
@@ -224,6 +224,10 @@ dialog::backdrop { background: rgba(10, 16, 30, 0.5); }
 .info-linhas.texto li { grid-template-columns: 1fr; gap: 2px; }
 .info-linhas strong { font-weight: 700; }
 .fonte { font-size: 0.78rem; color: var(--tinta-2); }
+.puxar { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 8px); left: 50%; transform: translate(-50%, 0); z-index: 20;
+  background: var(--cartao); color: var(--tinta-2); border: 1px solid var(--linha); border-radius: 999px; padding: 6px 14px;
+  font-size: 0.86rem; font-weight: 700; box-shadow: 0 4px 14px rgba(10, 20, 40, 0.12); white-space: nowrap; }
+.puxar.pronto { color: var(--uff); border-color: var(--uff); }
 .rodape-uff { display: grid; gap: 8px; justify-items: start; padding-top: 6px; border-top: 1px solid var(--linha); }
 .rodape-uff .logo-uff { width: 64px; opacity: 0.7; }
 .rodape-uff .rodape { margin: 0; }
@@ -256,10 +260,12 @@ dialog::backdrop { background: rgba(10, 16, 30, 0.5); }
     <button class="aba" data-aba="agenda"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Agenda</button>
     <button class="aba" data-aba="periodo"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M9 11h6M9 15h6"/></svg>Período</button>
     <button class="aba" data-aba="curso"><svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5-9 5z"/><path d="M7 11.5V16c0 1.5 2.5 3 5 3s5-1.5 5-3v-4.5"/></svg>Curso</button>
+    <button class="aba" data-aba="certificados"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M9 13.2 7.5 21l4.5-2.4 4.5 2.4-1.5-7.8"/></svg>Certificados</button>
     <button class="aba" data-aba="estudo"><svg viewBox="0 0 24 24"><path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/></svg>Estudo</button>
   </div>
 </nav>
 
+<div id="puxar" class="puxar" role="status" hidden>Puxe para atualizar</div>
 <dialog id="folha"><form class="folha" id="folha-form" method="dialog"></form></dialog>
 
 <script>
@@ -417,13 +423,13 @@ function resumoCurso() {
 }
 
 /* ---------- telas ---------- */
-const TITULOS = { hoje: "Hoje", agenda: "Agenda", periodo: "Este período", curso: "Meu curso", estudo: "Plano de estudo" };
+const TITULOS = { hoje: "Hoje", agenda: "Agenda", periodo: "Este período", curso: "Meu curso", certificados: "Certificados", estudo: "Plano de estudo" };
 function render() {
   $("#titulo-aba").textContent = TITULOS[S.aba];
   $("#semestre").textContent = S.perfil.semestreAtual || "semestre —";
   $("#curso-nome").textContent = S.perfil.curso || "Graduação";
   const el = $("#conteudo");
-  el.innerHTML = ({ hoje: telaHoje, agenda: telaAgenda, periodo: telaPeriodo, curso: telaCurso, estudo: telaEstudo })[S.aba]();
+  el.innerHTML = ({ hoje: telaHoje, agenda: telaAgenda, periodo: telaPeriodo, curso: telaCurso, certificados: telaCertificados, estudo: telaEstudo })[S.aba]();
 }
 
 const NOMES_MES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
@@ -551,7 +557,7 @@ function telaCurso() {
     <li><strong>Extensão (387 h)</strong><span>Projetos e ações da UFF voltados para a comunidade. Pelo menos 10% da carga do curso precisa ser de extensão.</span></li>
     <li><strong>Optativas (150 h)</strong><span>Matérias que você escolhe numa lista do próprio currículo de Engenharia Química.</span></li>
     <li><strong>Eletivas (30 h)</strong><span>Matérias de fora do seu currículo. Horas a mais de optativas também contam aqui.</span></li>
-    <li><strong>Atividades complementares (30 h)</strong><span>Atividades fora das aulas que a coordenação do curso aceita.</span></li></ul>`,
+    <li><strong>Atividades complementares (30 h)</strong><span>Atividades fora das aulas que a coordenação do curso aceita. Guarde os certificados na aba Certificados.</span></li></ul>`,
     "Fonte: integralização do currículo no idUFF; extensão: Resolução CNE/CES nº 7/2018.");
   out += `<div class="secao-cab"><div class="filtros" role="group" aria-label="Filtrar">${[["todas", "Todas"], ["aprovado", "Aprovadas"], ["cursando", "Cursando"], ["pendente", "Faltam"], ["reprovado", "Reprovadas"]].map(([k, t]) => `<button class="filtro" data-acao="filtro" data-f="${k}" aria-pressed="${f === k}">${t}</button>`).join("")}</div><button class="btn forte" data-acao="nova-disc">+ Matéria</button></div>`;
   if (!S.discs.size) return out + `<div class="vazio">O currículo ainda não foi carregado. Ele vem do idUFF (currículo integralizado) e do fluxograma do curso.</div>` + rodape();
@@ -601,6 +607,7 @@ function campo(c) {
   const id = "f-" + c.id;
   let input;
   if (c.tipo === "select") input = `<select id="${id}" name="${c.id}">${c.opcoes.map(([k, t]) => `<option value="${esc(k)}" ${String(k) === String(v) ? "selected" : ""}>${esc(t)}</option>`).join("")}</select>`;
+  else if (c.tipo === "file") input = `<input id="${id}" name="${c.id}" type="file" accept="${esc(c.accept || "")}">`;
   else if (c.tipo === "textarea") input = `<textarea id="${id}" name="${c.id}" placeholder="${esc(c.dica || "")}">${esc(v)}</textarea>`;
   else input = `<input id="${id}" name="${c.id}" type="${c.tipo || "text"}" value="${esc(v)}" ${c.inputmode ? `inputmode="${c.inputmode}"` : ""} placeholder="${esc(c.dica || "")}" ${c.obrig ? "required" : ""}>`;
   return `<div class="campo"><label for="${id}">${esc(c.rotulo)}</label>${input}${c.ajuda ? `<span class="ajuda">${esc(c.ajuda)}</span>` : ""}</div>`;
@@ -752,20 +759,34 @@ function folhaPerfil() {
     },
   });
   const msg = (t) => { const m = $("#bk-msg"); m.hidden = false; m.textContent = t; };
-  const pacote = () => JSON.stringify({ caderneta: "uff", exportado: hojeISO(), alteracoes: ALT });
+  const pacote = (arquivos) => JSON.stringify({ caderneta: "uff", exportado: hojeISO(), alteracoes: ALT, ...(arquivos ? { arquivos } : {}) });
+  const paraBase64 = (b) => new Promise((ok, erro) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1] || ""); r.onerror = () => erro(r.error); r.readAsDataURL(b); });
   $("#bk-copiar").onclick = async () => {
-    try { await navigator.clipboard.writeText(pacote()); msg("Copiado. Cole numa conversa com o Claude e peça para incluir no site."); }
+    try { await navigator.clipboard.writeText(pacote()); msg("Copiado (sem os PDFs dos certificados). Cole numa conversa com o Claude e peça para incluir no site."); }
     catch { msg("O celular não deixou copiar. Use “Salvar cópia” e mande o arquivo."); }
   };
-  $("#bk-salvar").onclick = () => { baixar(pacote(), "application/json", `caderneta-uff-${hojeISO()}.json`); msg("Cópia salva nos arquivos do celular."); };
+  $("#bk-salvar").onclick = async () => {
+    msg("Preparando a cópia…");
+    const arquivos = {};
+    for (const id of Object.keys(colecao("certificados"))) {
+      try { const b = await idb.get(id); if (b) arquivos[id] = { nome: b.name || "certificado", tipo: b.type || "application/pdf", dados: await paraBase64(b) }; } catch {}
+    }
+    baixar(pacote(arquivos), "application/json", `caderneta-uff-${hojeISO()}.json`);
+    msg(`Cópia salva nos arquivos do celular${Object.keys(arquivos).length ? `, com ${Object.keys(arquivos).length} certificado(s)` : ""}.`);
+  };
   $("#bk-abrir").onchange = async (ev) => {
     const arq = ev.target.files?.[0]; if (!arq) return;
     try {
       const j = JSON.parse(await arq.text());
       if (j.caderneta !== "uff" || typeof j.alteracoes !== "object") throw 0;
       ALT = { ...ALT, ...j.alteracoes }; guardarAlt();
-      for (const c of ["disciplinas", "avaliacoes", "avisos", "eventos", "config"]) avisarMudanca(c);
-      msg("Cópia aberta: as alterações dela voltaram para este aparelho.");
+      for (const [id, x] of Object.entries(j.arquivos || {})) {
+        const bin = atob(x.dados); const bytes = new Uint8Array(bin.length);
+        for (let k = 0; k < bin.length; k++) bytes[k] = bin.charCodeAt(k);
+        await idb.set(id, new File([bytes], x.nome, { type: x.tipo }));
+      }
+      for (const c of COLECOES) avisarMudanca(c);
+      msg("Cópia aberta: as alterações e os certificados dela voltaram para este aparelho.");
     } catch { msg("Esse arquivo não é uma cópia da Caderneta."); }
   };
 }
@@ -801,6 +822,118 @@ function folhaEvento(id) {
     const alarme = ALARME_DIAS[String(x.avisarDias)];
     lembreteIcs({ id: x.id, titulo: x.titulo, data: x.data, hora: x.hora, horaFim: x.horaFim, local: x.local, notas: x.notas, alarmes: alarme ? [alarme] : [], ate: x.repeteAte });
   };
+}
+
+/* ---------- certificados: os dados ficam com o resto; o PDF fica no próprio aparelho (IndexedDB) ---------- */
+const idb = (() => {
+  let aberto;
+  const abrir = () => aberto ??= new Promise((ok, erro) => {
+    const r = indexedDB.open("caderneta-uff", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("arquivos");
+    r.onsuccess = () => ok(r.result);
+    r.onerror = () => erro(r.error);
+  });
+  const usar = async (modo, fn) => {
+    const banco = await abrir();
+    return new Promise((ok, erro) => {
+      const t = banco.transaction("arquivos", modo);
+      const req = fn(t.objectStore("arquivos"));
+      t.oncomplete = () => ok(req?.result);
+      t.onerror = () => erro(t.error);
+    });
+  };
+  return { get: (k) => usar("readonly", (s) => s.get(k)), set: (k, v) => usar("readwrite", (s) => s.put(v, k)), del: (k) => usar("readwrite", (s) => s.delete(k)) };
+})();
+const PARA = { complementares: "Atividades complementares", extensao: "Extensão", outro: "Ainda não sei" };
+const tabelaHoras = () => (typeof BASE !== "undefined" && BASE.tabelaHoras) || null;
+function certificadosContados() {
+  const cats = tabelaHoras()?.categorias || [];
+  const usado = new Map();
+  return ordenarPor([...S.certs.values()], (c) => c.data || "9999").map((c) => {
+    const cat = cats.find((t) => t.id === c.categoria);
+    let h = Number(c.horas) || 0;
+    if (cat?.limitePorCertificado != null) h = Math.min(h, cat.limitePorCertificado);
+    if (cat?.limiteTotal != null) { const u = usado.get(cat.id) || 0; h = Math.max(0, Math.min(h, cat.limiteTotal - u)); usado.set(cat.id, u + h); }
+    return { ...c, cat, valida: cats.length ? (cat ? h : 0) : h };
+  });
+}
+async function verArquivo(id) {
+  let b;
+  try { b = await idb.get(id); } catch {}
+  if (!b) { mostrarAviso("O arquivo deste certificado não está neste aparelho. Abra uma cópia de segurança que tenha ele (Ajustes)."); return; }
+  const url = URL.createObjectURL(b);
+  const a = document.createElement("a");
+  a.href = url; a.target = "_blank"; a.rel = "noopener";
+  document.body.append(a); a.click();
+  setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 60000);
+}
+function telaCertificados() {
+  const lista = certificadosContados();
+  const tab = tabelaHoras();
+  const faltas = S.perfil.faltas || {};
+  const soma = (k) => lista.filter((c) => c.contaPara === k).reduce((s, c) => s + c.valida, 0);
+  const bloco = (k, meta) => {
+    const h = soma(k);
+    const pct = meta ? Math.min(100, (h / meta) * 100) : 0;
+    return `<div class="numero" style="gap:6px"><span class="rotulo">${PARA[k]}</span><span class="v">${h} h${meta ? `<small class="pequeno fraco" style="font-family:var(--f-texto);font-weight:600"> de ${meta} h</small>` : ""}</span>
+      ${meta ? `<div class="barra" role="img" aria-label="${Math.round(pct)}%"><i style="width:${pct}%"></i></div>` : ""}</div>`;
+  };
+  let out = `<section class="secao"><div class="numeros" style="grid-template-columns:repeat(2,minmax(0,1fr))">${bloco("complementares", faltas.complementares)}${bloco("extensao", faltas.extensao)}</div>
+    <p class="pequeno fraco" style="margin:0">${tab ? "Horas contadas pela tabela do curso." : "Somando as horas de cada certificado. Quando a tabela do curso chegar, cada tipo de atividade passa a contar pelo limite dela."} A meta é o que o idUFF diz que ainda falta.</p></section>`;
+  out += `<div class="secao-cab"><h2>Meus certificados</h2><button class="btn forte" data-acao="novo-cert">+ Certificado</button></div>`;
+  if (!lista.length) out += `<div class="vazio">Nenhum certificado guardado ainda. Toque em “+ Certificado”, escolha o PDF (ou a foto) e diga quantas horas ele vale.</div>`;
+  for (const k of ["complementares", "extensao", "outro"]) {
+    const grupo = lista.filter((c) => (c.contaPara || "outro") === k).reverse();
+    if (!grupo.length) continue;
+    out += `<section class="secao"><h2 style="font-size:1rem">${PARA[k]}</h2><div class="lista">${grupo.map((c) => `
+      <div class="linha clicavel" data-acao="editar-cert" data-id="${esc(c.id)}"><span class="dmenos">${c.valida} h</span>
+        <div><div class="t">${esc(c.titulo)}</div><div class="s">${[c.data ? ddmm(c.data) + "/" + c.data.slice(0, 4) : "", c.cat ? esc(c.cat.nome) : esc(c.tipoAtividade || ""), c.instituicao ? esc(c.instituicao) : "", c.valida !== (Number(c.horas) || 0) ? `certificado diz ${esc(c.horas)} h` : ""].filter(Boolean).join(" · ")}</div></div>
+        ${c.arquivoNome ? `<button class="btn" data-acao="ver-cert" data-id="${esc(c.id)}" aria-label="Abrir o arquivo de ${esc(c.titulo)}">Ver</button>` : `<span class="pequeno fraco">sem arquivo</span>`}</div>`).join("")}</div></section>`;
+  }
+  out += cartaoUff("Onde os certificados ficam guardados", `<ul class="info-linhas texto">
+    <li><strong>Neste celular</strong><span>Os PDFs ficam guardados dentro do app, neste aparelho. Ninguém mais vê, nem quem abre o site.</span></li>
+    <li><strong>Para não perder</strong><span>De vez em quando, vá em Ajustes e toque em “Salvar cópia”: o arquivo salvo leva os certificados junto.</span></li>
+    <li><strong>Para valer no idUFF</strong><span>As horas só contam oficialmente depois que a coordenação lança. Este app é o seu controle.</span></li></ul>`, tab?.fonte ? "Tabela de horas: " + esc(tab.fonte) : "");
+  return out + rodape();
+}
+function folhaCert(id) {
+  const c = id ? S.certs.get(id) : { contaPara: "complementares", data: hojeISO() };
+  const cats = tabelaHoras()?.categorias || [];
+  abrirFolha({
+    titulo: id ? "Editar certificado" : "Novo certificado",
+    campos: [
+      { id: "titulo", rotulo: "Nome do evento ou curso", valor: c.titulo, obrig: true, dica: "Palestra de segurança de processos…" },
+      { id: "data", rotulo: "Data", valor: c.data, tipo: "date", par: true },
+      { id: "horas", rotulo: "Horas no certificado", valor: c.horas, inputmode: "decimal", dica: "ex.: 4" },
+      { id: "contaPara", rotulo: "Conta para", valor: c.contaPara, tipo: "select", opcoes: Object.entries(PARA), par: !cats.length },
+      cats.length
+        ? { id: "categoria", rotulo: "Tipo de atividade (tabela do curso)", valor: c.categoria || "", tipo: "select", opcoes: [["", "Escolha…"], ...cats.map((t) => [t.id, t.nome])] }
+        : { id: "tipoAtividade", rotulo: "Tipo de atividade", valor: c.tipoAtividade, dica: "Palestra, curso, monitoria…" },
+      { id: "instituicao", rotulo: "Quem emitiu", valor: c.instituicao, dica: "UFF, CRQ, empresa…" },
+      { id: "arquivo", rotulo: id && c.arquivoNome ? `Trocar arquivo (agora: ${c.arquivoNome})` : "Arquivo do certificado (PDF ou foto)", tipo: "file", accept: "application/pdf,image/*" },
+      { id: "obs", rotulo: "Anotações", valor: c.obs, tipo: "textarea" },
+    ],
+    extra: id && c.arquivoNome ? `<div class="acoes-folha"><button type="button" class="btn" id="cert-ver">Ver o certificado</button></div>` : "",
+    salvar: async (f) => {
+      const arq = f.arquivo && f.arquivo.size ? f.arquivo : null;
+      if (!id && !arq) throw "Escolha o PDF ou a foto do certificado.";
+      if (arq && arq.size > 25 * 1024 * 1024) throw "Esse arquivo passa de 25 MB. Tente um PDF menor.";
+      const horas = Number(String(f.horas).replace(",", "."));
+      if (!(horas > 0)) throw "Diga quantas horas o certificado tem.";
+      const novo = id || novoId();
+      if (arq) {
+        try { await idb.set(novo, arq); } catch { throw "O celular não deixou guardar o arquivo. Libere espaço e tente de novo."; }
+        try { await navigator.storage?.persist?.(); } catch {}
+      }
+      const doc = { titulo: f.titulo.trim(), data: f.data || null, horas, contaPara: f.contaPara, instituicao: f.instituicao.trim(), obs: f.obs.trim(),
+        arquivoNome: arq ? arq.name : c.arquivoNome || null, arquivoTipo: arq ? arq.type : c.arquivoTipo || null, arquivoTamanho: arq ? arq.size : c.arquivoTamanho || null };
+      if (cats.length) doc.categoria = f.categoria || null; else doc.tipoAtividade = f.tipoAtividade.trim();
+      await db.collection("certificados").doc(novo).set(doc);
+    },
+    apagar: id ? async () => { try { await idb.del(id); } catch {} await db.collection("certificados").doc(id).delete(); } : null,
+  });
+  const bv = $("#cert-ver");
+  if (bv) bv.onclick = () => verArquivo(id);
 }
 
 /* ---------- plano de estudo ---------- */
@@ -899,6 +1032,9 @@ document.addEventListener("click", async (ev) => {
   else if (acao === "perfil") folhaPerfil();
   else if (acao === "novo-evento") folhaEvento(null);
   else if (acao === "editar-evento") folhaEvento(id);
+  else if (acao === "novo-cert") folhaCert(null);
+  else if (acao === "editar-cert") folhaCert(id);
+  else if (acao === "ver-cert") verArquivo(id);
   else if (acao === "marcar-aviso") {
     const v = S.avisos.get(id); if (!v) return;
     alvo.disabled = true;
@@ -917,6 +1053,7 @@ document.querySelectorAll(".aba").forEach((x) => x.dataset.aba === S.aba ? x.set
 
 /* ---------- dados: o arquivo do site + o que você mudou neste aparelho ---------- */
 const CHAVE = "caderneta-uff-alteracoes-v1";
+const COLECOES = ["disciplinas", "avaliacoes", "avisos", "eventos", "certificados", "config"];
 let BASE = { perfil: {}, disciplinas: {}, avaliacoes: {}, avisos: {}, eventos: {} };
 let ALT = {};
 try { ALT = JSON.parse(localStorage.getItem(CHAVE) || "{}") || {}; } catch { ALT = {}; }
@@ -984,17 +1121,64 @@ const ALARME_DIAS = { "0": "-PT2H", "1": "-P1D", "3": "-P3D", "7": "-P7D" };
 
 /* ---------- carregar ---------- */
 const ouvir = (col, mapa) => db.collection(col).onSnapshot((snap) => { mapa.clear(); for (const d of snap.docs) mapa.set(d.id, { ...d.data(), id: d.id }); render(); });
-ouvir("disciplinas", S.discs); ouvir("avaliacoes", S.avals); ouvir("avisos", S.avisos); ouvir("eventos", S.eventos);
+S.certs = new Map();
+ouvir("disciplinas", S.discs); ouvir("avaliacoes", S.avals); ouvir("avisos", S.avisos); ouvir("eventos", S.eventos); ouvir("certificados", S.certs);
 db.doc("config/perfil").onSnapshot((d) => { S.perfil = d.exists ? d.data() : {}; render(); });
-(async () => {
+/* ---------- atualizar: ao abrir, ao voltar para o app, a cada 5 minutos e ao puxar a tela no topo ---------- */
+const VERSAO_APP = "2026-10-23-4";
+let atualizando = false, recarregarDepois = false;
+const buscar = (arq) => fetch(`${arq}?v=${Date.now()}`, { cache: "no-store" }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
+async function atualizar(manual) {
+  if (atualizando) return;
+  atualizando = true;
   try {
-    const r = await fetch("dados/caderneta.json", { cache: "no-cache" });
-    if (!r.ok) throw new Error(r.status);
-    BASE = await r.json();
-  } catch { mostrarAviso("Não consegui baixar os dados agora. Confira a internet e abra de novo."); }
-  for (const c of ["disciplinas", "avaliacoes", "avisos", "eventos", "config"]) avisarMudanca(c);
+    const [v, dados] = await Promise.all([buscar("dados/versao.json").catch(() => null), buscar("dados/caderneta.json")]);
+    let jaTentou = false;
+    try { jaTentou = sessionStorage.getItem("caderneta-recarregou") === v?.app; } catch {}
+    if (v?.app && v.app !== VERSAO_APP && !jaTentou) {
+      try { sessionStorage.setItem("caderneta-recarregou", v.app); } catch {}
+      if (folha.open) recarregarDepois = true;
+      else { mostrarAviso("Tem versão nova do app. Atualizando…", true); setTimeout(() => location.reload(), 700); return; }
+    }
+    const mudou = JSON.stringify(dados) !== JSON.stringify(BASE);
+    if (mudou) { BASE = dados; for (const c of COLECOES) avisarMudanca(c); }
+    if (manual) mostrarAviso(mudou ? "Atualizado com as novidades." : "Já está tudo atualizado.", true);
+    else if (mudou && BASE.atualizado && S.carregou) mostrarAviso("Dados novos chegaram.", true);
+    S.carregou = true;
+  } catch {
+    if (manual || !S.carregou) mostrarAviso("Sem internet agora. Mostrando o que ficou guardado no celular.");
+    for (const c of COLECOES) avisarMudanca(c);
+  } finally { atualizando = false; }
+}
+folha.addEventListener("close", () => { if (recarregarDepois) location.reload(); });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") atualizar(false); });
+setInterval(() => { if (document.visibilityState === "visible") atualizar(false); }, 5 * 60 * 1000);
+atualizar(false);
+
+// puxar para baixo no topo da tela
+(() => {
+  const ind = $("#puxar");
+  let inicio = null, puxado = 0;
+  addEventListener("touchstart", (e) => { inicio = scrollY <= 0 && !folha.open ? e.touches[0].clientY : null; puxado = 0; }, { passive: true });
+  addEventListener("touchmove", (e) => {
+    if (inicio == null) return;
+    puxado = e.touches[0].clientY - inicio;
+    if (puxado <= 8 || scrollY > 0) { ind.hidden = true; return; }
+    ind.hidden = false;
+    ind.style.transform = `translate(-50%, ${Math.min(puxado, 110) * 0.55}px)`;
+    ind.textContent = puxado > 80 ? "Solte para atualizar" : "Puxe para atualizar";
+    ind.classList.toggle("pronto", puxado > 80);
+  }, { passive: true });
+  addEventListener("touchend", () => {
+    if (inicio == null) return;
+    const ok = puxado > 80;
+    inicio = null; puxado = 0;
+    if (!ok) { ind.hidden = true; ind.style.transform = ""; return; }
+    ind.textContent = "Atualizando…";
+    atualizar(true).finally(() => { setTimeout(() => { ind.hidden = true; ind.style.transform = ""; ind.classList.remove("pronto"); }, 400); });
+  });
 })();
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js", { scope: "./" }).catch(() => {});
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js", { scope: "./" }).then((r) => r.update()).catch(() => {});
 </script>
 </body>
 </html>
