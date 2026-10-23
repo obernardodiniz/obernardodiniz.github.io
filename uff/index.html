@@ -227,6 +227,13 @@ dialog::backdrop { background: rgba(10, 16, 30, 0.5); }
   background: var(--cartao); color: var(--tinta-2); border: 1px solid var(--linha); border-radius: 999px; padding: 6px 14px;
   font-size: 0.86rem; font-weight: 700; box-shadow: 0 4px 14px rgba(10, 20, 40, 0.12); white-space: nowrap; }
 .puxar.pronto { color: var(--uff); border-color: var(--uff); }
+/* visor de certificado: tela cheia dentro do app */
+.visor { position: fixed; inset: 0; z-index: 40; background: var(--papel); display: grid; grid-template-rows: auto minmax(0, 1fr); }
+.visor-barra { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; background: var(--cartao); border-bottom: 1px solid var(--linha);
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) max(12px, env(safe-area-inset-right, 0px)) 10px max(12px, env(safe-area-inset-left, 0px)); }
+.visor-barra strong { font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+.visor-paginas { overflow: auto; -webkit-overflow-scrolling: touch; padding: 12px max(8px, env(safe-area-inset-left, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 12px; align-content: start; justify-items: center; }
+.visor-paginas canvas, .visor-paginas img { display: block; width: 100%; max-width: 900px; height: auto; background: #fff; box-shadow: 0 2px 10px rgba(10, 20, 40, 0.15); border-radius: 4px; }
 .tabela-he { border-top: 1px solid var(--linha); padding-top: 8px; }
 .tabela-he summary { cursor: pointer; font-weight: 700; color: var(--uff); padding-block: 4px; }
 .tabela-he ul { margin-top: 8px; }
@@ -270,12 +277,20 @@ dialog::backdrop { background: rgba(10, 16, 30, 0.5); }
 </nav>
 
 <div id="puxar" class="puxar" role="status" hidden>Puxe para atualizar</div>
+<div id="visor" class="visor" role="dialog" aria-modal="true" aria-labelledby="visor-titulo" hidden>
+  <div class="visor-barra">
+    <button class="btn" id="visor-fechar">Fechar</button>
+    <strong id="visor-titulo"></strong>
+    <button class="btn" id="visor-editar">Editar</button>
+  </div>
+  <div id="visor-paginas" class="visor-paginas"></div>
+</div>
 <dialog id="folha"><form class="folha" id="folha-form" method="dialog"></form></dialog>
 
 <script>
 "use strict";
 /* ---------- estado ---------- */
-const VERSAO_APP = "2026-10-23-8"; // trocar junto com dados/versao.json a cada publicação do app
+const VERSAO_APP = "2026-10-23-9"; // trocar junto com dados/versao.json a cada publicação do app
 const S = { discs: new Map(), avals: new Map(), avisos: new Map(), eventos: new Map(), perfil: {}, aba: "hoje", filtroCurso: "todas", mes: null, diaSel: null };
 let db = null, sample = null, podeEscrever = true;
 
@@ -864,16 +879,60 @@ function certificadosContados() {
   for (const c of lista) if (c.cat) c.usadoCat = usado.get(c.cat.id);
   return lista;
 }
+// Visor: mostra o certificado na hora, em tela cheia, dentro do app. PDF é desenhado página a página (pdf.js, carregado só aqui).
+let pdfjs = null, visorId = null, visorUrl = null, visorVez = 0;
+async function carregarPdfjs() {
+  if (!pdfjs) {
+    pdfjs = await import("./vendor/pdfjs/pdf.min.mjs");
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL("vendor/pdfjs/pdf.worker.min.mjs", location.href).href;
+  }
+  return pdfjs;
+}
+function fecharVisor() {
+  $("#visor").hidden = true; document.body.style.overflow = ""; visorId = null; visorVez++;
+  $("#visor-paginas").innerHTML = "";
+  if (visorUrl) { URL.revokeObjectURL(visorUrl); visorUrl = null; }
+}
 async function verArquivo(id) {
   let b;
   try { b = await idb.get(id); } catch {}
-  if (!b) { mostrarAviso("O arquivo deste certificado não está neste aparelho. Abra uma cópia de segurança que tenha ele (Ajustes)."); return; }
-  const url = URL.createObjectURL(b);
-  const a = document.createElement("a");
-  a.href = url; a.target = "_blank"; a.rel = "noopener";
-  document.body.append(a); a.click();
-  setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 60000);
+  if (!b) { mostrarAviso("O arquivo deste certificado não está neste aparelho. Use “Receber certificados” ou abra uma cópia de segurança."); return; }
+  const c = S.certs.get(id) || {};
+  const vez = ++visorVez;
+  visorId = id;
+  const caixa = $("#visor-paginas");
+  $("#visor-titulo").textContent = c.titulo || "Certificado";
+  $("#visor").hidden = false; document.body.style.overflow = "hidden";
+  caixa.innerHTML = `<p class="fraco">Abrindo…</p>`;
+  if (visorUrl) URL.revokeObjectURL(visorUrl);
+  visorUrl = URL.createObjectURL(b);
+  if ((b.type || c.arquivoTipo || "").startsWith("image/")) { caixa.innerHTML = `<img src="${visorUrl}" alt="${esc(c.titulo || "Certificado")}">`; return; }
+  try {
+    const lib = await carregarPdfjs();
+    const pasta = new URL("vendor/pdfjs/", location.href).href;
+    const doc = await lib.getDocument({ data: new Uint8Array(await b.arrayBuffer()), standardFontDataUrl: pasta + "standard_fonts/", cMapUrl: pasta + "cmaps/", cMapPacked: true }).promise;
+    if (vez !== visorVez) return;
+    caixa.innerHTML = "";
+    const largura = Math.min(caixa.clientWidth - 16, 900);
+    for (let n = 1; n <= doc.numPages; n++) {
+      const pg = await doc.getPage(n);
+      if (vez !== visorVez) return;
+      const escala = (largura / pg.getViewport({ scale: 1 }).width) * Math.min(window.devicePixelRatio || 1, 2.5);
+      const vp = pg.getViewport({ scale: escala });
+      const cv = document.createElement("canvas");
+      cv.width = Math.floor(vp.width); cv.height = Math.floor(vp.height);
+      cv.setAttribute("aria-label", `Página ${n} de ${doc.numPages}`);
+      caixa.append(cv);
+      await pg.render({ canvasContext: cv.getContext("2d"), viewport: vp }).promise;
+    }
+  } catch {
+    if (vez !== visorVez) return;
+    caixa.innerHTML = `<p>Não consegui desenhar este PDF aqui.</p><p><a class="btn" href="${visorUrl}" target="_blank" rel="noopener">Abrir no leitor do celular</a></p>`;
+  }
 }
+$("#visor-fechar").addEventListener("click", fecharVisor);
+$("#visor-editar").addEventListener("click", () => { const id = visorId; fecharVisor(); if (id) folhaCert(id); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#visor").hidden) fecharVisor(); });
 // Abre uma cópia (a de Ajustes ou o arquivo de certificados que o Claude manda) e devolve a mensagem para mostrar
 async function importarCopia(arq) {
   let j;
@@ -977,10 +1036,10 @@ function telaCertificados() {
     const grupo = lista.filter((c) => (c.contaPara || "outro") === k).reverse();
     if (!grupo.length) continue;
     out += `<section class="secao"><h2 style="font-size:1rem">${PARA[k]}</h2><div class="lista">${grupo.map((c) => `
-      <div class="linha clicavel" data-acao="editar-cert" data-id="${esc(c.id)}"><span class="dmenos">${umaCasa(c.valida)} h</span>
+      <div class="linha clicavel" data-acao="${c.arquivoNome ? "ver-cert" : "editar-cert"}" data-id="${esc(c.id)}"><span class="dmenos">${umaCasa(c.valida)} h</span>
         <div><div class="t">${esc(c.titulo)}</div><div class="s">${[c.data ? ddmm(c.data) + "/" + c.data.slice(0, 4) : "", c.cat ? esc(c.cat.nome) : tab ? '<strong style="color:var(--vs)">escolha o tipo de atividade</strong>' : esc(c.tipoAtividade || ""), c.instituicao ? esc(c.instituicao) : ""].filter(Boolean).join(" · ")}</div>
         ${c.cat ? `<div class="s">${c.valida < c.bruta ? `Valeria ${umaCasa(c.bruta)} h, mas o máximo do tipo é ${c.cat.max} h. ` : ""}Tipo: ${umaCasa(c.usadoCat)} de ${c.cat.max} h usadas.</div>` : ""}</div>
-        ${c.arquivoNome ? `<button class="btn" data-acao="ver-cert" data-id="${esc(c.id)}" aria-label="Abrir o arquivo de ${esc(c.titulo)}">Ver</button>` : `<span class="pequeno fraco">sem arquivo</span>`}</div>`).join("")}</div></section>`;
+        ${c.arquivoNome ? `<button class="btn" data-acao="ver-cert" data-id="${esc(c.id)}" aria-label="Ver o certificado ${esc(c.titulo)}">Ver</button>` : `<button class="btn" data-acao="editar-cert" data-id="${esc(c.id)}">Pôr PDF</button>`}</div>`).join("")}</div></section>`;
   }
   if (tab) {
     const usadoPor = new Map();
@@ -1075,7 +1134,7 @@ function folhaCert(id) {
     previa();
   }
   const bv = $("#cert-ver");
-  if (bv) bv.onclick = () => verArquivo(id);
+  if (bv) bv.onclick = () => { folha.close(); verArquivo(id); };
 }
 
 /* ---------- plano de estudo ---------- */
@@ -1301,7 +1360,7 @@ atualizar(false);
 (() => {
   const ind = $("#puxar");
   let inicio = null, puxado = 0;
-  addEventListener("touchstart", (e) => { inicio = scrollY <= 0 && !folha.open ? e.touches[0].clientY : null; puxado = 0; }, { passive: true });
+  addEventListener("touchstart", (e) => { inicio = scrollY <= 0 && !folha.open && $("#visor").hidden ? e.touches[0].clientY : null; puxado = 0; }, { passive: true });
   addEventListener("touchmove", (e) => {
     if (inicio == null) return;
     puxado = e.touches[0].clientY - inicio;
