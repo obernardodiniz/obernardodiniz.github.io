@@ -371,7 +371,7 @@ dialog::backdrop { background: rgba(4, 10, 20, .5); -webkit-backdrop-filter: blu
 <script>
 "use strict";
 /* ---------- estado ---------- */
-const VERSAO_APP = "2026-10-24-11"; // trocar junto com dados/versao.json a cada publicação do app
+const VERSAO_APP = "2026-10-24-12"; // trocar junto com dados/versao.json a cada publicação do app
 const S = { discs: new Map(), avals: new Map(), avisos: new Map(), eventos: new Map(), perfil: {}, aba: "hoje", filtroCurso: "todas", mes: null, diaSel: null };
 let db = null, sample = null, podeEscrever = true;
 
@@ -423,6 +423,13 @@ function situacaoDisc(id) {
     return r;
   }
   r.media = pontos / pesoTotal;
+  // semestre ainda em curso: pode haver avaliação que não foi cadastrada, então não dá resultado final
+  if (S.perfil.fimSemestre && hojeISO() <= S.perfil.fimSemestre && !(vs && vs.nota != null)) {
+    r.parcial = r.media; r.media = null;
+    r.texto = `Média das notas lançadas: ${nota1(r.parcial)}. Se ainda tiver prova ou trabalho, cadastre para a conta ficar certa.`;
+    [r.rotulo, r.classe] = r.parcial >= 6 ? ["Acima de 6", "p-ok"] : r.parcial >= 4 ? ["Rumo à VS", "p-vs"] : ["Em risco", "p-rep"];
+    return r;
+  }
   if (r.media >= 6) { r.texto = "Média 6,0 ou mais: aprovado direto (com frequência de 75%)."; r.classe = "p-ok"; r.rotulo = "Aprovado"; }
   else if (r.media >= 4) {
     if (vs && vs.nota != null) {
@@ -683,7 +690,9 @@ function telaAgenda() {
 
 function telaHoje() {
   const h = hojeISO();
-  const proximas = ordenarPor([...S.avals.values()].filter((a) => a.data && a.data >= h && a.nota == null), (a) => a.data);
+  // VS só entra quando a média da matéria pede VS
+  const precisaVs = (a) => a.tipo !== "vs" || situacaoDisc(a.disciplinaId).rotulo === "VS";
+  const proximas = ordenarPor([...S.avals.values()].filter((a) => a.data && a.data >= h && a.nota == null && precisaVs(a)), (a) => a.data);
   const avisos = ordenarPor([...S.avisos.values()].filter((v) => !v.feito && v.data && v.data <= h), (v) => v.data);
   let out = capaInicio(proximas, resumoCurso());
   const atalho = (acao, t, ic) => `<button class="atalho" data-acao="${acao}">${svgIco(ic)}${t}</button>`;

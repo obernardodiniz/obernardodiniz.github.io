@@ -1,5 +1,5 @@
 {
- "atualizado": "2026-10-23",
+ "atualizado": "2026-10-24",
  "perfil": {
   "atualizadoIduff": "2026-10-23",
   "chObtida": 2116,
@@ -1063,9 +1063,113 @@
    "tipo": "obrigatoria"
   }
  },
- "avaliacoes": {},
+ "avaliacoes": {
+  "teq00127-p1": {
+   "tipo": "prova",
+   "peso": 1,
+   "nota": 6.8,
+   "data": "2026-09-09",
+   "hora": null,
+   "conteudo": "6,3 na prova + 0,5 do desafio",
+   "disciplinaId": "TEQ00127",
+   "nome": "P1"
+  },
+  "teq00127-p2": {
+   "tipo": "prova",
+   "peso": 1,
+   "nota": null,
+   "data": "2026-11-23",
+   "hora": null,
+   "conteudo": "",
+   "disciplinaId": "TEQ00127",
+   "nome": "P2"
+  },
+  "teq00127-vs": {
+   "tipo": "vs",
+   "peso": 1,
+   "nota": null,
+   "data": "2026-11-07",
+   "hora": null,
+   "conteudo": "Data divulgada, mas vem antes da P2: confirmar com o professor",
+   "disciplinaId": "TEQ00127",
+   "nome": "VS"
+  },
+  "teq00089-p1": {
+   "tipo": "prova",
+   "peso": 1,
+   "nota": 7.3,
+   "data": null,
+   "hora": null,
+   "conteudo": "",
+   "disciplinaId": "TEQ00089",
+   "nome": "P1"
+  },
+  "teq00101-p1": {
+   "tipo": "prova",
+   "peso": 1,
+   "nota": null,
+   "data": null,
+   "hora": null,
+   "conteudo": "Prova feita; a nota ainda não foi divulgada",
+   "disciplinaId": "TEQ00101",
+   "nome": "P1"
+  },
+  "teq00191-t1": {
+   "tipo": "trabalho",
+   "peso": 1,
+   "nota": null,
+   "data": null,
+   "hora": null,
+   "conteudo": "",
+   "disciplinaId": "TEQ00191",
+   "nome": "Trabalho 1"
+  },
+  "teq00191-t2": {
+   "tipo": "trabalho",
+   "peso": 1,
+   "nota": null,
+   "data": null,
+   "hora": null,
+   "conteudo": "",
+   "disciplinaId": "TEQ00191",
+   "nome": "Trabalho 2"
+  },
+  "teq00191-t3": {
+   "tipo": "trabalho",
+   "peso": 1,
+   "nota": null,
+   "data": null,
+   "hora": null,
+   "conteudo": "",
+   "disciplinaId": "TEQ00191",
+   "nome": "Trabalho 3"
+  }
+ },
  "avisos": {},
- "eventos": {},
+ "eventos": {
+  "teq00127-2ch": {
+   "titulo": "2ª chamada · Tópicos de Matemática",
+   "categoria": "faculdade",
+   "data": "2026-11-30",
+   "hora": null,
+   "horaFim": null,
+   "local": "",
+   "avisarDias": -1,
+   "repeteAte": null,
+   "notas": "Só para quem faltou a uma prova. Segunda avaliação de 2ª chamada: 02/12."
+  },
+  "teq00127-vista": {
+   "titulo": "Vista da VS · Tópicos de Matemática",
+   "categoria": "faculdade",
+   "data": "2026-12-09",
+   "hora": null,
+   "horaFim": null,
+   "local": "",
+   "avisarDias": -1,
+   "repeteAte": null,
+   "notas": ""
+  }
+ },
  "calendarioUff": {
   "fonte": "Resolução CEPEx/UFF nº 5.309/2025 (calendário 2026) e nº 5.581/2026 (feriados)",
   "datas": [
