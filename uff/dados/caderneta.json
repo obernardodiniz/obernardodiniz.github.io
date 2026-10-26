@@ -1,5 +1,5 @@
 {
- "atualizado": "2026-10-24",
+ "atualizado": "2026-10-26",
  "perfil": {
   "atualizadoIduff": "2026-10-23",
   "chObtida": 2116,
@@ -1078,7 +1078,7 @@
    "tipo": "prova",
    "peso": 1,
    "nota": null,
-   "data": "2026-11-23",
+   "data": "2026-11-12",
    "hora": null,
    "conteudo": "",
    "disciplinaId": "TEQ00127",
@@ -1088,9 +1088,9 @@
    "tipo": "vs",
    "peso": 1,
    "nota": null,
-   "data": "2026-11-07",
+   "data": null,
    "hora": null,
-   "conteudo": "Data divulgada, mas vem antes da P2: confirmar com o professor",
+   "conteudo": "Data ainda não divulgada (a de 07/11 da planilha estava errada)",
    "disciplinaId": "TEQ00127",
    "nome": "VS"
   },
