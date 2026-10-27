@@ -1204,7 +1204,7 @@ function limparNome(s) {
 }
 // Nome da loja: linha do começo que parece texto de verdade (e não sujeira da borda da foto nem endereço).
 function pontoLoja(linha) {
-  if (IGNORAR.test(linha) || /(RUA|AV\.|AVENIDA|BAIRRO|CEP|TEL|ESTRADA|\d{2}\.\d{3}\.\d{3})/i.test(linha)) return 0;
+  if (IGNORAR.test(linha) || /(\b(RUA|AV|AVENIDA|CEP|TEL|FONE|ESTRADA|ROD|TRAVESSA|PRA[CÇ]A)\b|\d{2}\.\d{3}\.\d{3}|\d{5}-\d{3})/i.test(linha)) return 0;
   const cheios = linha.replace(/\s/g, "");
   const palavras = linha.split(" ").filter((p) => /^\p{L}{3,}[.,]?$/u.test(p));
   if (palavras.length < 2 || !cheios.length || letras(linha) / cheios.length < 0.8) return 0;
