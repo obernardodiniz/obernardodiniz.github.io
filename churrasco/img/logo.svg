@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="fundo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#43261B"/>
+      <stop offset="1" stop-color="#170D09"/>
+    </linearGradient>
+    <linearGradient id="brasa" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FF8A3D"/>
+      <stop offset="1" stop-color="#D9361A"/>
+    </linearGradient>
+    <linearGradient id="chama" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#FF7A2F"/>
+      <stop offset="1" stop-color="#FFD25A"/>
+    </linearGradient>
+    <radialGradient id="brilho" cx="0.5" cy="0.45" r="0.5">
+      <stop offset="0" stop-color="#FF7A2F" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#FF7A2F" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect id="caixa" width="512" height="512" rx="116" fill="url(#fundo)"/>
+  <circle cx="256" cy="230" r="210" fill="url(#brilho)"/>
+  <path d="M256 80c40 46 62 80 50 120-8 27-28 42-50 42s-46-14-50-42c-4-26 12-44 24-58 2 22 12 34 24 34-6-32-14-62 2-96z" fill="url(#chama)"/>
+  <path d="M176 150c22 24 34 44 28 66-4 15-15 24-28 24s-26-8-28-24c-2-15 8-26 14-33 2 12 7 18 13 18-3-17-8-34 1-51z" fill="url(#chama)" opacity="0.9"/>
+  <path d="M336 150c22 24 34 44 28 66-4 15-15 24-28 24s-26-8-28-24c-2-15 8-26 14-33 2 12 7 18 13 18-3-17-8-34 1-51z" fill="url(#chama)" opacity="0.9"/>
+  <rect x="108" y="252" width="296" height="22" rx="11" fill="#FFF3E6"/>
+  <path d="M132 284h248a124 124 0 0 1-248 0z" fill="url(#brasa)"/>
+  <path d="M170 312c20 26 52 40 86 40" stroke="#FFF3E6" stroke-opacity="0.35" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <g stroke="#FFF3E6" stroke-width="16" stroke-linecap="round">
+    <line x1="196" y1="384" x2="170" y2="440"/>
+    <line x1="316" y1="384" x2="342" y2="440"/>
+    <line x1="256" y1="408" x2="256" y2="440"/>
+  </g>
+</svg>
