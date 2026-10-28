@@ -389,7 +389,7 @@ main.sem-abas { padding-bottom: calc(40px + var(--base)); }
 <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
 <input type="file" id="arqCamera" accept="image/*" capture="environment" hidden>
 <input type="file" id="arqGaleria" accept="image/*" hidden>
-<input type="file" id="arqArquivo" accept="application/pdf,.pdf,image/*" hidden>
+<input type="file" id="arqArquivo" accept="application/pdf,.pdf,image/*,text/xml,application/xml,.xml" hidden>
 <input type="file" id="arqComprovante" accept="application/pdf,.pdf,image/*" hidden>
 <input type="file" id="arqCopia" accept="application/json,.json" hidden>
 <noscript><p style="padding:20px">O Nosso Churrasco precisa do JavaScript ligado no navegador.</p></noscript>
@@ -470,7 +470,7 @@ const fotos = {
     const u = URL.createObjectURL(b); this._urls.set(id, u); return u;
   },
 };
-const tipoArquivo = (t) => (/pdf/i.test(t || "") ? "PDF" : "imagem");
+const tipoArquivo = (t) => (/pdf/i.test(t || "") ? "PDF" : /xml/i.test(t || "") ? "XML" : "imagem");
 async function mostrarFotos() {
   for (const el of document.querySelectorAll("[data-arquivo]")) { const u = await fotos.url(el.dataset.arquivo); if (u) el.href = u; }
   for (const el of document.querySelectorAll("[data-foto]")) {
@@ -1259,6 +1259,7 @@ function pontoLoja(linha) {
 }
 function lerTextoDaNota(texto) {
   const linhas = texto.split(/\r?\n/).map((l) => l.replace(/[|_—–]+/g, " ").replace(/\s+/g, " ").trim()).filter((l) => l.length > 1);
+  if (pareceDanfe(texto)) { const d = lerDanfe(linhas); if (d.itens.length) return d; }
   const r = { loja: "", data: "", total: 0, chave: "", itens: [] };
   const digitos = texto.replace(/[^\d\n]/g, "").split("\n").find((l) => l.length === 44);
   if (digitos) r.chave = digitos;
@@ -1299,16 +1300,140 @@ function lerTextoDaNota(texto) {
   return r;
 }
 
+/* ----- Nota em folha A4 (DANFE), como as do Mercado Livre e das lojas on-line ----- */
+// A tabela de produtos tem código, descrição, NCM, CFOP, unidade, quantidade, valor unitário, valor total e impostos.
+// O item é achado pela conta: quantidade × valor unitário = valor total, três números seguidos na linha.
+const DANFE_PRODUTOS = /DADOS\s+DOS?\s+PRODUTOS?/i;
+const DANFE_FIM = /DADOS\s+ADICIONAIS|C[ÁA]LCULO\s+DO\s+ISSQN|INFORMA[ÇC][ÕO]ES\s+COMPLEMENTARES|RESERVADO\s+AO\s+FISCO/i;
+const DANFE_CABECALHO = /C[ÓO]D(IGO|\.)?\s*(DO\s+)?PROD|DESCRI[ÇC][ÃA]O|NCM|CFOP|AL[ÍI]Q|QUANT|QTDE?\b|V(ALO)?R?\.?\s*UNIT|B\.?\s*C[ÁA]LC|CST|CSOSN|V\.?\s*DESC/i;
+const pareceDanfe = (t) => DANFE_PRODUTOS.test(t) || (/DANFE|DOCUMENTO\s+AUXILIAR\s+DA\s+NOTA\s+FISCAL\s+ELETR/i.test(t) && !/NFC-?E|CONSUMIDOR\s+ELETR/i.test(t));
+// "1.299,90" → 1299.9; "1,0000" → 1; "2" → 2
+const numBr = (s) => Number(String(s).replace(/\./g, "").replace(",", "."));
+const ehDecimal = (s) => /^\d{1,3}(\.\d{3})*,\d{2,10}$|^\d+,\d{2,10}$/.test(s);
+const precoTexto = (n) => n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function itemDaLinha(linha) {
+  const t = linha.split(" ");
+  for (let i = 0; i + 2 < t.length; i++) {
+    // A unidade pode vir entre a quantidade e o valor unitário ("4 UN 12,50 50,00").
+    const meio = /^[A-Za-z]{1,6}\.?$/.test(t[i + 1]) ? 1 : 0;
+    const a = t[i], b = t[i + 1 + meio], c = t[i + 2 + meio];
+    if (!b || !c || !(ehDecimal(b) && ehDecimal(c) && (ehDecimal(a) || /^\d{1,4}$/.test(a)))) continue;
+    const q = numBr(a), u = numBr(b), v = numBr(c);
+    if (!(q > 0 && u > 0 && v > 0) || Math.abs(q * u - v) > 0.011 + v * 0.002) continue;
+    // Descrição: o que vem antes do NCM (8 dígitos) ou da quantidade, sem o código do produto no começo.
+    let fim = i; const ncm = t.findIndex((x, k) => k < i && /^\d{8}$/.test(x.replace(/\./g, "")));
+    if (ncm > 0) fim = ncm;
+    let desc = t.slice(0, fim);
+    if (desc.length > 1 && /\d/.test(desc[0])) desc = desc.slice(1);
+    const u0 = meio ? t[i + 1] : t[i - 1] && /^[A-Za-z]{1,6}\.?$/.test(t[i - 1]) && i - 1 >= fim ? t[i - 1] : "";
+    const un = u0 ? u0.replace(".", "").toUpperCase() + " " : "";
+    return { nome: limparNome(desc.join(" ")), qtd: `${qtdTexto(q)} ${un}× ${precoTexto(u)}`, valor: Math.round(v * 100) };
+  }
+  return null;
+}
+function lerDanfe(linhas) {
+  const r = { loja: "", data: "", total: 0, chave: "", itens: [] };
+  const tudo = linhas.join(" ");
+  const ch = tudo.match(/(?:^|\D)(\d{4}(?:[ .]?\d{4}){10})(?!\d)/);
+  if (ch) r.chave = ch[1].replace(/\D/g, "");
+  const recebemos = tudo.match(/RECEBEMOS\s+DE\s+(.+?)\s+OS\s+PRODUTOS/i);
+  if (recebemos) r.loja = tituloCaso(recebemos[1].replace(/[^\p{L}\p{N}\s&.-]/gu, "").trim()).slice(0, 50);
+  else {
+    let melhor = 0;
+    const iTabela = linhas.findIndex((l) => DANFE_PRODUTOS.test(l) || DANFE_CABECALHO.test(l));
+    linhas.slice(0, Math.min(15, iTabela < 0 ? 15 : iTabela)).forEach((l) => {
+      if (DANFE_PRODUTOS.test(l) || DANFE_CABECALHO.test(l) || /IDENTIFICA[ÇC]|DESTINAT|NATUREZA|DOCUMENTO\s+AUXILIAR/i.test(l)) return;
+      l = l.replace(/^\s*EMITENTE\s*:?\s*/i, "");
+      const p = pontoLoja(l);
+      if (p > melhor) { melhor = p; r.loja = tituloCaso(l.replace(/[^\p{L}\p{N}\s&.-]/gu, "").replace(/\s+/g, " ").trim()).slice(0, 50); }
+    });
+  }
+  const dataEm = (l) => { const d = l && l.match(/(\d{2})\/(\d{2})\/(\d{4})/); return d && +d[2] >= 1 && +d[2] <= 12 ? `${d[3]}-${d[2]}-${d[1]}` : ""; };
+  const iEmissao = linhas.findIndex((l) => /DATA\s+D[AE]\s+EMISS/i.test(l));
+  if (iEmissao >= 0) r.data = dataEm(linhas[iEmissao]) || dataEm(linhas[iEmissao + 1]) || dataEm(linhas[iEmissao + 2]);
+  if (!r.data) for (const l of linhas) if ((r.data = dataEm(l))) break;
+  // Valor total da nota: o rótulo fica numa linha e os valores na de baixo; o total é o maior deles (inclui frete).
+  const iTotal = linhas.findIndex((l) => /V(ALOR|\.)?\s*TOTAL\s+(DA\s+)?NOTA/i.test(l));
+  if (iTotal >= 0) {
+    const depois = linhas[iTotal].split(/TOTAL\s+(?:DA\s+)?NOTA/i)[1] || "";
+    const nums = (l) => (l.match(/\d{1,3}(?:\.\d{3})*,\d{2}(?!\d)/g) || []).map((x) => Math.round(numBr(x) * 100));
+    const naLinha = nums(depois);
+    if (naLinha.length) r.total = naLinha[0];
+    else for (const l of linhas.slice(iTotal + 1, iTotal + 3)) { const n = nums(l); if (n.length) { r.total = Math.max(...n); break; } }
+  }
+  // Itens: só dentro do quadro de produtos (que se repete em cada página); se o quadro não for achado, procura na nota toda.
+  const temQuadro = linhas.some((l) => DANFE_PRODUTOS.test(l));
+  let dentro = !temQuadro, pendente = [];
+  const juntar = (it, extra, antes) => { if (it && extra.length) { const e = limparNome(extra.join(" ")); it.nome = (antes ? `${e} ${it.nome}` : `${it.nome} ${e}`).trim(); } };
+  for (const l of linhas) {
+    if (DANFE_PRODUTOS.test(l)) { dentro = true; pendente = []; continue; }
+    if (DANFE_FIM.test(l)) { juntar(r.itens[r.itens.length - 1], pendente); dentro = !temQuadro; pendente = []; continue; }
+    if (!dentro) continue;
+    const it = itemDaLinha(l);
+    if (!it) {
+      // Cabeçalho da tabela: o que veio antes dele não é descrição de produto.
+      if (DANFE_CABECALHO.test(l)) { if (!r.itens.length) pendente = []; }
+      else if (!IGNORAR.test(l) && letras(l) >= 3) pendente.push(l);
+      continue;
+    }
+    // Descrição que quebrou em várias linhas: se a linha do item já tem nome, as linhas soltas antes dela são do item anterior.
+    if (letras(it.nome) >= 3) juntar(r.itens.length ? r.itens[r.itens.length - 1] : it, pendente, !r.itens.length);
+    else { it.nome = limparNome(pendente.join(" ")); }
+    pendente = [];
+    r.itens.push({ id: novoId(), ...it });
+  }
+  juntar(r.itens[r.itens.length - 1], pendente);
+  r.itens = r.itens.filter((i) => letras(i.nome) >= 2).map((i) => ({ ...i, nome: tituloCaso(i.nome).slice(0, 80), usar: true }));
+  // Frete da compra pela internet: é o primeiro quadro da linha "VALOR DO FRETE | VALOR DO SEGURO | ...".
+  const iFrete = linhas.findIndex((l) => /^V(ALOR|\.)?\s*(DO\s+)?FRETE/i.test(l));
+  if (r.itens.length && iFrete >= 0) {
+    const l = linhas.slice(iFrete + 1, iFrete + 3).find((x) => /\d,\d{2}/.test(x));
+    const v = l ? Math.round(numBr(l.match(/\d{1,3}(?:\.\d{3})*,\d{2}(?!\d)/)[0]) * 100) : 0;
+    if (v > 0) r.itens.push({ id: novoId(), nome: "Frete", qtd: "", valor: v, usar: true });
+  }
+  return r;
+}
+
+/* ----- Arquivo XML da nota (o Mercado Livre e as lojas on-line deixam baixar junto com o PDF): tudo vem exato ----- */
+function lerXmlDaNota(texto) {
+  const x = new DOMParser().parseFromString(texto, "text/xml");
+  const tag = (el, nome) => (el && el.getElementsByTagName(nome)[0]) || null;
+  const val = (el, nome) => { const e = tag(el, nome); return e ? e.textContent.trim() : ""; };
+  const dets = [...x.getElementsByTagName("det")];
+  if (!dets.length) return null;
+  const emit = tag(x, "emit");
+  const inf = tag(x, "infNFe");
+  const r = {
+    loja: tituloCaso(val(emit, "xFant") || val(emit, "xNome")).slice(0, 50),
+    data: (val(tag(x, "ide"), "dhEmi") || val(tag(x, "ide"), "dEmi")).slice(0, 10),
+    total: Math.round(Number(val(tag(x, "ICMSTot"), "vNF")) * 100) || 0,
+    chave: val(x, "chNFe") || ((inf && inf.getAttribute("Id")) || "").replace(/\D/g, ""),
+    itens: [],
+  };
+  r.itens = dets.map((d) => {
+    const p = tag(d, "prod");
+    const q = Number(val(p, "qCom")) || 1, u = Number(val(p, "vUnCom")) || 0;
+    // Valor pago pelo item: valor do produto menos o desconto dele.
+    const valor = Math.round((Number(val(p, "vProd")) - (Number(val(p, "vDesc")) || 0)) * 100);
+    return { id: novoId(), nome: tituloCaso(val(p, "xProd")).slice(0, 80), qtd: `${qtdTexto(q)} ${val(p, "uCom").toUpperCase()} × ${precoTexto(u)}`, valor, usar: true };
+  }).filter((i) => i.valor > 0 && i.nome);
+  const frete = Math.round(Number(val(tag(x, "ICMSTot"), "vFrete")) * 100) || 0;
+  if (frete > 0) r.itens.push({ id: novoId(), nome: "Frete", qtd: "", valor: frete, usar: true });
+  return r;
+}
+
 const ehPdf = (a) => /pdf/i.test(a.type || "") || /\.pdf$/i.test(a.name || "");
+const ehXml = (a) => /xml/i.test(a.type || "") || /\.xml$/i.test(a.name || "");
 const ehImagem = (a) => /^image\//.test(a.type || "") || /\.(jpe?g|png|heic|heif|webp|gif|bmp)$/i.test(a.name || "");
 const LIMITE_ARQUIVO = 25 * 1024 * 1024;
 async function receberFoto(arquivo) {
   const p = rota(); const c = achar(p[1]);
   if (!c || !arquivo) return;
-  if (!ehImagem(arquivo) && !ehPdf(arquivo)) { avisar("Mande uma foto ou um PDF da nota", "alerta"); return; }
+  if (!ehImagem(arquivo) && !ehPdf(arquivo) && !ehXml(arquivo)) { avisar("Mande uma foto, um PDF ou o XML da nota", "alerta"); return; }
   if (arquivo.size > LIMITE_ARQUIVO) { avisar("Arquivo grande demais (máximo 25 MB)", "alerta"); return; }
-  const n = { id: novoId(), criadoEm: Date.now(), fotoId: novoId(), loja: "", data: "", total: 0, itens: [] };
+  const n = { id: novoId(), criadoEm: Date.now(), fotoId: ehXml(arquivo) ? "" : novoId(), loja: "", data: "", total: 0, itens: [] };
   if (ehPdf(arquivo)) Object.assign(n, { arquivoId: novoId(), arquivoTipo: "application/pdf", arquivoNome: (arquivo.name || "nota.pdf").slice(0, 80) });
+  else if (ehXml(arquivo)) Object.assign(n, { arquivoId: novoId(), arquivoTipo: "text/xml", arquivoNome: (arquivo.name || "nota.xml").slice(0, 80) });
   lerFoto(arquivo, c, n, true);
 }
 
@@ -1363,8 +1488,13 @@ async function lerFoto(arquivo, c, n, nova) {
     else if (/load|initializ/i.test(m.status)) prog(8 + (m.progress || 0) * 10, "Preparando o leitor");
   };
   try {
-    let lido = "", link = "";
-    if (ehPdf(arquivo)) {
+    let lido = "", link = "", doXml = null;
+    if (ehXml(arquivo)) {
+      if (nova) await fotos.por(n.arquivoId, arquivo);
+      prog(50, "Lendo o arquivo da nota");
+      doXml = lerXmlDaNota(await arquivo.text());
+      if (!doXml) throw new Error("xml");
+    } else if (ehPdf(arquivo)) {
       if (nova) await fotos.por(n.arquivoId, arquivo);
       prog(6, "Abrindo o PDF");
       const doc = await abrirPdf(arquivo);
@@ -1404,7 +1534,7 @@ async function lerFoto(arquivo, c, n, nova) {
     }
     aoProgresso = null;
     if (cancelado) { desfazer(); return; }
-    const r = lerTextoDaNota(lido);
+    const r = doXml || lerTextoDaNota(lido);
     if (r.chave && nova && c.notas.some((x) => x.chave === r.chave)) {
       tela.remove(); desfazer();
       avisar("Esta nota já foi lançada neste churrasco", "alerta"); return;
@@ -1424,7 +1554,7 @@ async function lerFoto(arquivo, c, n, nova) {
     aoProgresso = null;
     tela.remove();
     desfazer();
-    avisar(!navigator.onLine ? "Na primeira leitura o celular precisa de internet." : ehPdf(arquivo) ? "Não consegui abrir este PDF. Ele pode estar protegido por senha." : "Não consegui ler esta foto. Tente de novo.", "alerta");
+    avisar(ehXml(arquivo) ? "Este arquivo não é o XML de uma nota fiscal." : !navigator.onLine ? "Na primeira leitura o celular precisa de internet." : ehPdf(arquivo) ? "Não consegui abrir este PDF. Ele pode estar protegido por senha." : "Não consegui ler esta foto. Tente de novo.", "alerta");
   }
 }
 for (const id of ["arqCamera", "arqGaleria", "arqArquivo"]) $("#" + id).addEventListener("change", (e) => { const a = e.target.files[0]; e.target.value = ""; receberFoto(a); });
