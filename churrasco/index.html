@@ -124,6 +124,10 @@ main.sem-abas { padding-bottom: calc(40px + var(--base)); }
 .linha-botoes { display: flex; gap: 10px; flex-wrap: wrap; }
 .linha-botoes > * { flex: 1 1 0; }
 .etiqueta { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 99px; font-size: 13px; font-weight: 650; background: var(--cartao-2); color: var(--tinta-2); white-space: nowrap; }
+.etiqueta svg.i { width: 14px; height: 14px; }
+.anexo { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: var(--cartao-2); font-size: 14.5px; }
+.anexo .meio { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.anexo a { color: var(--brasa); font-weight: 700; }
 .etiqueta.brasa { background: var(--brasa-suave); color: var(--brasa); }
 .etiqueta.verde { background: var(--verde-suave); color: var(--verde); }
 .etiqueta.ouro { background: #FFF1C9; color: #A86A00; }
@@ -247,7 +251,7 @@ main.sem-abas { padding-bottom: calc(40px + var(--base)); }
 .grande-acao small { font-size: 13px; opacity: .8; margin-top: -6px; }
 .nota-cartao { display: flex; gap: 14px; align-items: center; cursor: pointer; transition: transform .2s var(--mola); }
 .nota-cartao:active { transform: scale(.98); }
-.miniatura { width: 58px; height: 72px; border-radius: 12px; background: var(--cartao-2) center/cover no-repeat; flex: none; display: grid; place-items: center; color: var(--tinta-3); }
+.miniatura { width: 58px; height: 72px; border-radius: 12px; background: var(--cartao-2) top center/cover no-repeat; flex: none; display: grid; place-items: center; color: var(--tinta-3); }
 .nota-cartao .meio { flex: 1; min-width: 0; }
 .nota-cartao b { display: block; font: 700 17px/1.2 var(--f-titulo); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .foto-nota { position: relative; border-radius: var(--raio); overflow: hidden; background: var(--cartao-2); margin-bottom: 14px; max-height: 260px; cursor: zoom-in; box-shadow: var(--sombra); }
@@ -295,7 +299,7 @@ main.sem-abas { padding-bottom: calc(40px + var(--base)); }
 .folha h2 { font-size: 23px; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
 .folha .sub { color: var(--tinta-2); margin: 0 0 16px; font-size: 15px; }
 .folha form { display: grid; gap: 14px; }
-.folha label.rot { display: grid; gap: 6px; font-size: 14px; font-weight: 650; color: var(--tinta-2); }
+.folha .rot { display: grid; gap: 6px; font-size: 14px; font-weight: 650; color: var(--tinta-2); }
 .folha .dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .folha .total-ao-vivo { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-radius: 14px; background: var(--cartao-2); font-weight: 650; }
 .folha .total-ao-vivo b { font: 800 22px var(--f-titulo); color: var(--brasa); }
@@ -355,6 +359,8 @@ main.sem-abas { padding-bottom: calc(40px + var(--base)); }
   <symbol id="i-lupa" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
   <symbol id="i-link" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/></symbol>
   <symbol id="i-alerta" viewBox="0 0 24 24"><path d="M12 3 2 21h20zM12 10v5M12 18h.01"/></symbol>
+  <symbol id="i-clipe" viewBox="0 0 24 24"><path d="M20.5 11.5 12.4 19.6a5 5 0 0 1-7-7l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></symbol>
+  <symbol id="i-arquivo" viewBox="0 0 24 24"><path d="M6 2.5h8.5L19 7v14.5H6zM14 2.5V7.5h5M9 13h6M9 17h4"/></symbol>
   <symbol id="i-escudo" viewBox="0 0 24 24"><path d="M12 3 4.5 6v6c0 4.5 3.2 8 7.5 9 4.3-1 7.5-4.5 7.5-9V6z"/></symbol>
 </svg>
 
@@ -383,6 +389,8 @@ main.sem-abas { padding-bottom: calc(40px + var(--base)); }
 <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
 <input type="file" id="arqCamera" accept="image/*" capture="environment" hidden>
 <input type="file" id="arqGaleria" accept="image/*" hidden>
+<input type="file" id="arqArquivo" accept="application/pdf,.pdf,image/*" hidden>
+<input type="file" id="arqComprovante" accept="application/pdf,.pdf,image/*" hidden>
 <input type="file" id="arqCopia" accept="application/json,.json" hidden>
 <noscript><p style="padding:20px">O Nosso Churrasco precisa do JavaScript ligado no navegador.</p></noscript>
 
@@ -462,7 +470,9 @@ const fotos = {
     const u = URL.createObjectURL(b); this._urls.set(id, u); return u;
   },
 };
+const tipoArquivo = (t) => (/pdf/i.test(t || "") ? "PDF" : "imagem");
 async function mostrarFotos() {
+  for (const el of document.querySelectorAll("[data-arquivo]")) { const u = await fotos.url(el.dataset.arquivo); if (u) el.href = u; }
   for (const el of document.querySelectorAll("[data-foto]")) {
     const u = await fotos.url(el.dataset.foto);
     if (!u) continue;
@@ -489,6 +499,8 @@ const TIPOS = { inteira: "Inteira", meia: "Meia", isento: "Não paga" };
 const PROXIMO_TIPO = { inteira: "meia", meia: "isento", isento: "inteira" };
 
 const achar = (id) => estado.churrascos.find((c) => c.id === id);
+// Tudo o que este churrasco guarda no banco de arquivos: fotos e PDFs das notas, comprovantes dos custos.
+const arquivosDe = (c) => [...c.notas.flatMap((n) => [n.fotoId, n.arquivoId]), ...c.custos.map((x) => x.arquivoId)].filter(Boolean);
 const somaNota = (n) => n.itens.reduce((s, i) => s + (i.usar ? i.valor : 0), 0);
 const totalLido = (n) => n.itens.reduce((s, i) => s + i.valor, 0);
 function contas(c) {
@@ -701,10 +713,10 @@ function telaNotas(c) {
       <button class="grande-acao principal sobe" data-acao="fotografar"><span>${ic("camera")}</span><b>Fotografar a nota</b><small>Abre a câmera</small></button>
       <button class="grande-acao sobe" style="--n:1" data-acao="galeria"><span>${ic("galeria")}</span><b>Foto da galeria</b><small>Uma foto que já tirou</small></button>
     </div>
-    <button class="botao pequeno contorno largo sobe" style="--n:2;margin-bottom:14px" data-acao="notaManual">${ic("lapis")} Lançar uma nota sem foto</button>`;
+    <div class="linha-botoes sobe" style="--n:2;margin-bottom:14px"><button class="botao pequeno contorno" data-acao="enviarArquivo">${ic("arquivo")} Arquivo ou PDF</button><button class="botao pequeno contorno" data-acao="notaManual">${ic("lapis")} Sem foto</button></div>`;
   if (!c.notas.length) {
     html += `<div class="dica sobe" style="--n:3">${ic("camera")}<div><b>Para ler bem:</b> nota esticada numa mesa, foto de cima, com boa luz e a nota inteira aparecendo. Nota comprida pode ir em duas fotos.</div></div>
-      <div class="vazio sobe" style="--n:4">${ic("nota")}<b>Nenhuma nota ainda</b>O app lê os itens da foto e você escolhe o que foi para o churrasco.</div>`;
+      <div class="vazio sobe" style="--n:4">${ic("nota")}<b>Nenhuma nota ainda</b>O app lê os itens da foto ou do PDF da nota e você escolhe o que foi para o churrasco.</div>`;
   } else {
     const soma = c.notas.reduce((s, n) => s + somaNota(n), 0);
     html += `<div class="secao"><h2>Notas</h2><small>${din(soma)} no churrasco</small></div>`;
@@ -713,7 +725,7 @@ function telaNotas(c) {
       html += `<a class="cartao nota-cartao sobe" style="--n:${i + 3}" href="#/c/${c.id}/nota/${n.id}" data-linha="${n.id}">
         <span class="miniatura" ${n.fotoId ? `data-foto="${n.fotoId}"` : ""}>${ic("nota")}</span>
         <div class="meio"><b>${esc(n.loja || "Nota fiscal")}</b><div class="miudo">${n.data ? esc(dataCurta(n.data)) + " · " : ""}${usados} de ${plural(n.itens.length, "item", "itens")}</div>
-        <div style="margin-top:6px"><span class="etiqueta brasa">${din(somaNota(n))}</span>${totalLido(n) !== somaNota(n) ? ` <span class="miudo">de ${din(totalLido(n))}</span>` : ""}</div></div>${ic("seta", "mudo")}</a>`;
+        <div style="margin-top:6px"><span class="etiqueta brasa">${din(somaNota(n))}</span>${n.arquivoId ? ` <span class="etiqueta">${ic("clipe")}${tipoArquivo(n.arquivoTipo)}</span>` : ""}${totalLido(n) !== somaNota(n) ? ` <span class="miudo">de ${din(totalLido(n))}</span>` : ""}</div></div>${ic("seta", "mudo")}</a>`;
     });
   }
   return { titulo: `<span>${esc(c.nome)}</span>`, voltar: "", ordem: 12, aba: "notas", churrasco: c.id, html, acoes: btTopo("compartilhar", "compartilhar", "Compartilhar") };
@@ -724,6 +736,7 @@ function telaNota(c, n) {
   let html = "";
   if (n.fotoId) html += `<div class="foto-nota sobe" data-acao="verFoto" data-id="${n.fotoId}"><img data-foto="${n.fotoId}" alt="Foto da nota"><span class="lupa">${ic("lupa")} Ver a foto</span></div>`;
   html += `<div class="cartao sobe" style="--n:1;display:flex;align-items:center;gap:12px"><div style="flex:1;min-width:0"><h3 style="font-size:21px">${esc(n.loja || "Nota fiscal")}</h3><div class="miudo">${n.data ? esc(dataLonga(n.data)) : "Sem data"}${n.total ? ` · total da nota ${din(n.total)}` : ""}</div></div><button class="mini" data-acao="editarNota" aria-label="Editar loja e data">${ic("lapis")}</button></div>`;
+  if (n.arquivoId) html += `<a class="botao pequeno contorno largo sobe" style="--n:2;margin-bottom:10px" data-arquivo="${n.arquivoId}" target="_blank" rel="noopener">${ic("clipe")} Abrir o arquivo original (${tipoArquivo(n.arquivoTipo)})</a>`;
   if (n.link) html += `<a class="botao pequeno contorno largo sobe" style="--n:2;margin-bottom:14px" href="${esc(n.link)}" target="_blank" rel="noopener">${ic("link")} Ver esta nota no site da Fazenda</a>`;
   if (n.total && n.itens.length && Math.abs(n.total - lido) > 1) html += `<div class="aviso-total sobe" style="--n:2">${ic("alerta")}<div>A nota diz <b>${din(n.total)}</b>, mas os itens lidos somam <b>${din(lido)}</b>. Confira na foto se faltou ou sobrou algum item.</div></div>`;
   html += `<div class="fixo-soma sobe" style="--n:2"><div><small>Vai para o churrasco</small><b>${din(somaNota(n))}</b></div><button class="botao pequeno" data-acao="todosItens" data-v="${usados === n.itens.length ? "0" : "1"}">${usados === n.itens.length && n.itens.length ? "Desmarcar todos" : "Marcar todos"}</button></div>`;
@@ -740,7 +753,7 @@ function telaNota(c, n) {
     html += `</div>`;
   }
   html += `<div style="display:grid;gap:10px"><button class="botao largo" data-acao="novoItem">${ic("mais")} Adicionar item</button>
-    <div class="linha-botoes">${n.fotoId ? `<button class="botao" data-acao="relerNota">${ic("releia")} Ler de novo</button>` : ""}<button class="botao perigo" data-acao="excluirNota">${ic("lixo")} Excluir nota</button></div></div>`;
+    <div class="linha-botoes">${n.fotoId || n.arquivoId ? `<button class="botao" data-acao="relerNota">${ic("releia")} Ler de novo</button>` : ""}<button class="botao perigo" data-acao="excluirNota">${ic("lixo")} Excluir nota</button></div></div>`;
   return { titulo: `<span>${esc(n.loja || "Nota fiscal")}</span>`, voltar: `c/${c.id}/notas`, ordem: 20, aba: "notas", churrasco: c.id, nota: n.id, html };
 }
 
@@ -756,7 +769,7 @@ function telaCustos(c) {
       const cat = categoria(x.categoria);
       html += `<div class="item sobe" style="--n:${Math.min(i + 4, 14)};cursor:pointer" data-acao="editarCusto" data-id="${x.id}" data-linha="${x.id}"><span class="ic-custo">${ic(cat.icone)}</span>
         <div class="meio"><b>${esc(x.descricao || cat.nome)}</b><small>${esc(cat.nome)}${x.qtd !== 1 ? ` · ${qtdTexto(x.qtd)} × ${din(x.valor)}` : ""}</small></div>
-        <span class="valor">${din(Math.round(x.valor * x.qtd))}</span>${ic("seta", "mudo")}</div>`;
+        ${x.arquivoId ? `<span class="mudo" title="Tem comprovante">${ic("clipe")}</span>` : ""}<span class="valor">${din(Math.round(x.valor * x.qtd))}</span>${ic("seta", "mudo")}</div>`;
     });
     html += `</div>`;
   }
@@ -860,13 +873,27 @@ function folhaCusto(c, custo, catId) {
       <label class="rot">Descrição (opcional)<input name="descricao" maxlength="80" placeholder="${esc(cat.dica)}" value="${esc(custo?.descricao || "")}"></label>
       <div class="dupla"><label class="rot">Quantidade<input name="qtd" inputmode="decimal" value="${esc(custo ? qtdTexto(custo.qtd) : "1")}"></label>${campoValor("valor", custo?.valor, "Valor de cada (R$)")}</div>
       <div class="total-ao-vivo"><span>Total</span><b id="totalCusto">${din(custo ? Math.round(custo.valor * custo.qtd) : 0)}</b></div>
+      <div class="rot">Comprovante (opcional)<div id="areaAnexo"></div></div>
       <button class="botao primario largo">${custo ? "Salvar" : "Adicionar custo"}</button>
       ${custo ? `<button type="button" class="botao perigo largo" data-acao="excluirCusto" data-id="${custo.id}">${ic("lixo")} Excluir este custo</button>` : ""}</form>`, (r) => {
+    anexoCusto = { atual: custo && custo.arquivoId ? { id: custo.arquivoId, nome: custo.arquivoNome, tipo: custo.arquivoTipo } : null, novo: null, tirar: false };
+    mostrarAnexo();
     const f = r.querySelector("form");
     const atualizar = () => { r.querySelector("#totalCusto").textContent = din(Math.round(centavos(f.valor.value) * numero(f.qtd.value))); };
     f.addEventListener("input", atualizar);
     if (!custo) setTimeout(() => f.valor.focus(), 350);
   });
+}
+// Comprovante do custo (recibo, contrato, Pix…): só é gravado quando ele toca em Salvar.
+let anexoCusto = { atual: null, novo: null, tirar: false };
+async function mostrarAnexo() {
+  const area = $("#areaAnexo");
+  if (!area) return;
+  const a = anexoCusto.novo || (!anexoCusto.tirar && anexoCusto.atual);
+  if (!a) { area.innerHTML = `<button type="button" class="botao pequeno contorno largo" style="margin-top:6px" data-acao="anexarComprovante">${ic("clipe")} Anexar foto ou PDF</button>`; return; }
+  area.innerHTML = `<div class="anexo" style="margin-top:6px">${ic(/pdf/i.test(a.tipo) ? "arquivo" : "galeria")}<span class="meio">${esc(a.nome || "Comprovante")}</span>${anexoCusto.novo ? "" : `<a data-arquivo="${a.id}" target="_blank" rel="noopener">Ver</a>`}<button type="button" class="mini" data-acao="tirarComprovante" aria-label="Tirar comprovante">${ic("x")}</button></div>`;
+  const link = area.querySelector("[data-arquivo]");
+  if (link) { const u = await fotos.url(a.id); if (u) link.href = u; }
 }
 function folhaItem(n, it) {
   abrirFolha(`<h2>${it ? "Corrigir item" : "Novo item"}</h2><p class="sub">${it ? "Ajuste o que o leitor errou." : `Na nota ${esc(n.loja || "")}`}</p>
@@ -942,12 +969,22 @@ const formularios = {
     salvar(); fecharFolha(); render();
     avisar(n ? `${plural(n, "pessoa entrou", "pessoas entraram")} na lista` : "Nenhum nome novo na lista", n ? "check" : "alerta");
   },
-  salvarCusto(f, dados) {
+  async salvarCusto(f, dados) {
     const c = achar(rota()[1]);
     const valor = centavos(dados.get("valor"));
     if (!valor) { avisar("Coloque o valor", "alerta"); f.valor.focus(); return; }
     const reg = { categoria: f.dataset.cat, descricao: dados.get("descricao").trim(), qtd: numero(dados.get("qtd")), valor };
     let id = f.dataset.id;
+    const antigo = id ? c.custos.find((x) => x.id === id) : null;
+    if (anexoCusto.novo || anexoCusto.tirar) {
+      if (antigo && antigo.arquivoId) fotos.tirar(antigo.arquivoId);
+      Object.assign(reg, { arquivoId: null, arquivoNome: "", arquivoTipo: "" });
+      if (anexoCusto.novo) {
+        const aid = novoId();
+        try { await fotos.por(aid, anexoCusto.novo.blob); Object.assign(reg, { arquivoId: aid, arquivoNome: anexoCusto.novo.nome, arquivoTipo: anexoCusto.novo.tipo }); }
+        catch (e) { avisar("Não consegui guardar o comprovante", "alerta"); }
+      }
+    }
     if (id) Object.assign(c.custos.find((x) => x.id === id), reg);
     else { id = novoId(); c.custos.push({ id, ...reg }); }
     salvar(); fecharFolha(); recentes.add(id); render();
@@ -988,7 +1025,7 @@ const acoes = {
   async excluirChurrasco() {
     const c = achar(rota()[1]);
     if (!(await confirmar(`Excluir “${c.nome}”?`, "Some com convidados, notas, fotos e custos deste churrasco. Não dá para desfazer."))) return;
-    c.notas.forEach((n) => fotos.tirar(n.fotoId));
+    arquivosDe(c).forEach((id) => fotos.tirar(id));
     estado.churrascos = estado.churrascos.filter((x) => x !== c); salvar(); ir(""); avisar("Churrasco excluído", "lixo");
   },
   verQuemFalta() { filtroConvidados = "falta"; ir(`c/${rota()[1]}/convidados`); },
@@ -1043,6 +1080,7 @@ const acoes = {
   },
   // Notas
   fotografar() { $("#arqCamera").click(); },
+  enviarArquivo() { $("#arqArquivo").click(); },
   galeria() { $("#arqGaleria").click(); },
   notaManual() { folhaNota(null, true); },
   alternarItem(el) {
@@ -1063,11 +1101,12 @@ const acoes = {
   async excluirNota() {
     const p = rota(); const c = achar(p[1]); const n = c.notas.find((x) => x.id === p[3]);
     if (!(await confirmar("Excluir esta nota?", "A foto e os itens dela saem da conta do churrasco."))) return;
-    fotos.tirar(n.fotoId); c.notas = c.notas.filter((x) => x !== n); salvar(); ir(`c/${c.id}/notas`); avisar("Nota excluída", "lixo");
+    fotos.tirar(n.fotoId); fotos.tirar(n.arquivoId); c.notas = c.notas.filter((x) => x !== n); salvar(); ir(`c/${c.id}/notas`); avisar("Nota excluída", "lixo");
   },
   async relerNota() {
     const p = rota(); const c = achar(p[1]); const n = c.notas.find((x) => x.id === p[3]);
-    const blob = await fotos.pegar(n.fotoId).catch(() => null);
+    const original = n.arquivoId ? await fotos.pegar(n.arquivoId).catch(() => null) : null;
+    const blob = original ? new File([original], n.arquivoNome || "nota.pdf", { type: n.arquivoTipo || original.type }) : await fotos.pegar(n.fotoId).catch(() => null);
     if (!blob) { avisar("Não achei a foto desta nota", "alerta"); return; }
     if (n.itens.length && !(await confirmar("Ler a nota de novo?", "Os itens desta nota são trocados pelo que o leitor achar agora. Correções feitas à mão se perdem.", "Ler de novo"))) return;
     lerFoto(blob, c, n);
@@ -1086,9 +1125,13 @@ const acoes = {
   async excluirCusto(el) {
     const c = achar(rota()[1]);
     fecharFolha(); await new Promise((r) => setTimeout(r, 430));
-    if (!(await confirmar("Excluir este custo?", "Ele sai da conta do churrasco."))) return;
-    c.custos = c.custos.filter((x) => x.id !== el.dataset.id); salvar(); render(); avisar("Custo excluído", "lixo");
+    if (!(await confirmar("Excluir este custo?", "Ele sai da conta do churrasco, junto com o comprovante."))) return;
+    const x = c.custos.find((k) => k.id === el.dataset.id);
+    if (x) fotos.tirar(x.arquivoId);
+    c.custos = c.custos.filter((k) => k !== x); salvar(); render(); avisar("Custo excluído", "lixo");
   },
+  anexarComprovante() { $("#arqComprovante").click(); },
+  tirarComprovante() { anexoCusto.novo = null; anexoCusto.tirar = true; mostrarAnexo(); },
   // Ajustes
   async instalar() {
     if (!pedidoInstalar) return;
@@ -1100,10 +1143,9 @@ const acoes = {
   async baixarCopia() {
     avisar("Preparando a cópia…", "baixar");
     const copia = { app: "nosso-churrasco", versao: 1, feitaEm: new Date().toISOString(), estado, fotos: {} };
-    for (const c of estado.churrascos) for (const n of c.notas) {
-      if (!n.fotoId) continue;
-      const b = await fotos.pegar(n.fotoId).catch(() => null);
-      if (b) copia.fotos[n.fotoId] = await new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(b); });
+    for (const c of estado.churrascos) for (const id of arquivosDe(c)) {
+      const b = await fotos.pegar(id).catch(() => null);
+      if (b) copia.fotos[id] = await new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(b); });
     }
     const nome = `nosso-churrasco-${new Date().toISOString().slice(0, 10)}.json`;
     const arquivo = new File([JSON.stringify(copia)], nome, { type: "application/json" });
@@ -1175,8 +1217,10 @@ function imagemParaLeitura(img) {
   const hist = new Uint32Array(256);
   for (let i = 0; i < px.length; i += 4) { const v = (px[i] * 299 + px[i + 1] * 587 + px[i + 2] * 114) / 1000 | 0; px[i] = v; hist[v]++; }
   const n = w * h; let acc = 0, lo = 0, hi = 255;
-  for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc > n * 0.02) { lo = v; break; } }
+  // Ponto escuro bem baixo (0,3%): numa página quase toda branca o texto é pouca coisa e não pode virar "papel".
+  for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc > n * 0.003) { lo = v; break; } }
   acc = 0; for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc > n * 0.02) { hi = v; break; } }
+  if (hi - lo < 48) { lo = 0; hi = 255; }
   const amp = Math.max(1, hi - lo);
   for (let i = 0; i < px.length; i += 4) { let v = ((px[i] - lo) * 255) / amp; v = v < 0 ? 0 : v > 255 ? 255 : v; px[i] = px[i + 1] = px[i + 2] = v; }
   cx.putImageData(d, 0, 0);
@@ -1192,7 +1236,8 @@ function fotoParaGuardar(img) {
 // Transforma o texto lido em itens. Funciona com as notas de mercado mais comuns (NFC-e / cupom).
 const PRECO = /(?:R\$\s*)?(\d{1,3}(?:\.\d{3})*,\s?\d{2}|\d+[.,]\s?\d{2})(?:\s+[A-Z]{1,2}\d{0,2})?\s*$/i;
 const QTD = /(\d+(?:[.,]\d{1,3})?)\s*(UN|UND|UNID|KG|PC|PCT|CX|LT|L|G|FD|DZ|BD|M)?\s*[xX×*]\s*(?:R\$\s*)?(\d+[.,]\d{2,3})/i;
-const QTD_SEM_X = /(\d+(?:[.,]\d{1,3})?)\s*(UN|UND|UNID|KG|PC|PCT|CX|LT|FD|DZ|BD)\s+(?:R\$\s*)?(\d+[.,]\d{2,3})\s*$/i;
+const SEFAZ = /(?:^|\n)[ \t]*([^\n(]{2,}?)\s*\(\s*C[óo]d(?:igo)?\.?\s*:?\s*[\w.-]+\s*\)\s*Qtde\.?\s*:?\s*([\d.,]+)\s*UN\s*:?\s*([A-Za-z]+)\s*Vl\.?\s*Unit\.?\s*:?\s*([\d.,]+)\s*Vl\.?\s*Total\s*:?\s*([\d.,]+)/gi;
+const QTD_SEM_X =/(\d+(?:[.,]\d{1,3})?)\s*(UN|UND|UNID|KG|PC|PCT|CX|LT|FD|DZ|BD)\s+(?:R\$\s*)?(\d+[.,]\d{2,3})\s*$/i;
 const IGNORAR =/(SUB\s*-?\s*TOTAL|TOTAL|TROCO|DINHEIRO|CART[AÃ]O|CR[EÉ]DITO|D[EÉ]BITO|\bPIX\b|DESCONTO|ACR[EÉ]SCIMO|VALOR\s*(PAGO|A\s*PAGAR|RECEBIDO|APROX)|TRIBUTO|IMPOSTO|CNPJ|\bCPF\b|ICMS|INSCRI|CONSUMIDOR|PROTOCOLO|CHAVE\s*DE|S[EÉ]RIE|EMISS[AÃ]O|NFC|DANFE|FORMA\s*(DE\s*)?PAG|QTD\.?\s*(TOTAL|ITENS)|LEI\s*\d|FEDERAL|ESTADUAL|MUNICIPAL|OPERADOR|VOLUMES|VIA\s*CONSUMIDOR|CONSULTE|DOCUMENTO\s*AUXILIAR)/i;
 const letras = (s) => (s.match(/\p{L}/gu) || []).length;
 function limparNome(s) {
@@ -1234,6 +1279,11 @@ function lerTextoDaNota(texto) {
     let qtd = "";
     const q = resto.match(QTD) || resto.match(QTD_SEM_X);
     if (q) { qtd = `${q[1].replace(".", ",")}${q[2] ? " " + q[2].toUpperCase() : ""} × ${q[3].replace(".", ",")}`; resto = resto.slice(0, q.index); }
+    // Linha que começa com quantidade e unidade ("l,200 KG 3 18,890"): o leitor errou o X, mas o nome está na linha de cima.
+    if (/^\s*[\dlIO|][\d.,lIO|]*\s*(UN|UND|UNID|KG|PC|PCT|CX|LT|L|G|FD)\b/i.test(resto) && pendente && letras(pendente) >= 3) {
+      if (!qtd) qtd = resto.trim().replace(/\s+/g, " ").slice(0, 30);
+      resto = "";
+    }
     let nome = limparNome(resto);
     if (letras(nome) < 3) { if (pendente && letras(pendente) >= 3) nome = pendente; else { pendente = null; return; } }
     pendente = null;
@@ -1241,16 +1291,62 @@ function lerTextoDaNota(texto) {
     if (valor <= 0 || valor > 5000000) return;
     r.itens.push({ id: novoId(), nome: tituloCaso(nome).slice(0, 80), qtd, valor, usar: true });
   });
+  // Página de consulta da NFC-e no site da Fazenda (salva em PDF): "PRODUTO (Código: 123) Qtde.:2 UN: KG Vl. Unit.: 9,9 Vl. Total 19,80"
+  const sefaz = [...texto.matchAll(SEFAZ)];
+  if (sefaz.length) {
+    r.itens = sefaz.map((m) => ({ id: novoId(), nome: tituloCaso(limparNome(m[1])).slice(0, 80), qtd: `${m[2]} ${m[3].toUpperCase()} × ${m[4]}`, valor: centavos(m[5]), usar: true })).filter((i) => i.valor > 0 && letras(i.nome) >= 2);
+  }
   return r;
 }
 
+const ehPdf = (a) => /pdf/i.test(a.type || "") || /\.pdf$/i.test(a.name || "");
+const ehImagem = (a) => /^image\//.test(a.type || "") || /\.(jpe?g|png|heic|heif|webp|gif|bmp)$/i.test(a.name || "");
+const LIMITE_ARQUIVO = 25 * 1024 * 1024;
 async function receberFoto(arquivo) {
   const p = rota(); const c = achar(p[1]);
   if (!c || !arquivo) return;
-  if (!/^image\//.test(arquivo.type) && !/\.(jpe?g|png|heic|webp)$/i.test(arquivo.name)) { avisar("Isso não parece uma foto", "alerta"); return; }
+  if (!ehImagem(arquivo) && !ehPdf(arquivo)) { avisar("Mande uma foto ou um PDF da nota", "alerta"); return; }
+  if (arquivo.size > LIMITE_ARQUIVO) { avisar("Arquivo grande demais (máximo 25 MB)", "alerta"); return; }
   const n = { id: novoId(), criadoEm: Date.now(), fotoId: novoId(), loja: "", data: "", total: 0, itens: [] };
+  if (ehPdf(arquivo)) Object.assign(n, { arquivoId: novoId(), arquivoTipo: "application/pdf", arquivoNome: (arquivo.name || "nota.pdf").slice(0, 80) });
   lerFoto(arquivo, c, n, true);
 }
+
+/* ----- PDF: lê o texto que já vem dentro do arquivo; se for PDF escaneado, lê as páginas como foto ----- */
+let pdfjs = null;
+async function carregarPdf() {
+  if (!pdfjs) {
+    pdfjs = await import("./vendor/pdfjs/pdf.min.mjs");
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL("vendor/pdfjs/pdf.worker.min.mjs", location.href).href;
+  }
+  return pdfjs;
+}
+async function abrirPdf(arquivo) {
+  const lib = await carregarPdf();
+  const pasta = new URL("vendor/pdfjs/", location.href).href;
+  return lib.getDocument({ data: new Uint8Array(await arquivo.arrayBuffer()), standardFontDataUrl: pasta + "standard_fonts/", cMapUrl: pasta + "cmaps/", cMapPacked: true }).promise;
+}
+async function textoDaPagina(pg) {
+  const tc = await pg.getTextContent();
+  const itens = tc.items.filter((i) => i.str && i.str.trim()).map((i) => ({ s: i.str.trim(), x: i.transform[4], y: i.transform[5], h: Math.abs(i.transform[3]) || i.height || 8 }));
+  itens.sort((a, b) => b.y - a.y || a.x - b.x);
+  const linhas = [];
+  for (const it of itens) {
+    const l = linhas[linhas.length - 1];
+    if (l && Math.abs(l.y - it.y) < Math.max(2, it.h * 0.5)) l.itens.push(it); else linhas.push({ y: it.y, itens: [it] });
+  }
+  return linhas.map((l) => l.itens.sort((a, b) => a.x - b.x).map((i) => i.s).join(" ")).join("\n");
+}
+async function desenharPagina(pg, largura) {
+  const v1 = pg.getViewport({ scale: 1 });
+  const vp = pg.getViewport({ scale: Math.min(4, largura / v1.width) });
+  const cv = document.createElement("canvas"); cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
+  const cx = cv.getContext("2d"); cx.fillStyle = "#fff"; cx.fillRect(0, 0, cv.width, cv.height);
+  // intent "print": desenha de uma vez, sem esperar a tela atualizar (não trava se o celular sair do app no meio).
+  await pg.render({ canvasContext: cx, viewport: vp, intent: "print" }).promise;
+  return cv;
+}
+
 async function lerFoto(arquivo, c, n, nova) {
   const tela = document.createElement("div"); tela.className = "leitor";
   tela.innerHTML = `<div class="papel"><span class="feixe"></span></div><h2>Lendo a nota…</h2><p id="leitorTexto">Preparando o leitor</p><div class="barra"><i id="leitorBarra" style="width:4%"></i></div><button class="botao pequeno" id="leitorCancelar">Cancelar</button>`;
@@ -1259,35 +1355,61 @@ async function lerFoto(arquivo, c, n, nova) {
   tela.querySelector("#leitorCancelar").addEventListener("click", () => { cancelado = true; tela.remove(); });
   const texto = tela.querySelector("#leitorTexto"), barra = tela.querySelector("#leitorBarra");
   const prog = (pct, msg) => { barra.style.width = Math.max(4, Math.min(100, pct)) + "%"; if (msg) texto.textContent = msg; };
+  const desfazer = () => { if (nova) { fotos.tirar(n.fotoId); fotos.tirar(n.arquivoId); } };
+  // Faixa da barra que a leitura (Tesseract) ocupa agora; muda a cada página do PDF escaneado.
+  let faixa = [20, 98];
+  aoProgresso = (m) => {
+    if (m.status === "recognizing text") prog(faixa[0] + m.progress * (faixa[1] - faixa[0]), `Lendo os itens… ${Math.round(m.progress * 100)}%`);
+    else if (/load|initializ/i.test(m.status)) prog(8 + (m.progress || 0) * 10, "Preparando o leitor");
+  };
   try {
-    const img = await abrirImagem(arquivo);
-    const previa = URL.createObjectURL(arquivo);
-    tela.querySelector(".papel").style.backgroundImage = `url("${previa}")`;
-    let link = "";
-    if ("BarcodeDetector" in window) {
-      try { const det = new BarcodeDetector({ formats: ["qr_code"] }); const achados = await det.detect(img); const q = achados.find((x) => /^https?:\/\//i.test(x.rawValue)); if (q) link = q.rawValue; } catch (e) {}
+    let lido = "", link = "";
+    if (ehPdf(arquivo)) {
+      if (nova) await fotos.por(n.arquivoId, arquivo);
+      prog(6, "Abrindo o PDF");
+      const doc = await abrirPdf(arquivo);
+      const paginas = Math.min(doc.numPages, 6);
+      const capa = await desenharPagina(await doc.getPage(1), 1400);
+      tela.querySelector(".papel").style.backgroundImage = `url("${capa.toDataURL("image/jpeg", 0.6)}")`;
+      if (nova) await fotos.por(n.fotoId, await fotoParaGuardar(capa));
+      for (let i = 1; i <= paginas; i++) { lido += (await textoDaPagina(await doc.getPage(i))) + "\n"; prog(6 + (i / paginas) * 12, "Lendo o texto do PDF"); }
+      // Sem texto dentro: é um PDF escaneado. Lê cada página como se fosse foto.
+      if (letras(lido) < 40) {
+        lido = "";
+        const w = await prepararLeitor();
+        for (let i = 1; i <= paginas && !cancelado; i++) {
+          faixa = [20 + ((i - 1) / paginas) * 78, 20 + (i / paginas) * 78];
+          prog(faixa[0], paginas > 1 ? `Lendo a página ${i} de ${paginas}` : "Lendo os itens…");
+          const cv = await desenharPagina(await doc.getPage(i), 1700);
+          lido += ((await w.recognize(imagemParaLeitura(cv))).data.text || "") + "\n";
+        }
+      }
+      doc.destroy();
+    } else {
+      const img = await abrirImagem(arquivo);
+      const previa = URL.createObjectURL(arquivo);
+      tela.querySelector(".papel").style.backgroundImage = `url("${previa}")`;
+      if ("BarcodeDetector" in window) {
+        try { const det = new BarcodeDetector({ formats: ["qr_code"] }); const achados = await det.detect(img); const q = achados.find((x) => /^https?:\/\//i.test(x.rawValue)); if (q) link = q.rawValue; } catch (e) {}
+      }
+      if (nova) await fotos.por(n.fotoId, await fotoParaGuardar(img));
+      prog(8, "Arrumando a foto");
+      const cv = imagemParaLeitura(img);
+      if (img.close) img.close();
+      const w = await prepararLeitor();
+      if (cancelado) { desfazer(); return; }
+      prog(20, "Lendo os itens…");
+      lido = (await w.recognize(cv)).data.text || "";
+      setTimeout(() => URL.revokeObjectURL(previa), 1000);
     }
-    if (nova) await fotos.por(n.fotoId, await fotoParaGuardar(img));
-    prog(8, "Arrumando a foto");
-    const cv = imagemParaLeitura(img);
-    if (img.close) img.close();
-    aoProgresso = (m) => {
-      if (m.status === "recognizing text") prog(20 + m.progress * 78, `Lendo os itens… ${Math.round(m.progress * 100)}%`);
-      else if (/load|initializ/i.test(m.status)) prog(8 + (m.progress || 0) * 10, "Preparando o leitor");
-    };
-    const w = await prepararLeitor();
-    if (cancelado) return;
-    prog(20, "Lendo os itens…");
-    const { data } = await w.recognize(cv);
     aoProgresso = null;
-    URL.revokeObjectURL(previa);
-    if (cancelado) { if (nova) fotos.tirar(n.fotoId); return; }
-    const r = lerTextoDaNota(data.text || "");
+    if (cancelado) { desfazer(); return; }
+    const r = lerTextoDaNota(lido);
     if (r.chave && nova && c.notas.some((x) => x.chave === r.chave)) {
-      tela.remove(); fotos.tirar(n.fotoId);
+      tela.remove(); desfazer();
       avisar("Esta nota já foi lançada neste churrasco", "alerta"); return;
     }
-    Object.assign(n, { itens: r.itens, chave: r.chave || n.chave || "", link: link || n.link || "", texto: (data.text || "").slice(0, 8000) });
+    Object.assign(n, { itens: r.itens, chave: r.chave || n.chave || "", link: link || n.link || "", texto: lido.slice(0, 8000) });
     if (!n.loja) n.loja = r.loja; if (!n.data) n.data = r.data; if (!n.total) n.total = r.total;
     if (nova) c.notas.push(n);
     salvar();
@@ -1296,16 +1418,28 @@ async function lerFoto(arquivo, c, n, nova) {
     tela.remove();
     if (nova) { recentes.add(n.id); ir(`c/${c.id}/nota/${n.id}`); } else render();
     if (r.itens.length) avisar(`Li ${plural(r.itens.length, "item", "itens")}. Desmarque o que não foi para o churrasco.`, "nota");
-    else avisar("Não consegui ler os itens. Lance à mão ou tire outra foto.", "alerta");
+    else avisar("Não consegui ler os itens. Lance à mão ou tente outra foto.", "alerta");
   } catch (e) {
     console.error(e);
     aoProgresso = null;
     tela.remove();
-    if (nova) fotos.tirar(n.fotoId);
-    avisar(navigator.onLine ? "Não consegui ler esta foto. Tente de novo." : "Na primeira leitura o celular precisa de internet.", "alerta");
+    desfazer();
+    avisar(!navigator.onLine ? "Na primeira leitura o celular precisa de internet." : ehPdf(arquivo) ? "Não consegui abrir este PDF. Ele pode estar protegido por senha." : "Não consegui ler esta foto. Tente de novo.", "alerta");
   }
 }
-for (const id of ["arqCamera", "arqGaleria"]) $("#" + id).addEventListener("change", (e) => { const a = e.target.files[0]; e.target.value = ""; receberFoto(a); });
+for (const id of ["arqCamera", "arqGaleria", "arqArquivo"]) $("#" + id).addEventListener("change", (e) => { const a = e.target.files[0]; e.target.value = ""; receberFoto(a); });
+$("#arqComprovante").addEventListener("change", async (e) => {
+  const a = e.target.files[0]; e.target.value = "";
+  if (!a) return;
+  if (!ehImagem(a) && !ehPdf(a)) { avisar("Mande uma foto ou um PDF", "alerta"); return; }
+  if (a.size > LIMITE_ARQUIVO) { avisar("Arquivo grande demais (máximo 25 MB)", "alerta"); return; }
+  let blob = a, tipo = a.type || (ehPdf(a) ? "application/pdf" : "image/jpeg");
+  // Foto vai reduzida para não encher o celular; PDF vai do jeito que veio.
+  if (ehImagem(a)) { try { const img = await abrirImagem(a); blob = await fotoParaGuardar(img); tipo = "image/jpeg"; if (img.close) img.close(); } catch (err) {} }
+  anexoCusto.novo = { blob, nome: (a.name || "comprovante").slice(0, 80), tipo };
+  anexoCusto.tirar = false;
+  mostrarAnexo();
+});
 $("#arqCopia").addEventListener("change", async (e) => {
   const a = e.target.files[0]; e.target.value = "";
   if (!a) return;

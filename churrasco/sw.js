@@ -1,5 +1,5 @@
 // Nosso Churrasco: guarda o app para abrir sem internet. A página vem primeiro da rede (para pegar atualizações); o resto, do cache.
-const CACHE = "nosso-churrasco-1";
+const CACHE = "nosso-churrasco-2";
 const BASE = ["./", "index.html", "manifest.webmanifest", "img/logo.svg", "img/icone-180.png", "img/icone-192.png", "img/icone-512.png", "img/favicon.png"];
 self.addEventListener("install", (e) => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then((c) => c.addAll(BASE))); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k.startsWith("nosso-churrasco-") && k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
