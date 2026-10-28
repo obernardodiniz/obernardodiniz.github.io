@@ -189,6 +189,38 @@ main.sem-abas { padding-bottom: calc(40px + var(--base)); }
 .cat-linha .nome { font-weight: 600; font-size: 15px; display: flex; justify-content: space-between; gap: 8px; }
 .cat-linha .barra { height: 7px; margin-top: 5px; }
 .cat-linha .pct { font-size: 13px; color: var(--tinta-2); width: 40px; text-align: right; }
+/* O que tem no churrasco */
+.destaques { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.destaque { background: var(--cartao-2); border-radius: var(--raio-p); padding: 12px 13px; }
+.destaque .em { font-size: 22px; line-height: 1; }
+.destaque > b { display: block; font: 800 23px/1.15 var(--f-titulo); margin-top: 6px; }
+.destaque small { display: block; color: var(--tinta-2); font-size: 12.5px; line-height: 1.35; }
+.destaque .por { color: var(--tinta); }
+.regua { position: relative; height: 7px; border-radius: 99px; background: var(--linha); margin: 10px 0 6px; }
+.regua i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; }
+.regua i.verde { background: var(--verde); } .regua i.ouro { background: var(--ouro); } .regua i.brasa { background: var(--brasa); }
+.regua span { position: absolute; top: -3px; bottom: -3px; width: 2px; border-radius: 2px; background: var(--tinta); opacity: .55; }
+.pilha { display: flex; height: 12px; border-radius: 99px; overflow: hidden; gap: 2px; margin-bottom: 12px; background: var(--linha); }
+.pilha i { display: block; height: 100%; min-width: 3px; }
+.grupo-linha { display: grid; grid-template-columns: 10px 24px 1fr auto 38px; gap: 8px; align-items: center; padding: 6px 0; font-size: 15px; }
+.grupo-linha .bola { width: 10px; height: 10px; border-radius: 50%; }
+.grupo-linha .nome { font-weight: 600; min-width: 0; }
+.grupo-linha .nome small { display: block; font-weight: 500; color: var(--tinta-2); font-size: 12.5px; }
+.grupo-linha .pct { font-size: 13px; color: var(--tinta-2); text-align: right; }
+.grupo-chip { width: 34px; height: 34px; border-radius: 11px; border: 1px solid var(--linha); background: var(--cartao-2); font-size: 17px; display: grid; place-items: center; cursor: pointer; flex: none; padding: 0; transition: transform .15s; }
+.grupo-chip:active { transform: scale(.9); }
+.item:has(> .grupo-chip) { gap: 9px; padding-left: 12px; padding-right: 8px; }
+.opcoes-grupo { display: grid; gap: 8px; }
+.opcoes-grupo button { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--raio-p); border: 1.5px solid var(--linha); background: var(--cartao); font-weight: 650; text-align: left; cursor: pointer; }
+.opcoes-grupo button.sim { border-color: var(--brasa); background: var(--brasa-suave); }
+.opcoes-grupo .em { font-size: 22px; }
+/* Tela larga (computador): o resumo das compras fica fixo do lado direito */
+#lado { display: none; }
+@media (min-width: 1200px) {
+  #lado:not(:empty) { display: block; position: fixed; top: calc(76px + var(--topo)); left: calc(50% + 296px); width: min(360px, calc(50% - 316px)); max-height: calc(100vh - 100px); overflow: auto; }
+  #lado .cartao { margin: 0; }
+  .so-estreita { display: none; }
+}
 .arrecadado { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
 .arrecadado b { font: 800 24px var(--f-titulo); color: var(--verde); }
 
@@ -373,6 +405,7 @@ main.sem-abas { padding-bottom: calc(40px + var(--base)); }
 </header>
 
 <main id="principal"><div id="tela"></div></main>
+<aside id="lado" aria-label="O que tem no churrasco"></aside>
 
 <nav class="abas fora" id="abas" aria-label="Partes do churrasco">
   <span class="marcador"></span>
@@ -498,6 +531,99 @@ const categoria = (id) => CATEGORIAS.find((c) => c.id === id) || CATEGORIAS[CATE
 const TIPOS = { inteira: "Inteira", meia: "Meia", isento: "Não paga" };
 const PROXIMO_TIPO = { inteira: "meia", meia: "isento", isento: "inteira" };
 
+/* ========= O que foi comprado: carne, bebida, acompanhamentos… ========= */
+// O app separa cada item pelo nome; quem usa pode trocar o grupo com um toque (fica gravado em it.grupo).
+const GRUPOS = [
+  { id: "carne", nome: "Carnes", emoji: "🥩", cor: "#C8371A" },
+  { id: "bebida", nome: "Bebidas", emoji: "🍺", cor: "#F2A516" },
+  { id: "comida", nome: "Acompanhamentos", emoji: "🥖", cor: "#3C9A5F" },
+  { id: "carvao", nome: "Carvão e gelo", emoji: "🔥", cor: "#7A5A4A" },
+  { id: "outros", nome: "Outros", emoji: "🧻", cor: "#9C8F88" },
+];
+const grupo = (id) => GRUPOS.find((g) => g.id === id) || GRUPOS[GRUPOS.length - 1];
+const semAcento = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const PALAVRAS = [
+  ["outros", /\b(churrasqueira|grelha|avental|tabua|faca|pegador|copo|prato|guardanapo|talher|garfo|descart|detergente|esponja|sacola|saco plast|papel|aluminio|palito|toalha|isqueiro|fosforo|espetos? (de )?(inox|aco|duplo)|kit espeto)/],
+  ["carvao", /\b(carvao|gelo|lenha|acendedor|briquete)/],
+  ["bebida", /\b(cerv|chop|refri|coca|guarana|fanta|sprite|pepsi|soda|agua|suco|vinho|espumante|vodka|whisk|uisque|cachaca|pinga|gin|rum|tequila|licor|energet|red ?bull|monster|tonica|h2oh|schweppes|skol|brahma|heineken|budweiser|amstel|antarctica|itaipava|stella|corona|spaten|devassa|eisenbahn|petra|bohemia|kaiser|imperio|campari|aperol|martini|gatorade|isoton|cha gelado|mate leao|lata \d+ ?ml)/],
+  ["carne", /\b(picanha|alcatra|maminha|fraldinha|contra ?file|file|costela|cupim|lingui|frango|coxa|sobrecoxa|asa|tulipa|coracao|coracaozinho|carne|bovin|suin|porco|pernil|lombo|bisteca|chuleta|acem|patinho|coxao|hamburg|kafta|medalhao|salsicha|bacon|panceta|toscana|cordeiro|carre|peixe|salmao|camarao|tilapia|ancho|chorizo|bife|miolo|paleta|musculo|vazio|entrecot|denver|short rib|baby beef|calabresa|cuiabana|chester|kibe|almondega|espetinho|steak|prime rib|t-?bone)/],
+  ["comida", /\b(pao|paes|farofa|farinha|arroz|feijao|vinagrete|tomate|cebola|alho|batata|mandioca|aipim|queijo|coalho|maionese|salada|alface|rucula|sal|tempero|molho|limao|laranja|abacaxi|milho|azeite|oleo|chimichurri|biscoito|bolacha|salgad|amendoim|castanha|doce|sobremesa|sorvete|bolo|pimenta|manteiga|chocolate|azeitona|palmito|pepino|cenoura|pimentao|banana|melancia|fruta|uva|mostarda|ketchup|catchup|requeijao|polenta|torrada|petisco|provolone|mussarela|presunto|ovo|creme|pudim)/],
+];
+function adivinharGrupo(nome, padrao = "outros") {
+  const s = semAcento(nome);
+  for (const [id, re] of PALAVRAS) if (re.test(s)) return id;
+  return padrao;
+}
+const grupoDe = (it) => it.grupo || adivinharGrupo(it.nome);
+// Quilos e litros de um item, pela quantidade ("1,250 KG", "2 UN") e pelo nome ("Linguiça 1kg", "Cerveja lata 350ml c/12").
+function medida(nome, qtd) {
+  const numQ = (s) => (s.includes(",") ? numBr(s) : Number(s)) || 0;
+  const mq = String(qtd || "").match(/^\s*([\d.,]+)\s*([A-Za-z]*)/);
+  const n = mq ? numQ(mq[1]) || 1 : 1, un = mq ? mq[2].toUpperCase() : "";
+  if (un === "KG") return { kg: n, litros: 0 };
+  if (un === "G" || un === "GR") return { kg: n / 1000, litros: 0 };
+  if (un === "L" || un === "LT") return { kg: 0, litros: n };
+  if (un === "ML") return { kg: 0, litros: n / 1000 };
+  const s = semAcento(nome);
+  const pack = s.match(/(?:\bc\/|\bcx\.?\s*c?\/?|\bpack\s*(?:c\/)?|\bfardo\s*(?:c\/)?|\bcom\s+)\s*(\d{1,3})\b/) || s.match(/\b(\d{1,3})\s*x\s*\d+\s*(?:ml|l)\b/) || s.match(/\b(\d{1,3})\s*(?:latas|garrafas|unidades)\b/);
+  const vezes = n * (pack ? +pack[1] || 1 : 1);
+  const peso = s.match(/(\d+(?:[.,]\d+)?)\s*(kg|g|gr|grs|gramas?)\b/);
+  const vol = s.match(/(\d+(?:[.,]\d+)?)\s*(ml|l|lt|lts|litros?)\b/);
+  const v = (m) => Number(m[1].replace(",", "."));
+  return {
+    kg: peso ? (v(peso) / (/^k/.test(peso[2]) ? 1 : 1000)) * vezes : 0,
+    litros: vol ? (v(vol) / (vol[2] === "ml" ? 1000 : 1)) * vezes : 0,
+  };
+}
+function comprasDe(c) {
+  const g = Object.fromEntries(GRUPOS.map((x) => [x.id, { ...x, valor: 0, kg: 0, litros: 0, semMedida: 0 }]));
+  const somar = (id, valor, m) => { const x = g[id]; x.valor += valor; x.kg += m.kg; x.litros += m.litros; if (!m.kg && !m.litros) x.semMedida += valor; };
+  for (const n of c.notas) for (const it of n.itens) if (it.usar) somar(grupoDe(it), it.valor, medida(it.nome, it.qtd));
+  // Custos extras de comida, bebida, carvão e descartáveis também entram (os de serviço, como churrasqueiro, não).
+  const BASE = { comida: "comida", bebida: "bebida", carvao: "carvao", descartaveis: "outros" };
+  for (const k of c.custos) {
+    if (!BASE[k.categoria]) continue;
+    somar(k.descricao ? adivinharGrupo(k.descricao, BASE[k.categoria]) : BASE[k.categoria], Math.round(k.valor * k.qtd), medida(k.descricao || "", String(k.qtd)));
+  }
+  return g;
+}
+const umaCasa = (v) => (v >= 10 ? Math.round(v).toLocaleString("pt-BR") : v.toLocaleString("pt-BR", { maximumFractionDigits: 1 }));
+// Referências comuns de churrasco, por pessoa: 400 g de carne e 2 litros de bebida.
+const REFERENCIA = { carne: { por: 0.4, un: "kg" }, bebida: { por: 2, un: "L" } };
+function destaque(x, pessoas) {
+  const ref = REFERENCIA[x.id];
+  const qtd = x.id === "carne" ? x.kg : x.litros;
+  const un = x.id === "carne" ? "kg" : "litros";
+  let h = `<div class="destaque"><span class="em">${x.emoji}</span><b>${qtd ? `${umaCasa(qtd)} ${un}` : din(x.valor)}</b><small>${x.id === "carne" ? "de carne" : "de bebida"}${qtd ? ` · ${din(x.valor)}` : ""}</small>`;
+  if (qtd && pessoas) {
+    const por = qtd / pessoas;
+    const pct = Math.min(100, (por / (ref.por * 1.5)) * 100);
+    const nivel = por >= ref.por ? "verde" : por >= ref.por * 0.75 ? "ouro" : "brasa";
+    const porTexto = x.id === "carne" ? `${Math.round(por * 1000)} g` : `${umaCasa(por)} L`;
+    const refTexto = x.id === "carne" ? "400 g" : "2 L";
+    h += `<div class="regua"><i class="${nivel}" style="width:${pct.toFixed(0)}%"></i><span style="left:66.7%"></span></div>
+      <small><b class="por">${porTexto}</b> por pessoa · costuma-se calcular ${refTexto}</small>`;
+  }
+  return h + `</div>`;
+}
+function cartaoCompras(c, classe = "") {
+  const g = comprasDe(c);
+  const lista = GRUPOS.map((x) => g[x.id]).filter((x) => x.valor > 0);
+  if (!lista.length) return "";
+  const total = lista.reduce((s, x) => s + x.valor, 0);
+  const pessoas = c.convidados.length;
+  let h = `<div class="cartao compras ${classe}"><h3>O que tem no churrasco</h3><p class="miudo" style="margin:2px 0 12px">${pessoas ? `Para ${plural(pessoas, "pessoa", "pessoas")} na lista` : "Ponha os convidados para ver quanto dá por pessoa"}</p>`;
+  const tops = ["carne", "bebida"].map((id) => g[id]).filter((x) => x.valor > 0);
+  if (tops.length) h += `<div class="destaques">${tops.map((x) => destaque(x, pessoas)).join("")}</div>`;
+  h += `<div class="pilha">${lista.map((x) => `<i style="width:${((x.valor / total) * 100).toFixed(1)}%;background:${x.cor}"></i>`).join("")}</div>`;
+  lista.forEach((x) => {
+    // Peso e volume só onde faz sentido somar (meio quilo de detergente não diz nada).
+    const med = x.id === "carne" || x.id === "carvao" ? (x.kg ? `${umaCasa(x.kg)} kg` : "") : x.id === "bebida" && x.litros ? `${umaCasa(x.litros)} litros` : "";
+    h += `<div class="grupo-linha"><span class="bola" style="background:${x.cor}"></span><span class="em">${x.emoji}</span><span class="nome">${x.nome}${med ? `<small>${med}</small>` : ""}</span><b>${din(x.valor)}</b><span class="pct">${Math.round((x.valor / total) * 100)}%</span></div>`;
+  });
+  return h + `<p class="miudo" style="margin:10px 0 0">Algum item no grupo errado? Na nota, toque no símbolo ao lado do item.</p></div>`;
+}
+
 const achar = (id) => estado.churrascos.find((c) => c.id === id);
 // Tudo o que este churrasco guarda no banco de arquivos: fotos e PDFs das notas, comprovantes dos custos.
 const arquivosDe = (c) => [...c.notas.flatMap((n) => [n.fotoId, n.arquivoId]), ...c.custos.map((x) => x.arquivoId)].filter(Boolean);
@@ -580,6 +706,8 @@ function render() {
     ultimaChave = chave; ultimaOrdem = ordem;
     contarAoEntrar = true;
   }
+  const cl = v.churrasco && achar(v.churrasco);
+  $("#lado").innerHTML = cl ? cartaoCompras(cl) : "";
   for (const id of recentes) { const el = tela.querySelector(`[data-linha="${id}"]`); if (el) el.classList.add("recente"); }
   recentes.clear();
   mostrarFotos();
@@ -647,6 +775,8 @@ function telaResumo(c) {
       <p class="miudo" style="margin:10px 0 12px">${k.faltam.length ? `Faltam ${din(k.esperado - k.recebido)} de ${plural(k.faltam.length, "pessoa", "pessoas")}: ${esc(k.faltam.slice(0, 4).map((g) => g.nome).join(", "))}${k.faltam.length > 4 ? "…" : ""}` : "Todo mundo pagou. 🎉"}</p>
       ${k.faltam.length ? `<button class="botao pequeno contorno largo" data-acao="verQuemFalta">Ver quem falta pagar</button>` : ""}</div>`;
   }
+  const compras = cartaoCompras(c, "sobe so-estreita");
+  if (compras) html += compras.replace('class="cartao compras', 'style="--n:5" class="cartao compras');
   // Para onde foi o dinheiro
   const partes = [];
   c.notas.forEach((n) => { const v = somaNota(n); if (v) partes.push({ nome: n.loja || "Nota fiscal", icone: "nota", valor: v }); });
@@ -746,6 +876,7 @@ function telaNota(c, n) {
     n.itens.forEach((it, i) => {
       html += `<div class="item ${it.usar ? "" : "desligado"} sobe" style="--n:${Math.min(i + 3, 14)}" data-linha="${it.id}">
         <button class="marca quadrada ${it.usar ? "sim" : ""}" data-acao="alternarItem" data-id="${it.id}" aria-label="${it.usar ? "Tirar do churrasco" : "Pôr no churrasco"}">${ic("check")}</button>
+        <button class="grupo-chip" data-acao="trocarGrupo" data-id="${it.id}" aria-label="Grupo: ${grupo(grupoDe(it)).nome}" title="${grupo(grupoDe(it)).nome}">${grupo(grupoDe(it)).emoji}</button>
         <div class="meio" data-acao="alternarItem" data-id="${it.id}" style="cursor:pointer"><b class="quebra">${esc(it.nome)}</b>${it.qtd ? `<small>${esc(it.qtd)}</small>` : ""}</div>
         <span class="valor">${din(it.valor)}</span>
         <button class="mini" data-acao="editarItem" data-id="${it.id}" aria-label="Corrigir item">${ic("lapis")}</button></div>`;
@@ -899,7 +1030,8 @@ function folhaItem(n, it) {
   abrirFolha(`<h2>${it ? "Corrigir item" : "Novo item"}</h2><p class="sub">${it ? "Ajuste o que o leitor errou." : `Na nota ${esc(n.loja || "")}`}</p>
     <form data-form="salvarItem" data-id="${it ? it.id : ""}" autocomplete="off">
       <label class="rot">Produto<input name="nome" required maxlength="80" placeholder="Picanha, carvão, cerveja…" value="${esc(it?.nome || "")}"></label>
-      <div class="dupla"><label class="rot">Quantidade (opcional)<input name="qtd" maxlength="20" placeholder="2 KG" value="${esc(it?.qtd || "")}"></label>${campoValor("valor", it?.valor, "Valor total (R$)")}</div>
+      <div class="dupla"><label class="rot">Quantidade (opcional)<input name="qtd" maxlength="30" placeholder="2 KG" value="${esc(it?.qtd || "")}"></label>${campoValor("valor", it?.valor, "Valor total (R$)")}</div>
+      <label class="rot">Grupo<select name="grupo"><option value="">Deixar o app escolher</option>${GRUPOS.map((g) => `<option value="${g.id}" ${it?.grupo === g.id ? "selected" : ""}>${g.emoji} ${g.nome}</option>`).join("")}</select></label>
       <button class="botao primario largo">${it ? "Salvar" : "Adicionar item"}</button>
       ${it ? `<button type="button" class="botao perigo largo" data-acao="excluirItem" data-id="${it.id}">${ic("lixo")} Tirar este item da nota</button>` : ""}</form>`, (r) => { if (!it) setTimeout(() => r.querySelector("[name=nome]").focus(), 350); });
 }
@@ -993,7 +1125,7 @@ const formularios = {
   salvarItem(f, dados) {
     const p = rota(); const c = achar(p[1]); const n = c.notas.find((x) => x.id === p[3]);
     const valor = centavos(dados.get("valor"));
-    const reg = { nome: dados.get("nome").trim(), qtd: dados.get("qtd").trim(), valor };
+    const reg = { nome: dados.get("nome").trim(), qtd: dados.get("qtd").trim(), valor, grupo: dados.get("grupo") || undefined };
     let id = f.dataset.id;
     if (id) Object.assign(n.itens.find((x) => x.id === id), reg);
     else { id = novoId(); n.itens.push({ id, usar: true, ...reg }); }
@@ -1086,6 +1218,16 @@ const acoes = {
   alternarItem(el) {
     const p = rota(); const n = achar(p[1]).notas.find((x) => x.id === p[3]);
     const it = n.itens.find((x) => x.id === el.dataset.id); it.usar = !it.usar; salvar(); render();
+  },
+  trocarGrupo(el) {
+    const p = rota(); const n = achar(p[1]).notas.find((x) => x.id === p[3]);
+    const it = n.itens.find((x) => x.id === el.dataset.id); const atual = grupoDe(it);
+    abrirFolha(`<h2>O que é este item?</h2><p class="sub">${esc(it.nome)}</p><div class="opcoes-grupo">${GRUPOS.map((g) => `<button type="button" class="${g.id === atual ? "sim" : ""}" data-acao="escolherGrupo" data-id="${it.id}" data-g="${g.id}"><span class="em">${g.emoji}</span>${g.nome}</button>`).join("")}</div>`);
+  },
+  escolherGrupo(el) {
+    const p = rota(); const n = achar(p[1]).notas.find((x) => x.id === p[3]);
+    const it = n.itens.find((x) => x.id === el.dataset.id); it.grupo = el.dataset.g;
+    salvar(); fecharFolha(); recentes.add(it.id); render(); avisar(`${grupo(it.grupo).emoji} ${grupo(it.grupo).nome}`);
   },
   todosItens(el) {
     const p = rota(); const n = achar(p[1]).notas.find((x) => x.id === p[3]);
