@@ -1,5 +1,5 @@
 <!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-OVYdvpd5NngSZqCKFwiv8lirxbPk0TFgWXpqB51HHkE=' 'sha256-CMreCuFwB1CpVPG6JKYvE23rB8UuZscvLTJVC4IweOg='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-3sPXmEqPGIwe6i1qBeJfR2AWGqX+8EjBTRujuQR1JaA=' 'sha256-CMreCuFwB1CpVPG6JKYvE23rB8UuZscvLTJVC4IweOg='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
@@ -470,6 +470,7 @@ mark { background: color-mix(in srgb, var(--accent) 28%, transparent); color: in
 .ask-ico { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; background: #D97757; color: #fff; font-size: 1.15rem }
 a.btn { display: inline-block; text-decoration: none; text-align: center; justify-self: start; border: 0; background: var(--accent); color: #fff; font-weight: 700; padding: 11px 18px; border-radius: 10px }
 .search-chips[hidden] { display: none !important }
+.vs-win { border-color: color-mix(in srgb, var(--cc) 70%, #fff) !important; box-shadow: 0 0 0 2px color-mix(in srgb, var(--cc) 45%, transparent) }
 .doors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px }
 .door { position: relative; isolation: isolate; overflow: hidden; border: 0; border-radius: 18px; min-height: 170px; cursor: pointer; text-align: left; color: #fff; padding: 0; background: #0b1a2e; box-shadow: var(--shadow-2) }
 .door::before { content: ""; position: absolute; inset: 0; z-index: -2; background: var(--di) center / cover; transition: transform .6s ease }
@@ -546,11 +547,11 @@ a.btn { display: inline-block; text-decoration: none; text-align: center; justif
         <div class="eyebrow">Brasil 2027</div>
         <h1>Política e engenharia química, com dados.</h1>
         <p>Escolha um dos dois cantos. Tudo tem fonte e se atualiza todo dia.</p>
-        <div class="pill" style="justify-self:start">2º turno · domingo, 25/10</div>
+        <button type="button" class="pill" data-go="eleicao" style="justify-self:start;border:0;cursor:pointer">Lula reeleito · 2º turno, 25/10 · ver detalhes →</button>
         <div class="vs">
-          <div class="vs-c" style="--cc:var(--g-bolso)"><img src="img/flavio.jpg" alt="Flávio Bolsonaro"><div><b>Flávio (PL)</b><span>47,04%</span></div></div>
-          <i>1º turno</i>
-          <div class="vs-c" style="--cc:var(--g-lula)"><img src="img/lula.jpg" alt="Lula"><div><b>Lula (PT)</b><span>45,15%</span></div></div>
+          <div class="vs-c vs-win" style="--cc:var(--g-lula)"><img src="img/lula.jpg" alt="Lula"><div><b>Lula (PT) ✓</b><span>51,79%</span></div></div>
+          <i>2º turno</i>
+          <div class="vs-c" style="--cc:var(--g-bolso)"><img src="img/flavio.jpg" alt="Flávio Bolsonaro"><div><b>Flávio (PL)</b><span>48,21%</span></div></div>
         </div>
       </div>
     </div>
@@ -567,7 +568,7 @@ a.btn { display: inline-block; text-decoration: none; text-align: center; justif
     <div class="cover"><div class="bg" style="background-image:url('img/planalto.jpg')"></div><span class="credit">Foto: Senado Federal, CC BY 2.0</span>
       <div class="cover-in"><div class="eyebrow">Canto 1</div><h2>Política</h2><p>O Brasil em números, governo por governo, e tudo da eleição. Toque num indicador para abrir o gráfico.</p></div></div>
     <div class="tiles">
-      <button type="button" class="tile tile-hl" data-go="eleicao"><strong>2º turno ao vivo</strong><span>Pesquisas, sigilos, debates e resultado</span></button>
+      <button type="button" class="tile tile-hl" data-go="eleicao"><strong>Resultado da eleição</strong><span>Lula reeleito, contestação de Flávio e o que vem agora</span></button>
       <button type="button" class="tile" data-go="debate"><strong>Debate</strong><span>O que não contam e como rebater</span></button>
       <button type="button" class="tile" data-go="planos"><strong>Planos 2026</strong><span>Lula × Flávio, tema por tema</span></button>
       <button type="button" class="tile" data-go="governos"><strong>Governos lado a lado</strong><span>O que cada um recebeu e entregou</span></button>
@@ -620,11 +621,11 @@ a.btn { display: inline-block; text-decoration: none; text-align: center; justif
   <!-- 2º TURNO -->
   <section data-view="eleicao" hidden>
     <div class="cover"><div class="bg" style="background-image:url('img/congresso.jpg')"></div><span class="credit">Foto: Ivolindbergh, CC BY-SA 4.0</span>
-      <div class="cover-in"><div class="eyebrow">Eleição 2026</div><h2>2º turno ao vivo</h2><p id="el-sub">Domingo, 25 de outubro. Atualizado todo dia pelo robô, com fonte em tudo.</p>
+      <div class="cover-in"><div class="eyebrow">Eleição 2026 · resultado</div><h2>Lula é reeleito</h2><p id="el-sub">2º turno em 25 de outubro. Flávio Bolsonaro, que venceu o 1º turno, perdeu a virada e diz que vai pedir a anulação. Tudo com fonte.</p>
         <div class="vs" id="el-vs">
-          <div class="vs-c" style="--cc:var(--g-bolso)"><img src="img/flavio.jpg" alt="Flávio Bolsonaro"><div><b>Flávio (PL)</b><span>47,04%</span></div></div>
-          <i>1º turno</i>
-          <div class="vs-c" style="--cc:var(--g-lula)"><img src="img/lula.jpg" alt="Lula"><div><b>Lula (PT)</b><span>45,15%</span></div></div>
+          <div class="vs-c vs-win" style="--cc:var(--g-lula)"><img src="img/lula.jpg" alt="Lula"><div><b>Lula (PT) ✓</b><span>51,79%</span></div></div>
+          <i>2º turno</i>
+          <div class="vs-c" style="--cc:var(--g-bolso)"><img src="img/flavio.jpg" alt="Flávio Bolsonaro"><div><b>Flávio (PL)</b><span>48,21%</span></div></div>
         </div></div></div>
     <div id="el-body" class="stack"></div>
   </section>
@@ -841,7 +842,7 @@ a.btn { display: inline-block; text-decoration: none; text-align: center; justif
 
   <!-- PLANOS -->
   <section data-view="planos" hidden>
-    <div class="view-head"><div class="eyebrow">Eleição 2026</div><h2>Mapa dos planos de governo</h2><p>O que Lula e Flávio registraram no TSE, tema por tema. Quando o plano não fala de algo, o mapa diz isso.</p></div>
+    <div class="view-head"><div class="eyebrow">Eleição 2026</div><h2>Mapa dos planos de governo</h2><p>Lula foi reeleito: o plano dele é a lista de promessas para cobrar a partir de 2027. O de Flávio fica como comparação. Quando o plano não fala de algo, o mapa diz isso.</p></div>
     <label class="search" for="busca">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="busca" type="search" placeholder="Pesquisar: universidade, imposto, SUS…" autocomplete="off">
@@ -934,7 +935,7 @@ a.btn { display: inline-block; text-decoration: none; text-align: center; justif
     <div class="view-head"><h2>Mais</h2></div>
     <div class="tiles">
       <button type="button" class="tile" data-go="noticias"><strong>Todas as notícias</strong><span>Os dois cantos juntos, por categoria</span></button>
-      <button type="button" class="tile" data-go="eleicao"><strong>2º turno ao vivo</strong><span>Pesquisas, sigilos, debates e resultado</span></button>
+      <button type="button" class="tile" data-go="eleicao"><strong>Resultado da eleição</strong><span>Lula reeleito e a contestação de Flávio</span></button>
       <button type="button" class="tile" data-go="debate"><strong>Debate</strong><span>O que não contam, checagens, sigilos e caso Master</span></button>
       <button type="button" class="tile" data-go="offshore"><strong>Offshore e FPSOs</strong><span>Trilha, questões e empresas</span></button>
       <button type="button" class="tile" data-go="sync"><strong>Levar meu progresso</strong><span>Copiar o progresso para outro aparelho</span></button>
@@ -977,7 +978,7 @@ var GOVS = [
   { id: "dilma", nome: "Dilma Rousseff", curto: "Dilma", ini: 2011.0, fim: 2016.36, periodo: "2011 – mai/2016", cor: "var(--g-dilma)" },
   { id: "temer", nome: "Michel Temer", curto: "Temer", ini: 2016.36, fim: 2019.0, periodo: "mai/2016 – 2018", cor: "var(--g-temer)" },
   { id: "bolsonaro", nome: "Jair Bolsonaro", curto: "Bolsonaro", ini: 2019.0, fim: 2023.0, periodo: "2019 – 2022", cor: "var(--g-bolso)" },
-  { id: "lula", nome: "Lula (3º mandato)", curto: "Lula 3", ini: 2023.0, fim: 2027.0, periodo: "2023 – hoje", cor: "var(--g-lula)" }
+  { id: "lula", nome: "Lula (3º mandato)", curto: "Lula 3", ini: 2023.0, fim: 2027.0, periodo: "2023 – 2026 (reeleito)", cor: "var(--g-lula)" }
 ];
 var govById = {}; GOVS.forEach(function (g) { govById[g.id] = g; });
 function govOfYear(y) { return y <= 2015 ? "dilma" : y === 2016 ? "transicao" : y <= 2018 ? "temer" : y <= 2022 ? "bolsonaro" : "lula"; }
@@ -2426,13 +2427,24 @@ var EL_SIGILO = [
 ];
 var EL_SIG_F = [["CNN Brasil", "https://www.cnnbrasil.com.br/eleicoes/lula-fala-em-abrir-sigilos-flavio-diz-que-nao-tem-nada-a-esconder/"], ["Nexo", "https://www.nexojornal.com.br/expresso/2026/10/20/lula-autoriza-quebra-de-sigilo-lulinha-flavio-bolsonaro"], ["Metrópoles", "https://www.metropoles.com/brasil/lula-desafia-flavio-a-abrir-conta-bancaria-e-sigilo-telefonico"]];
 var EL_PESQ_F = [["CartaCapital (AtlasIntel)", "https://www.cartacapital.com.br/politica/lula-sobe-mas-flavio-segue-a-frente-no-2o-turno-indica-atlasintel/"], ["Poder360 (agregado)", "https://www.poder360.com.br/poder-eleicoes-2026/saiba-como-estao-lula-e-flavio-nas-pesquisas-a-7-dias-do-2o-turno/"], ["Hora Hiper", "https://horahiper.com.br/eleicoes-2026/segundo-turno-presidencial-chega-com-disputa-apertada-e-historico-favoravel-a-quem-lidera-no-primeiro-193592"]];
+var EL_RES = { flavio: 48.21, lula: 51.79, apurado: "99,99%", vencedor: "Lula (PT) é reeleito para o 4º mandato, que começa em 1º de janeiro de 2027.", votos: [64256232, 59826041], fonte: ["TSE", "https://www.tse.jus.br/comunicacao/noticias/2026/Outubro/presidente-do-tse-anuncia-reeleicao-de-lula-e-faz-balanco-do-2o-turno-das-eleicoes-2026"] };
+var EL_POS = [
+  ["25/10", "Lula vence com 51,79%", "Lula teve 64.256.232 votos (51,79% dos válidos) e Flávio, 59.826.041 (48,21%). Flávio tinha liderado o 1º turno com 47,04%. A abstenção caiu para cerca de 19,2%, contra 21,08% no 1º turno.", ["TSE", "https://www.tse.jus.br/comunicacao/noticias/2026/Outubro/presidente-do-tse-anuncia-reeleicao-de-lula-e-faz-balanco-do-2o-turno-das-eleicoes-2026"]],
+  ["25/10", "Votação prorrogada até as 19h", "O ministro Cristiano Zanin, do STF, atendeu a pedido da campanha de Lula e prorrogou a votação por duas horas, citando falta de ônibus e filas. A campanha de Flávio também tinha pedido prorrogação em cidades de São Paulo, Paraná e Santa Catarina, por causa das chuvas.", ["InfoMoney", "https://www.infomoney.com.br/politica/flavio-nao-reconhece-resultado-da-eleicao-e-diz-que-pedira-anulacao-ao-tse/"]],
+  ["25/10", "Flávio não reconhece e diz que vai pedir anulação", "Disse que é “impossível reconhecer o resultado” e alegou quebra de igualdade entre eleitores, porque nem todas as cidades tiveram urnas reabertas. Também disse que fiscais do PL foram retirados da sala-cofre e lembrou que Zanin foi advogado de Lula. As acusações não foram comprovadas.", ["Gazeta do Povo", "https://www.gazetadopovo.com.br/eleicoes/2026/flavio-bolsonaro-pronunciamento-anulacao-eleicao/"]],
+  ["25/10", "Lula: “governar para 215 milhões”", "No discurso da vitória, disse que a disputa acabou, que vai governar também para quem votou em Flávio e defendeu diálogo com o novo Congresso.", ["Times Brasil", "https://timesbrasil.com.br/brasil/decisao-2026-em-discurso-lula-promete-governar-para-todos-flavio-rejeita-resultado-e-diz-que-vai-pedir-anulacao-da-eleicao/"]],
+  ["26/10", "TSE: eleição segura", "O presidente do TSE proclamou o resultado e disse que a eleição foi segura. Dados do TSE mostram 35.521 votos registrados depois das 17h; não se sabe para quem foram. Com uma diferença de cerca de 4,4 milhões de votos, esse número não muda o resultado.", ["Mix Vale (dados do TSE)", "https://www.mixvale.com.br/2026/10/26/eleicao-presidencial-de-2026-dados-do-tse-mostram-que-35-521-votos-foram-registrados-apos-as-17h-no-2o-turno/"]],
+  ["até 28/10", "Pedido de anulação", "Até 28/10 não encontramos registro de que o pedido tenha sido protocolado no TSE nem de decisão sobre ele.", ["InfoMoney", "https://www.infomoney.com.br/politica/flavio-nao-reconhece-resultado-da-eleicao-e-diz-que-pedira-anulacao-ao-tse/"]]
+];
 function linkSeguro(f) { return f && /^https:\/\//.test(f[1]) ? '<a href="' + esc(f[1]) + '" target="_blank" rel="noopener">' + esc(f[0]) + "</a>" : esc(f ? f[0] : ""); }
 function renderEleicao() {
   var live = LIVE.eleicao || {}, h = "";
-  var res = live.resultado;
+  var res = live.resultado && typeof live.resultado.lula === "number" ? live.resultado : EL_RES;
   if (res && typeof res.flavio === "number" && typeof res.lula === "number") {
-    h += '<div class="card pad stack reveal"><div class="eyebrow">Resultado do 2º turno' + (res.apurado ? " · " + esc(String(res.apurado)) + " das urnas apuradas" : "") + '</div><div class="numgrid"><div><b>' + fmt(res.flavio, 2) + '%</b><span>Flávio Bolsonaro (PL)</span></div><div><b>' + fmt(res.lula, 2) + "%</b><span>Lula (PT)</span></div></div>" + (res.vencedor ? '<p class="lead"><strong>' + esc(String(res.vencedor)) + "</strong></p>" : "") + (res.fonte ? fontesLine([res.fonte]) : "") + "</div>";
+    h += '<div class="card pad stack reveal"><div class="eyebrow">Resultado do 2º turno' + (res.apurado ? " · " + esc(String(res.apurado)) + " das urnas apuradas" : "") + '</div><div class="numgrid"><div><b>' + fmt(res.lula, 2) + '%</b><span>Lula (PT)' + (EL_RES.votos ? " · " + fmt(EL_RES.votos[0], 0) + " votos" : "") + '</span></div><div><b>' + fmt(res.flavio, 2) + "%</b><span>Flávio Bolsonaro (PL)" + (EL_RES.votos ? " · " + fmt(EL_RES.votos[1], 0) + " votos" : "") + "</span></div></div>" + (res.vencedor ? '<p class="lead"><strong>' + esc(String(res.vencedor)) + "</strong></p>" : "") + (res.fonte ? fontesLine([res.fonte]) : "") + "</div>";
   }
+  h += '<div class="card pad"><h3>Depois da votação</h3><div class="timeline">' + EL_POS.map(function (x) { return '<div class="tl-item"><div class="tl-when">' + esc(x[0]) + '</div><div class="tl-what"><strong>' + esc(x[1]) + "</strong><p>" + esc(x[2]) + '</p><small class="muted">' + linkSeguro(x[3]) + "</small></div></div>"; }).join("") + "</div></div>";
+  h += '<div class="card pad"><h3>Como foram as pesquisas</h3><p class="muted small">Quase todas mostravam Flávio numericamente à frente, mas dentro da margem de erro (empate técnico). Lula venceu por 3,6 pontos.</p></div>';
   var pesq = (Array.isArray(live.pesquisas) ? live.pesquisas.filter(function (p) { return Array.isArray(p) && typeof p[2] === "number" && typeof p[3] === "number"; }) : []).concat(EL_PESQ);
   h += '<div class="card pad"><h3>Pesquisas (votos válidos)</h3><p class="muted small">Diferenças dentro da margem de erro são empate técnico.</p><div class="pesq">' + pesq.slice(0, 8).map(function (p) {
     var tot = p[2] + p[3] || 100, wf = p[2] / tot * 100;
@@ -2449,9 +2461,11 @@ function aplicarEleicaoCapa() {
   if (!res || typeof res.flavio !== "number" || typeof res.lula !== "number") return;
   ["home-cover-in"].forEach(function (id) {
     var el = $(id); if (!el) return;
-    var pill = el.querySelector(".pill"); if (pill) pill.textContent = "Resultado do 2º turno" + (res.apurado ? " · " + res.apurado + " apurado" : "");
-    var spans = el.querySelectorAll(".vs-c span"); if (spans.length === 2) { spans[0].textContent = fmt(res.flavio, 2) + "%"; spans[1].textContent = fmt(res.lula, 2) + "%"; }
-    var i = el.querySelector(".vs i"); if (i) i.textContent = "2º turno";
+    el.querySelectorAll(".vs-c").forEach(function (c) {
+      var alt = (c.querySelector("img") || {}).alt || "", s = c.querySelector("span");
+      if (s && /Lula/.test(alt)) s.textContent = fmt(res.lula, 2) + "%";
+      if (s && /Flávio/.test(alt)) s.textContent = fmt(res.flavio, 2) + "%";
+    });
   });
 }
 
