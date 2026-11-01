@@ -209,6 +209,13 @@ main.sem-abas { padding-bottom: calc(40px + var(--base)); }
 .grupo-linha .pct { font-size: 13px; color: var(--tinta-2); text-align: right; }
 .grupo-chip { width: 34px; height: 34px; border-radius: 11px; border: 1px solid var(--linha); background: var(--cartao-2); font-size: 17px; display: grid; place-items: center; cursor: pointer; flex: none; padding: 0; transition: transform .15s; }
 .grupo-chip:active { transform: scale(.9); }
+.junto { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; border: 0; cursor: pointer; margin-bottom: 14px; }
+.junto > svg.i:first-child { color: var(--brasa); }
+.junto .meio { flex: 1; min-width: 0; }
+.junto .meio b { display: block; }
+.junto .meio small { color: var(--tinta-2); font-size: 13.5px; }
+.junto .meio small.erro { color: var(--vermelho); }
+.link-caixa { padding: 12px 14px; border-radius: var(--raio-p); background: var(--cartao-2); font-size: 13.5px; word-break: break-all; margin-bottom: 14px; user-select: all; -webkit-user-select: all; }
 .item:has(> .grupo-chip) { gap: 9px; padding-left: 12px; padding-right: 8px; }
 .opcoes-grupo { display: grid; gap: 8px; }
 .opcoes-grupo button { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--raio-p); border: 1.5px solid var(--linha); background: var(--cartao); font-weight: 650; text-align: left; cursor: pointer; }
@@ -469,10 +476,12 @@ function carregar() {
   try { const e = JSON.parse(localStorage.getItem(CHAVE)); if (e && Array.isArray(e.churrascos)) return e; } catch (e) {}
   return { versao: 1, churrascos: [] };
 }
-function salvar() {
+function gravar() {
   try { localStorage.setItem(CHAVE, JSON.stringify(estado)); }
   catch (e) { avisar("Não consegui salvar: a memória do navegador está cheia.", "alerta"); }
 }
+// Toda mudança feita por quem usa: grava no aparelho e, se o churrasco é compartilhado, manda para a internet.
+function salvar() { gravar(); if (typeof agendarEnvio === "function") agendarEnvio(); }
 const pref = {
   ler(k) { try { return localStorage.getItem("nc-" + k); } catch (e) { return null; } },
   por(k, v) { try { localStorage.setItem("nc-" + k, v); } catch (e) {} },
@@ -493,12 +502,14 @@ const fotos = {
   },
   por(id, blob) { this._urls.delete(id); return this._fazer("readwrite", (s) => s.put(blob, id)); },
   pegar(id) { return this._fazer("readonly", (s) => s.get(id)); },
+  // Do aparelho; se não tiver (veio de outro celular), da internet.
+  async buscar(id) { return (await this.pegar(id).catch(() => null)) || (await baixarArquivo(id)); },
   tirar(id) { if (!id) return; const u = this._urls.get(id); if (u) URL.revokeObjectURL(u); this._urls.delete(id); return this._fazer("readwrite", (s) => s.delete(id)).catch(() => {}); },
   limpar() { this._urls.clear(); return this._fazer("readwrite", (s) => s.clear()); },
   async url(id) {
     if (!id) return null;
     if (this._urls.has(id)) return this._urls.get(id);
-    const b = await this.pegar(id).catch(() => null);
+    const b = await this.buscar(id);
     if (!b) return null;
     const u = URL.createObjectURL(b); this._urls.set(id, u); return u;
   },
@@ -646,6 +657,183 @@ function contas(c) {
   return { notas, custos, total, inteiras, meias, isentos: c.convidados.length - inteiras - meias, meia, inteira, deve, pagantes, esperado, recebido, faltam: pagantes.filter((g) => !g.pagou) };
 }
 
+/* ========= Churrasco compartilhado (na internet) ========= */
+// Quem tem o link (id + segredo) vê e mexe, sem conta. Cada convidado, nota e custo vai como um registro separado,
+// então duas pessoas mexendo ao mesmo tempo em coisas diferentes não se atrapalham. Endereço e chave abaixo são
+// públicos (a chave "publishable" é feita para ficar no site); o segredo de cada churrasco só existe no link.
+const NUVEM_URL = "https://rexifhjmtphbpyirajgq.supabase.co", NUVEM_CHAVE = "sb_publishable_VHk3k9180XGEVrmWKWC3OA_f0BxEzJQ";
+const nuvemLigada = () => !!(NUVEM_URL && NUVEM_CHAVE);
+const LIMITE_NUVEM = 9 * 1024 * 1024;
+async function rpc(nome, corpo) {
+  const r = await fetch(`${NUVEM_URL}/rest/v1/rpc/${nome}`, { method: "POST", headers: { apikey: NUVEM_CHAVE, "Content-Type": "application/json" }, body: JSON.stringify(corpo) });
+  if (!r.ok) { const t = await r.text().catch(() => ""); const e = new Error(t || String(r.status)); e.link = /link invalido/.test(t); throw e; }
+  return r.json();
+}
+// Impressão digital de um registro: o mesmo conteúdo dá a mesma marca, não importa a ordem dos campos.
+function canon(v) {
+  if (Array.isArray(v)) return "[" + v.map(canon).join(",") + "]";
+  if (v && typeof v === "object") return "{" + Object.keys(v).filter((k) => v[k] !== undefined).sort().map((k) => JSON.stringify(k) + ":" + canon(v[k])).join(",") + "}";
+  return JSON.stringify(v === undefined ? null : v);
+}
+function marca(v) { const s = canon(v); let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36) + "." + s.length.toString(36); }
+function registrosDe(c) {
+  const m = new Map();
+  m.set("churrasco:" + c.id, { nome: c.nome, data: c.data || "", local: c.local || "", pix: c.pix || "", criadoEm: c.criadoEm });
+  c.convidados.forEach((g) => m.set("convidado:" + g.id, g));
+  // O texto bruto da leitura fica só no aparelho de quem leu (é grande e não muda nada na conta).
+  c.notas.forEach((n) => { const { texto, ...resto } = n; m.set("nota:" + n.id, resto); });
+  c.custos.forEach((k) => m.set("custo:" + k.id, k));
+  return m;
+}
+const LISTAS = { convidado: "convidados", nota: "notas", custo: "custos" };
+function aplicarRegistro(c, tipo, id, dados) {
+  if (tipo === "churrasco") { if (dados) Object.assign(c, { nome: dados.nome, data: dados.data, local: dados.local, pix: dados.pix, criadoEm: dados.criadoEm || c.criadoEm }); return; }
+  const lista = c[LISTAS[tipo]]; if (!lista) return;
+  const i = lista.findIndex((x) => x.id === id);
+  if (!dados) { if (i >= 0) { const [x] = lista.splice(i, 1); [x.fotoId, x.arquivoId].forEach((a) => a && fotos.tirar(a)); } return; }
+  const antes = i >= 0 ? lista[i] : null;
+  if (antes && antes.texto && tipo === "nota") dados = { ...dados, texto: antes.texto };
+  if (i >= 0) lista[i] = dados; else lista.push(dados);
+}
+const blobParaBase64 = (b) => new Promise((ok, erro) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1] || ""); r.onerror = () => erro(r.error); r.readAsDataURL(b); });
+async function enviarArquivos(c, registros) {
+  const arq = (c.nuvem.arq ||= {});
+  for (const d of registros) for (const a of [d && d.fotoId, d && d.arquivoId]) {
+    if (!a || arq[a]) continue;
+    const b = await fotos.pegar(a).catch(() => null);
+    if (!b) continue; // veio de outro aparelho e ainda não foi baixado: já está na internet
+    if (b.size > LIMITE_NUVEM) { arq[a] = "grande"; avisar("Um arquivo passou de 9 MB e ficou só neste aparelho", "alerta"); continue; }
+    await rpc("nc_arquivo_por", { p_id: c.id, p_segredo: c.nuvem.segredo, p_arquivo: a, p_tipo: b.type || "", p_base64: await blobParaBase64(b) });
+    arq[a] = 1;
+  }
+}
+const emSinc = new Map();
+let desenharDepois = false;
+function sincronizar(c) {
+  if (!nuvemLigada() || !c || !c.nuvem) return Promise.resolve();
+  const atual = emSinc.get(c.id);
+  if (atual) { atual.denovo = true; return atual.p; }
+  const estadoSinc = { denovo: false };
+  estadoSinc.p = (async () => {
+    try {
+      do { estadoSinc.denovo = false; await umaSincronizacao(c); } while (estadoSinc.denovo);
+      c.nuvem.erro = "";
+    } catch (e) {
+      c.nuvem.erro = e.link ? "link" : "rede";
+    } finally {
+      emSinc.delete(c.id); gravar();
+      const el = document.querySelector(`[data-sinc="${c.id}"]`);
+      if (el) { el.textContent = textoSinc(c); el.classList.toggle("erro", !!c.nuvem.erro); }
+    }
+  })();
+  emSinc.set(c.id, estadoSinc);
+  return estadoSinc.p;
+}
+async function umaSincronizacao(c) {
+  const nv = c.nuvem, base = (nv.base ||= {});
+  // 1) Manda o que mudou aqui
+  const atual = registrosDe(c), mudou = [];
+  for (const [k, d] of atual) { const h = marca(d); if (base[k] !== h) mudou.push({ k, h, d }); }
+  for (const k of Object.keys(base)) if (!atual.has(k)) mudou.push({ k, h: null, d: null });
+  if (mudou.length) {
+    await enviarArquivos(c, mudou.map((x) => x.d));
+    for (let i = 0; i < mudou.length; i += 100) {
+      const lote = mudou.slice(i, i + 100);
+      await rpc("nc_enviar", { p_id: c.id, p_segredo: nv.segredo, p_registros: lote.map((x) => { const [tipo, ...id] = x.k.split(":"); return { tipo, id: id.join(":"), dados: x.d }; }) });
+      lote.forEach((x) => { if (x.h) base[x.k] = x.h; else delete base[x.k]; });
+    }
+  }
+  // 2) Recebe o que os outros mudaram
+  const r = await rpc("nc_buscar", { p_id: c.id, p_segredo: nv.segredo, p_desde: nv.versao || 0 });
+  const agora = registrosDe(c);
+  let alterou = false;
+  for (const reg of r.registros || []) {
+    const k = reg.tipo + ":" + reg.id, local = agora.get(k);
+    // Mexido aqui enquanto a internet respondia: fica o daqui, que vai na próxima volta.
+    if (local ? marca(local) !== base[k] : k in base) continue;
+    const h = reg.dados ? marca(reg.dados) : null;
+    if (h === (local ? marca(local) : null)) { if (h) base[k] = h; else delete base[k]; continue; }
+    aplicarRegistro(c, reg.tipo, reg.id, reg.dados);
+    if (h) base[k] = h; else delete base[k];
+    alterou = true;
+  }
+  nv.versao = Math.max(nv.versao || 0, r.versao || 0);
+  nv.em = Date.now();
+  if (alterou) { gravar(); desenharDepois = true; redesenharSePuder(); }
+}
+// Redesenha com o que chegou, mas sem atrapalhar quem está digitando ou com uma folha aberta.
+function redesenharSePuder() {
+  if (!desenharDepois) return;
+  const ativo = document.activeElement;
+  const digitando = ativo && /INPUT|TEXTAREA/.test(ativo.tagName) && ativo.type !== "radio" && ativo.value;
+  if (!$("#folha").hidden || digitando || $(".leitor")) return;
+  desenharDepois = false;
+  const foco = ativo && ativo.id;
+  render();
+  if (foco && $("#" + foco)) $("#" + foco).focus(); // campo vazio com o cursor: continua pronto para o próximo nome
+}
+let envioMarcado = null;
+function agendarEnvio() {
+  if (!nuvemLigada()) return;
+  clearTimeout(envioMarcado);
+  envioMarcado = setTimeout(() => estado.churrascos.filter((c) => c.nuvem).forEach((c) => sincronizar(c)), 900);
+}
+const compartilhados = () => estado.churrascos.filter((c) => c.nuvem);
+let voltasSinc = 0;
+setInterval(() => {
+  if (document.hidden || !nuvemLigada()) return;
+  redesenharSePuder();
+  const p = rota(), aberto = p[0] === "c" ? achar(p[1]) : null;
+  voltasSinc++;
+  if (aberto && aberto.nuvem) sincronizar(aberto);
+  if (voltasSinc % 4 === 0) compartilhados().filter((c) => c !== aberto).forEach((c) => sincronizar(c));
+}, 6000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) compartilhados().forEach((c) => sincronizar(c)); });
+window.addEventListener("online", () => compartilhados().forEach((c) => sincronizar(c)));
+// Arquivo (foto, PDF) que veio de outro aparelho: baixa da internet na primeira vez que aparece.
+const baixando = new Map();
+function baixarArquivo(id) {
+  const c = compartilhados().find((x) => arquivosDe(x).includes(id));
+  if (!c || !nuvemLigada()) return Promise.resolve(null);
+  if (!baixando.has(id)) baixando.set(id, (async () => {
+    try {
+      const r = await rpc("nc_arquivo_pegar", { p_id: c.id, p_segredo: c.nuvem.segredo, p_arquivo: id });
+      if (!r || !r.base64) return null;
+      const b = await (await fetch(`data:${r.tipo};base64,${r.base64.replace(/\s/g, "")}`)).blob();
+      await fotos.por(id, b);
+      (c.nuvem.arq ||= {})[id] = 1;
+      return b;
+    } catch (e) { return null; } finally { setTimeout(() => baixando.delete(id), 30000); }
+  })());
+  return baixando.get(id);
+}
+function segredoNovo() {
+  const letras = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  return Array.from(crypto.getRandomValues(new Uint8Array(26)), (b) => letras[b % letras.length]).join("");
+}
+const linkDe = (c) => `${location.origin}${location.pathname}#/entrar/${c.id}/${c.nuvem.segredo}`;
+function entrarPeloLink(id, segredo) {
+  if (!/^[\w-]{6,40}$/.test(id || "") || !/^[A-Za-z0-9]{20,80}$/.test(segredo || "")) { location.replace("#/"); avisar("Este link não é de um churrasco", "alerta"); return; }
+  let c = achar(id);
+  if (!c) { c = { id, nome: "Churrasco compartilhado", data: "", local: "", pix: "", criadoEm: Date.now(), convidados: [], notas: [], custos: [] }; estado.churrascos.push(c); }
+  if (!c.nuvem || c.nuvem.segredo !== segredo) {
+    // O nome e a data que valem são os da internet: os daqui não contam como mudança a enviar.
+    const k = "churrasco:" + c.id;
+    c.nuvem = { segredo, versao: 0, base: { [k]: marca(registrosDe(c).get(k)) }, arq: {} };
+  }
+  gravar();
+  location.replace(`#/c/${id}`);
+  avisar("Abrindo o churrasco compartilhado…", "pessoas");
+  sincronizar(c).then(() => { render(); if (c.nuvem.erro === "link") avisar("Este link não vale mais. Peça um novo.", "alerta"); else if (c.nuvem.erro) avisar("Sem internet agora. Tento de novo sozinho.", "alerta"); else avisar("Pronto! Vocês estão mexendo no mesmo churrasco.", "pessoas"); });
+}
+function textoSinc(c) {
+  if (!c.nuvem) return "";
+  if (c.nuvem.erro === "link") return "O link deste churrasco não vale mais";
+  if (c.nuvem.erro) return "Sem internet: as mudanças vão quando voltar";
+  if (!c.nuvem.em) return "Conectando…";
+  return `Atualizado às ${new Date(c.nuvem.em).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
+}
+
 /* ========= Rotas e telas ========= */
 const ABAS = ["resumo", "convidados", "notas", "custos"];
 let ultimaChave = null, ultimaOrdem = 0, recentes = new Set(), filtroConvidados = "todos", contarAoEntrar = false;
@@ -655,6 +843,7 @@ function ir(caminho) { location.hash = "#/" + caminho; }
 function montarTela(p) {
   if (!p.length) return telaInicio();
   if (p[0] === "ajustes") return telaAjustes();
+  if (p[0] === "entrar") { setTimeout(() => entrarPeloLink(p[1], p[2])); return { titulo: logoTitulo, ordem: 0, html: `<div class="vazio">${ic("pessoas")}<b>Abrindo o churrasco…</b></div>` }; }
   if (p[0] === "c") {
     const c = achar(p[1]);
     if (!c) return null;
@@ -732,6 +921,7 @@ function telaInicio() {
   let html = `<section class="capa sobe"><div class="faiscas">${faiscas}</div><img src="img/logo.svg" alt="Logo do Nosso Churrasco"><h1>Nosso<br><em>Churrasco</em></h1><p>As notas, os convidados e a conta dividida, tudo num lugar só.</p></section>`;
   if (!instalado() && !pref.ler("dica-instalar")) html += `<div class="dica sobe" style="--n:1">${ic("celular")}<div><b>Ponha na tela do celular</b><br><a href="#/ajustes" style="text-decoration:underline">Ver como instalar o app</a></div><button class="fechar-dica" data-acao="fecharDicaInstalar" aria-label="Fechar">${ic("x")}</button></div>`;
   html += `<button class="botao primario largo sobe" style="--n:2" data-acao="novoChurrasco">${ic("mais")} Novo churrasco</button>`;
+  if (nuvemLigada()) html += `<button class="botao pequeno contorno largo sobe" style="--n:2;margin-top:10px" data-acao="colarLink">${ic("link")} Recebi um link de churrasco</button>`;
   if (!lista.length) {
     html += `<div class="cartao sobe" style="--n:3;margin-top:16px"><h3 style="margin-bottom:12px">Como funciona</h3><div class="passos">
       <div class="passo"><span>${ic("camera")}</span><div><b>Fotografe as notinhas</b><small class="mudo">O app lê os itens e você marca o que foi para o churrasco.</small></div></div>
@@ -751,7 +941,7 @@ function telaInicio() {
         <div class="miudo" style="margin-top:6px">${k.pagantes.length ? `${din(k.recebido)} recebidos de ${din(k.esperado)}` : "Ninguém na lista ainda"}</div></a>`;
     });
   }
-  html += `<p class="rodape">Os dados ficam guardados só neste aparelho.</p>`;
+  html += `<p class="rodape">${compartilhados().length ? "Os churrascos compartilhados ficam também na internet, para quem tem o link. Os outros, só neste aparelho." : "Os dados ficam guardados só neste aparelho."}</p>`;
   return { titulo: logoTitulo, ordem: 0, html, acoes: btTopo("irAjustes", "ajustes", "Ajustes") };
 }
 
@@ -768,6 +958,11 @@ function telaResumo(c) {
       <button class="numero sobe" style="--n:2" data-acao="irAba" data-aba="notas">${ic("nota")}<b>${c.notas.length}</b><small>notas</small></button>
       <button class="numero sobe" style="--n:3" data-acao="irAba" data-aba="custos">${ic("moedas")}<b>${c.custos.length}</b><small>custos extras</small></button>
     </div>`;
+  if (nuvemLigada()) {
+    html += c.nuvem
+      ? `<div class="cartao junto sobe" style="--n:4">${ic("pessoas")}<div class="meio"><b>Compartilhado</b><small data-sinc="${c.id}" class="${c.nuvem.erro ? "erro" : ""}">${esc(textoSinc(c))}</small></div><button class="botao pequeno contorno" data-acao="convidar">${ic("link")} Link</button></div>`
+      : `<button class="cartao junto sobe" style="--n:4" data-acao="convidar">${ic("pessoas")}<div class="meio"><b>Mexer junto com alguém</b><small>Mande um link e a pessoa também põe convidados e notas. Sem conta.</small></div>${ic("seta", "mudo")}</button>`;
+  }
   if (k.pagantes.length) {
     const pct = k.esperado ? Math.round((k.recebido / k.esperado) * 100) : 0;
     html += `<div class="cartao sobe" style="--n:4"><div class="arrecadado"><div><small class="miudo">Já recebido</small><br><b>${din(k.recebido)}</b></div><span class="etiqueta ${pct === 100 ? "verde" : "brasa"}">${pct}%</span></div>
@@ -942,7 +1137,7 @@ function fecharFolha() {
   if (f.hidden) return;
   f.classList.remove("aberta");
   clearTimeout(fecharFolha._t);
-  fecharFolha._t = setTimeout(() => { f.hidden = true; $("#folhaConteudo").innerHTML = ""; }, 420);
+  fecharFolha._t = setTimeout(() => { f.hidden = true; $("#folhaConteudo").innerHTML = ""; redesenharSePuder(); }, 420);
   const cb = aoFecharFolha; aoFecharFolha = null; if (cb) cb();
 }
 function confirmar(titulo, texto, botao = "Sim, excluir") {
@@ -1122,6 +1317,11 @@ const formularios = {
     salvar(); fecharFolha(); recentes.add(id); render();
     avisar(f.dataset.id ? "Custo atualizado" : `${categoria(reg.categoria).nome}: ${din(Math.round(reg.valor * reg.qtd))}`);
   },
+  entrarLink(f, dados) {
+    const m = String(dados.get("link")).match(/entrar\/([\w-]{6,40})\/([A-Za-z0-9]{20,80})/);
+    if (!m) { avisar("Este não parece um link do Nosso Churrasco", "alerta"); return; }
+    fecharFolha(); entrarPeloLink(m[1], m[2]);
+  },
   salvarItem(f, dados) {
     const p = rota(); const c = achar(p[1]); const n = c.notas.find((x) => x.id === p[3]);
     const valor = centavos(dados.get("valor"));
@@ -1156,9 +1356,45 @@ const acoes = {
   editarChurrasco() { folhaChurrasco(achar(rota()[1])); },
   async excluirChurrasco() {
     const c = achar(rota()[1]);
-    if (!(await confirmar(`Excluir “${c.nome}”?`, "Some com convidados, notas, fotos e custos deste churrasco. Não dá para desfazer."))) return;
+    const texto = c.nuvem ? "Ele sai só deste aparelho. Quem tem o link continua com o churrasco, e você pode voltar abrindo o link de novo." : "Some com convidados, notas, fotos e custos deste churrasco. Não dá para desfazer.";
+    if (!(await confirmar(`Excluir “${c.nome}”?`, texto))) return;
     arquivosDe(c).forEach((id) => fotos.tirar(id));
     estado.churrascos = estado.churrascos.filter((x) => x !== c); salvar(); ir(""); avisar("Churrasco excluído", "lixo");
+  },
+  // Quem instalou o app no iPhone abre o link no Safari, que guarda os dados à parte: aqui ele cola o link dentro do app.
+  colarLink() {
+    abrirFolha(`<h2>${ic("link")} Recebi um link</h2><p class="sub">Copie o link que recebeu no WhatsApp e cole aqui. O churrasco aparece neste aparelho.</p>
+      <form data-form="entrarLink" autocomplete="off"><label class="rot">Link do churrasco<input name="link" required inputmode="url" placeholder="https://…"></label><button class="botao primario largo">Abrir o churrasco</button></form>`);
+  },
+  async convidar() {
+    const c = achar(rota()[1]);
+    if (!c.nuvem) {
+      if (!(await confirmar("Mexer junto neste churrasco?", "Ele passa a ficar guardado também na internet. Quem receber o link pode ver e mudar tudo: convidados, notas, fotos e custos. Ninguém precisa criar conta.", "Sim, compartilhar"))) return;
+      avisar("Mandando o churrasco para a internet…", "subir");
+      const segredo = segredoNovo();
+      try { await rpc("nc_criar", { p_id: c.id, p_segredo: segredo }); }
+      catch (e) { avisar("Não consegui agora. Confira a internet e tente de novo.", "alerta"); return; }
+      c.nuvem = { segredo, versao: 0, base: {}, arq: {} };
+      gravar();
+      await sincronizar(c);
+      if (c.nuvem.erro) avisar("Parte do churrasco ainda não subiu. Tento de novo sozinho.", "alerta");
+      render();
+    }
+    abrirFolha(`<h2>${ic("pessoas")} Mexer junto</h2><p class="sub">Mande este link para quem vai organizar com você. A pessoa abre, e o churrasco aparece no celular dela, igualzinho. O que um mudar, o outro vê em alguns segundos.</p>
+      <div class="link-caixa">${esc(linkDe(c))}</div>
+      <button class="botao primario largo" data-acao="mandarLink">${ic("compartilhar")} Mandar no WhatsApp</button>
+      <button class="botao largo" style="margin-top:10px" data-acao="copiarLink">${ic("link")} Copiar o link</button>
+      <p class="miudo" style="margin:14px 2px 0">Quem tem o link mexe em tudo. Mande só para quem você confia.</p>`);
+  },
+  async mandarLink() {
+    const c = achar(rota()[1]);
+    const t = `🔥 Vem organizar comigo o *${c.nome}* no Nosso Churrasco. É só abrir o link, não precisa de conta:\n${linkDe(c)}`;
+    if (navigator.share) { try { await navigator.share({ text: t }); return; } catch (e) { if (e.name === "AbortError") return; } }
+    window.open("https://wa.me/?text=" + encodeURIComponent(t), "_blank", "noopener");
+  },
+  async copiarLink() {
+    const c = achar(rota()[1]);
+    try { await navigator.clipboard.writeText(linkDe(c)); avisar("Link copiado"); } catch (e) { avisar("Não deu para copiar. Segure o dedo no link e copie.", "alerta"); }
   },
   verQuemFalta() { filtroConvidados = "falta"; ir(`c/${rota()[1]}/convidados`); },
   async compartilhar() {
@@ -1247,8 +1483,8 @@ const acoes = {
   },
   async relerNota() {
     const p = rota(); const c = achar(p[1]); const n = c.notas.find((x) => x.id === p[3]);
-    const original = n.arquivoId ? await fotos.pegar(n.arquivoId).catch(() => null) : null;
-    const blob = original ? new File([original], n.arquivoNome || "nota.pdf", { type: n.arquivoTipo || original.type }) : await fotos.pegar(n.fotoId).catch(() => null);
+    const original = n.arquivoId ? await fotos.buscar(n.arquivoId) : null;
+    const blob = original ? new File([original], n.arquivoNome || "nota.pdf", { type: n.arquivoTipo || original.type }) : await fotos.buscar(n.fotoId);
     if (!blob) { avisar("Não achei a foto desta nota", "alerta"); return; }
     if (n.itens.length && !(await confirmar("Ler a nota de novo?", "Os itens desta nota são trocados pelo que o leitor achar agora. Correções feitas à mão se perdem.", "Ler de novo"))) return;
     lerFoto(blob, c, n);
@@ -1286,7 +1522,7 @@ const acoes = {
     avisar("Preparando a cópia…", "baixar");
     const copia = { app: "nosso-churrasco", versao: 1, feitaEm: new Date().toISOString(), estado, fotos: {} };
     for (const c of estado.churrascos) for (const id of arquivosDe(c)) {
-      const b = await fotos.pegar(id).catch(() => null);
+      const b = await fotos.buscar(id);
       if (b) copia.fotos[id] = await new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(b); });
     }
     const nome = `nosso-churrasco-${new Date().toISOString().slice(0, 10)}.json`;
