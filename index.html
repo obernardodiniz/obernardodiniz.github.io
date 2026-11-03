@@ -1,5 +1,5 @@
 <!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-0eDskFtVs4VyCzGjvVJGK9B8NIADYU5KzsF+cIJ/k/4=' 'sha256-CMreCuFwB1CpVPG6JKYvE23rB8UuZscvLTJVC4IweOg='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Rqg2YawltfOJR6tumCt88Mfzr6pqhnBFIwKw2VCQyOI=' 'sha256-CMreCuFwB1CpVPG6JKYvE23rB8UuZscvLTJVC4IweOg='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
@@ -101,6 +101,10 @@ main { padding-block: 18px 32px }
 .election { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: .82rem }
 .election strong { font-family: var(--f-display); font-size: .88rem }
 .group-title { display: flex; align-items: baseline; justify-content: space-between; margin: 20px 0 8px }
+.gt-acts { display: inline-flex; gap: 14px }
+.upd-btn { margin-top: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--accent); font-weight: 600; font-size: .9rem; border-radius: 999px; padding: 7px 14px; cursor: pointer }
+.upd-btn:disabled, .back:disabled { opacity: .6; cursor: progress }
+.upd-st { margin: -2px 0 10px }
 .group-title h3 { font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-family: var(--f-body) }
 .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px }
 .icard { text-align: left; cursor: pointer; padding: 12px 12px 10px; display: grid; gap: 2px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); min-width: 0 }
@@ -519,7 +523,7 @@ a.btn { display: inline-block; text-decoration: none; text-align: center; justif
     <nav class="topnav" aria-label="Seções">
       <button type="button" data-go="inicio">Início</button>
       <button type="button" data-go="politica">Política</button>
-      <button type="button" data-go="eleicao">2º turno</button>
+      <button type="button" data-go="eleicao">Eleição</button>
       <button type="button" data-go="quimica">Engenharia química</button>
       <button type="button" data-go="aprender">Trilha</button>
       <button type="button" data-go="noticias">Notícias</button>
@@ -547,19 +551,14 @@ a.btn { display: inline-block; text-decoration: none; text-align: center; justif
         <div class="eyebrow">Brasil 2027</div>
         <h1>Política e engenharia química, com dados.</h1>
         <p>Escolha um dos dois cantos. Tudo tem fonte e se atualiza todo dia.</p>
-        <button type="button" class="pill" data-go="eleicao" style="justify-self:start;border:0;cursor:pointer">Lula reeleito · 2º turno, 25/10 · ver detalhes →</button>
-        <div class="vs">
-          <div class="vs-c vs-win" style="--cc:var(--g-lula)"><img src="img/lula.jpg" alt="Lula"><div><b>Lula (PT) ✓</b><span>51,79%</span></div></div>
-          <i>2º turno</i>
-          <div class="vs-c" style="--cc:var(--g-bolso)"><img src="img/flavio.jpg" alt="Flávio Bolsonaro"><div><b>Flávio (PL)</b><span>48,21%</span></div></div>
-        </div>
       </div>
     </div>
     <div class="doors">
       <button type="button" class="door" data-go="politica" style="--di:url('img/planalto.jpg')"><span class="door-in"><small>Canto 1</small><strong>Política</strong><span>Eleição, 2º turno, debate, planos, governos e indicadores</span></span></button>
       <button type="button" class="door" data-go="quimica" style="--di:url('img/tocha.jpg')"><span class="door-in"><small>Canto 2</small><strong>Engenharia química</strong><span>Offshore, trilha de estudo, empresas, setor químico e política da química</span></span></button>
     </div>
-    <div class="group-title"><h3>Últimas notícias</h3><button type="button" class="back" data-go="noticias">Ver todas →</button></div>
+    <div class="group-title"><h3>Últimas notícias</h3><span class="gt-acts"><button type="button" class="back" data-atualizar="home-news-st">↻ Atualizar</button><button type="button" class="back" data-go="noticias">Ver todas →</button></span></div>
+    <p class="muted small upd-st" id="home-news-st" role="status" hidden></p>
     <div class="news" id="home-news"></div>
   </section>
 
@@ -835,7 +834,7 @@ a.btn { display: inline-block; text-decoration: none; text-align: center; justif
 
   <!-- NOTÍCIAS -->
   <section data-view="noticias" hidden>
-    <div class="view-head"><div class="eyebrow">Atualizado todo dia</div><h2>Notícias</h2><p id="news-upd">Brasil, mundo, engenharia química e offshore, com link para a fonte.</p></div>
+    <div class="view-head"><div class="eyebrow">Atualizado todo dia</div><h2>Notícias</h2><p id="news-upd">Brasil, mundo, engenharia química e offshore, com link para a fonte.</p><button type="button" class="upd-btn" data-atualizar="news-st">↻ Atualizar notícias</button><p class="muted small upd-st" id="news-st" role="status" hidden></p></div>
     <div class="chips" id="news-filter"></div>
     <div class="news" id="news-list"></div>
   </section>
@@ -2456,18 +2455,6 @@ function renderEleicao() {
   h += '<div class="card pad stack"><h3>Debates</h3><p><b>Band, 18/10:</b> os checadores acharam erros dos dois lados. Veja falas falsas de Lula e de Flávio na aba Debate.</p><p><b>Globo, 23/10 (sexta):</b> último debate. A campanha de Lula pediu checagem de fatos ao vivo.</p><button type="button" class="full-btn" data-go="debate">Abrir a aba Debate</button><button type="button" class="full-btn" data-go="planos">Comparar os planos de governo</button>' + fontesLine([["Correio Braziliense (checagem na Globo)", "https://www.correiobraziliense.com.br/politica/2026/10/7525239-campanha-de-lula-tem-conversas-com-tv-globo-sobre-checagem-de-fatos-no-debate.html"], ["Agência Lupa (Band)", "https://www.agencialupa.org/checagem/2026/10/18/ao-vivo-checagem-do-debate-entre-lula-e-flavio-bolsonaro-na-band/"]]) + "</div>";
   $("el-body").innerHTML = h;
 }
-function aplicarEleicaoCapa() {
-  var res = (LIVE.eleicao || {}).resultado;
-  if (!res || typeof res.flavio !== "number" || typeof res.lula !== "number") return;
-  ["home-cover-in"].forEach(function (id) {
-    var el = $(id); if (!el) return;
-    el.querySelectorAll(".vs-c").forEach(function (c) {
-      var alt = (c.querySelector("img") || {}).alt || "", s = c.querySelector("span");
-      if (s && /Lula/.test(alt)) s.textContent = fmt(res.lula, 2) + "%";
-      if (s && /Flávio/.test(alt)) s.textContent = fmt(res.flavio, 2) + "%";
-    });
-  });
-}
 
 /* ---------- gráficos que se atualizam: séries oficiais baixadas todo dia ---------- */
 function aplicarSeries(dados) {
@@ -2768,24 +2755,41 @@ function aplicarPainel(d) {
   LIVE.upd = d.atualizado ? String(d.atualizado) : null;
   LIVE.ind = d.indicadores && typeof d.indicadores === "object" ? d.indicadores : {};
   LIVE.eleicao = d.eleicao && typeof d.eleicao === "object" ? d.eleicao : null;
-  aplicarEleicaoCapa(); if (state.view === "eleicao") renderEleicao();
+  if (state.view === "eleicao") renderEleicao();
   renderHome();
   if (state.view === "indicador") renderIndicador();
   if (state.view === "noticias") renderNews();
 }
-function startLive() {
-  if (!window.claude || !window.claude.use) {
-    /* versão pública (GitHub Pages): o robô diário grava os mesmos dados em arquivos JSON */
-    fetch("dados/painel.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(aplicarPainel).catch(function () {});
-    fetch("dados/noticias.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (l) {
+function versaoPublica() { return !window.claude || !window.claude.use; }
+/* versão pública (GitHub Pages): o robô diário grava os mesmos dados em arquivos JSON */
+function carregarPublico() {
+  function pega(arq) { return fetch("dados/" + arq, { cache: "no-store" }).then(function (r) { if (!r.ok) throw new Error(arq); return r.json(); }); }
+  return Promise.all([
+    pega("painel.json").then(aplicarPainel),
+    pega("noticias.json").then(function (l) {
       if (Array.isArray(l)) { LIVE.news = l.filter(function (n) { return n && n.titulo && n.data; }); renderNewsBits(); }
-    }).catch(function () {});
-    fetch("dados/series.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(aplicarSeries).catch(function () {});
-    fetch("dados/licoes.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (l) {
-      if (Array.isArray(l)) { LIVE.licoes = l; renderTrilha(); }
-    }).catch(function () {});
-    return;
-  }
+    }),
+    pega("series.json").then(aplicarSeries).catch(function () {}),
+    pega("licoes.json").then(function (l) { if (Array.isArray(l)) { LIVE.licoes = l; renderTrilha(); } }).catch(function () {})
+  ]);
+}
+/* botão "Atualizar": busca de novo o que o robô publicou e diz se veio algo novo */
+document.addEventListener("click", function (e) {
+  var b = e.target.closest("[data-atualizar]"); if (!b) return;
+  var st = $(b.dataset.atualizar), antes = newsItems().length, rot = b.textContent;
+  function fim(msg) { b.disabled = false; b.textContent = rot; if (st) { st.textContent = msg; st.hidden = false; } }
+  b.disabled = true; b.textContent = "Buscando…"; if (st) st.hidden = true;
+  (versaoPublica() ? carregarPublico() : Promise.resolve(renderNewsBits())).then(function () {
+    var lista = newsItems(), novas = lista.length - antes, ult = lista[0] ? fmtData(lista[0].data).slice(0, 5) : "";
+    var dias = lista[0] ? Math.floor((Date.now() - new Date(String(lista[0].data).slice(0, 10) + "T12:00:00").getTime()) / 864e5) : 0;
+    var msg = novas > 0 ? (novas > 1 ? novas + " notícias novas." : "1 notícia nova.") : "Nada novo desde a última vez.";
+    if (ult) msg += " A mais recente é de " + ult + ".";
+    if (dias >= 2) msg += " O robô ainda não publicou as notícias dos últimos dias.";
+    fim(msg);
+  }, function () { fim("Sem conexão agora. Mostrando o que já estava salvo no aparelho."); });
+});
+function startLive() {
+  if (versaoPublica()) { carregarPublico().catch(function () {}); return; }
   window.claude.use("db").then(function (db) {
     if (!db) return;
     db.collection("noticias").orderBy("data", "desc").limit(80).onSnapshot(function (snap) {
