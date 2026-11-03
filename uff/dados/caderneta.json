@@ -1,5 +1,5 @@
 {
- "atualizado": "2026-10-26",
+ "atualizado": "2026-11-03",
  "perfil": {
   "atualizadoIduff": "2026-10-23",
   "chObtida": 2116,
@@ -1118,9 +1118,9 @@
    "tipo": "trabalho",
    "peso": 1,
    "nota": null,
-   "data": null,
+   "data": "2026-11-10",
    "hora": null,
-   "conteudo": "",
+   "conteudo": "Data de entrega",
    "disciplinaId": "TEQ00191",
    "nome": "Trabalho 1"
   },
@@ -1143,6 +1143,26 @@
    "conteudo": "",
    "disciplinaId": "TEQ00191",
    "nome": "Trabalho 3"
+  },
+  "teq00089-p2": {
+   "tipo": "prova",
+   "peso": 1,
+   "nota": null,
+   "hora": null,
+   "conteudo": "",
+   "disciplinaId": "TEQ00089",
+   "nome": "P2",
+   "data": "2026-11-23"
+  },
+  "teq00101-p2": {
+   "tipo": "prova",
+   "peso": 1,
+   "nota": null,
+   "hora": null,
+   "conteudo": "",
+   "disciplinaId": "TEQ00101",
+   "nome": "P2",
+   "data": "2026-11-26"
   }
  },
  "avisos": {},
