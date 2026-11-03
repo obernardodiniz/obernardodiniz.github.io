@@ -1118,9 +1118,9 @@
    "tipo": "trabalho",
    "peso": 1,
    "nota": null,
-   "data": "2026-11-10",
+   "data": null,
    "hora": null,
-   "conteudo": "Data de entrega",
+   "conteudo": "Já entregue; a nota ainda não foi informada",
    "disciplinaId": "TEQ00191",
    "nome": "Trabalho 1"
   },
@@ -1128,9 +1128,9 @@
    "tipo": "trabalho",
    "peso": 1,
    "nota": null,
-   "data": null,
+   "data": "2026-11-10",
    "hora": null,
-   "conteudo": "",
+   "conteudo": "Data de entrega",
    "disciplinaId": "TEQ00191",
    "nome": "Trabalho 2"
   },
