@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Terê House's">
+  <circle id="fundo" cx="100" cy="100" r="100" fill="#3b6b2b"/>
+  <g id="desenho">
+    <g fill="none" stroke="#fff" stroke-width="7"><path d="M57 64V37.5h86V64"/><path d="M57.5 124V85L100 59.5 142.5 85v39"/></g>
+    <path fill="#fff" d="M83 84h8.5v14.5h17V84h8.5v37h-8.5v-15h-17v15H83z"/>
+    <g fill="#fff">
+      <path d="M56 138h16v4.8h-5.4V157h-5.2v-14.2H56z"/>
+      <path d="M80 138h15v4.8h-9.8v2.3h8.6v4.8h-8.6v2.3h9.8v4.8H80z"/>
+      <path d="M104 138h5.2v19H104z M110.6 149h5.4l4.4 8h-5.8z"/>
+      <path d="M128 138h15v4.8h-9.8v2.3h8.6v4.8h-8.6v2.3h9.8v4.8H128z"/>
+    </g>
+    <g fill="none" stroke="#fff">
+      <path stroke-width="4.8" d="M107 140.4h5.6a4.4 4.4 0 0 1 0 8.8H107"/>
+      <path stroke-width="2.6" d="M131.5 135.2l4-3.8 4 3.8"/>
+      <path stroke-width="2.4" d="M55 166.5h14M131 166.5h14"/>
+      <g stroke-width="2.2">
+        <path d="M73.1 162.5v8M77.7 162.5v8M73.1 166.5h4.6"/>
+        <ellipse cx="84.4" cy="166.5" rx="2.3" ry="2.9"/>
+        <path d="M91.1 162.5v5.1a2.3 2.3 0 0 0 4.6 0v-5.1"/>
+        <path id="s" d="M105.2 163.7c-.6-.7-1.6-1.1-2.7-1.1-1.5 0-2.4.8-2.4 1.9 0 2.5 5.6 1.6 5.6 4.2 0 1.1-1 1.9-2.5 1.9-1.2 0-2.3-.5-3-1.3"/>
+        <path d="M114.8 163.6h-5.7v5.8h5.7M109.1 166.5h4.7"/>
+        <path d="M117.6 162.5v3"/>
+        <path transform="translate(21.2 0)" d="M105.2 163.7c-.6-.7-1.6-1.1-2.7-1.1-1.5 0-2.4.8-2.4 1.9 0 2.5 5.6 1.6 5.6 4.2 0 1.1-1 1.9-2.5 1.9-1.2 0-2.3-.5-3-1.3"/>
+      </g>
+    </g>
+  </g>
+</svg>

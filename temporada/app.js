@@ -25,13 +25,8 @@ const I = {
   vassoura: ic('<path d="M14 4 9 13M6 14h7l2 7H4z"/>'),
 };
 
-// Logo da Terê House's, redesenhada em vetor para ficar nítida em qualquer tamanho.
-const LOGO = `<svg viewBox="0 0 200 200" class="marca" role="img" aria-label="Terê House's"><circle cx="100" cy="100" r="100" fill="#3b6b2b"/>
-  <g fill="none" stroke="#fff" stroke-width="7"><path d="M57 64V37.5h86V64"/><path d="M57.5 124V85L100 59.5 142.5 85v39"/></g>
-  <path fill="#fff" d="M83 84h8.5v14.5h17V84h8.5v37h-8.5v-15h-17v15H83z"/>
-  <text x="100" y="157" text-anchor="middle" fill="#fff" font-family="'DM Sans', Arial, sans-serif" font-weight="800" font-size="26" letter-spacing="5" dx="2.5">TERÊ</text>
-  <path stroke="#fff" stroke-width="2.4" d="M55 166.5h15M130 166.5h15"/>
-  <text x="100" y="170.5" text-anchor="middle" fill="#fff" font-family="'DM Sans', Arial, sans-serif" font-weight="800" font-size="11" letter-spacing="1.6" dx=".8">HOUSE’S</text></svg>`;
+// Logo da Terê House's: um desenho só (img/logo.svg, letras em traço, sem fonte), o mesmo que gera os ícones.
+const LOGO = `<img src="img/logo.svg" alt="Terê House's">`;
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -80,9 +75,29 @@ const GUARDADO_DADOS = "temporada-dados";
 function dadosGuardados() { try { const x = JSON.parse(localStorage.getItem(GUARDADO_DADOS)); return x && x.token === token ? x.dados : null; } catch { return null; } }
 function guardarDados() { try { D ? localStorage.setItem(GUARDADO_DADOS, JSON.stringify({ token, dados: D })) : localStorage.removeItem(GUARDADO_DADOS); } catch { /* sem espaço: abre pela internet */ } }
 
+// Quem começou o app ("mestre") pode ver como qualquer uma das 3 pessoas. Neste aparelho ficam guardadas
+// a chave dele e as chaves que ele abriu para os outros; os outros não têm esse poder.
+const GUARDADO_MESTRE = "temporada-mestre", GUARDADO_CONTAS = "temporada-contas";
+const lerLocal = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+const gravarLocal = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch { /* sem espaço */ } };
+let mestre = lerLocal(GUARDADO_MESTRE);
+const contasGuardadas = () => { try { return JSON.parse(lerLocal(GUARDADO_CONTAS)) || {}; } catch { return {}; } };
+
 async function carregar() {
-  try { D = await rpc("ab_dados", { p_token: token }); guardarDados(); }
-  catch (e) { if (e.linkRuim) { token = null; guardar(null); D = null; guardarDados(); } throw e; }
+  try {
+    D = await rpc("ab_dados", { p_token: token }); guardarDados();
+    if (D.eu.mestre && mestre !== token) { mestre = token; gravarLocal(GUARDADO_MESTRE, token); }
+  } catch (e) {
+    if (!e.linkRuim) throw e;
+    if (mestre && token !== mestre) {
+      // a chave de "ver como" caiu (pessoa tirada, por exemplo): volta para a conta do mestre
+      const c = contasGuardadas(); Object.keys(c).forEach((k) => { if (c[k] === token) delete c[k]; }); gravarLocal(GUARDADO_CONTAS, JSON.stringify(c));
+      token = mestre; guardar(token); D = null; return carregar();
+    }
+    token = null; guardar(null); D = null; guardarDados();
+    if (mestre) { mestre = null; gravarLocal(GUARDADO_MESTRE, null); gravarLocal(GUARDADO_CONTAS, null); }
+    throw e;
+  }
 }
 
 // ---------- moldura e navegação ----------
@@ -110,11 +125,22 @@ const instalado = () => navigator.standalone === true || matchMedia("(display-mo
 let pedidoInstalar = null;
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); pedidoInstalar = e; if (D && abaAtual === "inicio" && !document.querySelector(".folha")) desenhar(); });
 
+// iPhone: o app da tela de início não enxerga o que foi aberto no Safari, mas abre no endereço em que foi
+// adicionado. Por isso, no Safari, o convite fica no endereço (e sem manifesto, para o iPhone usar esse endereço):
+// ao tocar no ícone, o app já entra sozinho, uma vez só. Nas outras aberturas o convite já usado é ignorado.
+const iphoneNoSafari = () => noIphone && !instalado();
+const conviteNoEndereco = /^#\/?entrar\//.test(location.hash);
+if (!(iphoneNoSafari() && conviteNoEndereco)) {
+  const m = document.createElement("link"); m.rel = "manifest"; m.href = "manifest.webmanifest"; document.head.append(m);
+}
+const GUARDADO_USADOS = "temporada-convites-usados";
+const usados = () => { try { return JSON.parse(lerLocal(GUARDADO_USADOS)) || []; } catch { return []; } };
+
 function rota() {
   const h = location.hash.replace(/^#\/?/, "");
   if (h.startsWith("entrar/")) {
     convite = decodeURIComponent(h.slice(7)).trim() || null;
-    history.replaceState(null, "", location.pathname + "#/inicio");
+    if (!iphoneNoSafari()) history.replaceState(null, "", location.pathname + "#/inicio");
     return "inicio";
   }
   const a = h.split("/")[0];
@@ -123,19 +149,23 @@ function rota() {
 
 async function resgatar(c, usarAqui = false) {
   convite = null;
-  // No iPhone, o app instalado não enxerga o que foi aberto no Safari: instala primeiro, depois usa o convite.
-  if (noIphone && !instalado() && !usarAqui) return telaInstalarPrimeiro(c);
+  if (iphoneNoSafari() && !usarAqui) return telaInstalarPrimeiro(c);
   app.innerHTML = `<div class="boas-vindas"><div class="logo">${LOGO}</div><div class="girar" style="margin:0 auto"></div></div>`;
   try {
-    token = await rpc("ab_resgatar", { p_convite: c }); guardar(token); D = null; abaAtual = null;
-    location.hash = "#/inicio"; return mostrar();
+    const novo = await rpc("ab_resgatar", { p_convite: c });
+    gravarLocal(GUARDADO_USADOS, JSON.stringify([...usados(), c].slice(-10)));
+    // convite de outra pessoa aberto no aparelho do mestre: vira mais uma conta dele, sem perder a dele
+    token = novo; guardar(token); D = null; abaAtual = null;
+    history.replaceState(null, "", location.pathname + "#/inicio"); return mostrar();
   } catch (e) {
+    if (token) { history.replaceState(null, "", location.pathname + "#/inicio"); return mostrar(); }
     return telaEntrada(/usado ou vencido/.test(e.message) ? "Este convite já foi usado ou venceu. Peça um novo a quem administra." : traduzir(e));
   }
 }
 
 async function mostrar() {
   const aba = rota();
+  if (convite && token && usados().includes(convite)) convite = null;
   if (convite) return resgatar(convite);
   if (!token) return telaEntrada();
   if (!D && (D = dadosGuardados())) setTimeout(recarregar, 0);
@@ -196,7 +226,32 @@ function resumoMes(mes) {
 
 // ---------- telas ----------
 function cabecalho(titulo, sub, marca = false) {
-  return `<header class="topo">${marca ? `<div class="marca-topo">${LOGO}</div>` : ""}<div class="meio"><h1>${esc(titulo)}</h1>${sub ? `<div class="sub">${sub}</div>` : ""}</div></header>`;
+  const trocar = mestre && D ? `<button class="trocar-conta${token !== mestre ? " outra" : ""}" data-acao="trocar-conta" aria-label="Trocar de conta">
+    <span class="avatar">${esc(D.eu.nome.trim()[0] || "?").toUpperCase()}</span>${ic('<path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>')}</button>` : "";
+  return `<header class="topo">${marca ? `<div class="marca-topo">${LOGO}</div>` : ""}<div class="meio"><h1>${esc(titulo)}</h1>${sub ? `<div class="sub">${sub}</div>` : ""}</div>${trocar}</header>`;
+}
+
+async function folhaTrocarConta() {
+  const { f, fechar } = abrirFolha(`<h3>Ver como</h3><div id="contas"><div class="esqueleto" style="height:150px"></div></div>`);
+  try {
+    const ps = await rpc("ab_pessoas_listar", { p_token: mestre });
+    $("#contas", f).innerHTML = ps.map((p) => `<button class="pessoa${p.id === D.eu.id ? " atual" : ""}" data-id="${p.id}">
+      <span class="avatar">${esc(p.nome.trim()[0] || "?").toUpperCase()}</span>
+      <span class="meio"><b>${esc(p.nome)}</b><span class="pequeno">${p.papel === "admin" ? "Administra" : "Proprietário · só vê"}</span></span>
+      ${p.id === D.eu.id ? `<span class="marcado">${I.ok}</span>` : ""}</button>`).join("");
+    $("#contas", f).addEventListener("click", async (e) => {
+      const b = e.target.closest("[data-id]"); if (!b || b.dataset.id === D.eu.id) return;
+      const p = ps.find((x) => x.id === b.dataset.id);
+      try {
+        const c = contasGuardadas();
+        let t = p.mestre ? mestre : c[p.id];
+        if (!t) { t = await rpc("ab_entrar_como", { p_token: mestre, p_pessoa: p.id }); c[p.id] = t; gravarLocal(GUARDADO_CONTAS, JSON.stringify(c)); }
+        token = t; guardar(t); D = null; abaAtual = null; fechar();
+        if (location.hash !== "#/inicio") history.replaceState(null, "", location.pathname + "#/inicio");
+        await mostrar(); avisar(p.mestre ? "De volta à sua conta" : `Vendo como ${p.nome.split(/\s+/)[0]}`);
+      } catch (err) { avisar(traduzir(err)); }
+    });
+  } catch (e) { $("#contas", f).innerHTML = `<p class="pequeno">${esc(traduzir(e))}</p>`; }
 }
 const barraMes = () => `<div class="mesbar"><button class="redondo" data-acao="mes" data-passo="-1" aria-label="Mês anterior">${I.esq}</button>
   <div class="mes">${nomeMes(mesSel)}</div><button class="redondo" data-acao="mes" data-passo="1" aria-label="Próximo mês">${I.dir}</button></div>`;
@@ -423,12 +478,12 @@ function telaInstalarPrimeiro(c) {
   if (nav) nav.style.display = "none";
   const link = linkDe(c);
   app.innerHTML = `<main class="tela"><div class="boas-vindas"><div class="logo">${LOGO}</div>
-    <h1>Instale o app primeiro</h1><p>Assim ele abre como um aplicativo, direto da tela do iPhone.</p>
-    <ol class="passos"><li>Toque em <b>Copiar convite</b> aqui embaixo.</li>
-      <li>Toque no botão <b>Compartilhar</b> do Safari (o quadrado com a seta para cima) e depois em <b>Adicionar à Tela de Início</b>.</li>
-      <li>Abra o <b>Terê House's</b> pela tela de início e cole o convite.</li></ol>
-    <button class="botao cheio" id="copiar-convite">${I.copiar} Copiar convite</button>
-    <button class="botao claro cheio" id="usar-aqui" style="margin-top:10px">Prefiro usar aqui no Safari</button>
+    <h1>Instale o app</h1>
+    <ol class="passos"><li>Toque em <b>Compartilhar</b> ${ic('<path d="M12 3v12M7 8l5-5 5 5M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/>').replace("<svg", '<svg style="width:18px;height:18px;vertical-align:-3px"')} no Safari.</li>
+      <li>Toque em <b>Adicionar à Tela de Início</b>.</li>
+      <li>Abra pelo ícone. Você já entra — uma vez só, para sempre.</li></ol>
+    <button class="botao claro cheio" id="usar-aqui">Prefiro usar aqui no Safari</button>
+    <button class="botao claro cheio" id="copiar-convite" style="margin-top:10px;box-shadow:none;background:none">${I.copiar} Copiar convite</button>
   </div></main>`;
   $("#copiar-convite").addEventListener("click", () => copiar(link, "Convite copiado"));
   $("#usar-aqui").addEventListener("click", () => resgatar(c, true));
@@ -803,8 +858,11 @@ const ACOES = {
   },
   sair: async () => {
     if (!(await perguntar("Sair deste aparelho?", "Para entrar de novo, você vai precisar de um convite novo.", "Sair"))) return;
-    token = null; D = null; guardar(null); guardarDados(); abaAtual = null; mostrar();
+    token = null; D = null; guardar(null); guardarDados(); abaAtual = null;
+    mestre = null; gravarLocal(GUARDADO_MESTRE, null); gravarLocal(GUARDADO_CONTAS, null);
+    mostrar();
   },
+  "trocar-conta": () => folhaTrocarConta(),
   tentar: () => mostrar(),
   iniciar: (b) => ocupado(b, async () => {
     const nome = $("#meu-nome").value.trim();
