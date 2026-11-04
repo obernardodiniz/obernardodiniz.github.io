@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SolarFlix</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Simule sua economia com energia solar por assinatura.">
+<meta name="description" content="Energia solar por assinatura: veja quanto você economiza na conta de luz.">
 <meta name="theme-color" content="#0E2A47">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,453 +14,815 @@
 <link rel="icon" href="img/logo.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="img/icone-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Figtree:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
-/* App de celular em uma coluna: azul-noite da marca, sol amarelo como único destaque, verde só para economia. */
+/* App de celular: papel claro com faixas azul-noite; o sol amarelo marca só o que importa; leituras de tarifa em fonte de medidor. */
 :root {
-  --bg: #0B2239;
-  --card: #12304F;
-  --card-2: #193C61;
-  --line: #24496F;
-  --ink: #F2F6FA;
-  --ink-2: #A9BCD0;
+  --bg: #F3F6F9;
+  --paper: #FFFFFF;
+  --ink: #0E2A47;
+  --ink-2: #4D6178;
+  --ink-3: #7B8DA1;
+  --line: #DFE6EE;
+  --night: #0E2A47;
+  --night-2: #17395D;
   --sun: #FFB703;
-  --sun-ink: #0E2A47;
-  --orange: #FF8A3D;
-  --good: #4FD394;
-  --enel: #5D7088;
+  --sun-soft: #FFF3D1;
+  --clay: #B9500F;
+  --good: #137347;
+  --good-soft: #E2F3EA;
   --display: 'Sora', 'Segoe UI', system-ui, sans-serif;
   --body: 'Figtree', 'Segoe UI', system-ui, sans-serif;
-  color-scheme: dark;
+  --mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  color-scheme: light;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
 html, body { height: 100%; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 500 16px/1.4 var(--body); -webkit-font-smoothing: antialiased; }
-h1, h2, p { margin: 0; }
-h1, h2 { font-family: var(--display); letter-spacing: -0.02em; text-wrap: balance; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 500 16px/1.45 var(--body); -webkit-font-smoothing: antialiased; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { font-family: var(--display); letter-spacing: -0.02em; text-wrap: balance; }
 .num { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--mono); }
 button { font: inherit; color: inherit; cursor: pointer; }
-button:focus-visible, input:focus-visible, label:focus-within { outline: 3px solid var(--sun); outline-offset: 2px; }
+button:focus-visible, select:focus-visible, a:focus-visible, label:focus-within { outline: 3px solid var(--sun); outline-offset: 2px; }
+.eyebrow { font: 600 11.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
 
-.app { position: relative; max-width: 460px; min-height: 100%; margin: 0 auto; display: flex; flex-direction: column;
-  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
-  padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.app { position: relative; max-width: 460px; min-height: 100%; margin: 0 auto; background: var(--bg); display: flex; flex-direction: column; padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+.app.sem-menu { padding-bottom: env(safe-area-inset-bottom, 0px); }
 @media (min-width: 600px) {
-  body { background: #061524; }
-  .app { min-height: calc(100% - 48px); margin-block: 24px; border-radius: 36px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; }
+  body { background: #DCE4EC; }
+  .app { min-height: calc(100% - 40px); margin-block: 20px; border-radius: 34px; overflow: hidden; box-shadow: 0 30px 80px rgba(14,42,71,.18); }
 }
+.pad { padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
 
-/* barra do topo */
-.bar { height: 56px; display: flex; align-items: center; gap: 12px; flex: none; }
-.icon-btn { width: 44px; height: 44px; border-radius: 14px; border: 0; background: var(--card); display: grid; place-items: center; }
-.icon-btn[hidden] { display: none; }
-.dots { display: flex; gap: 6px; margin-left: auto; margin-right: auto; }
-.dots i { width: 8px; height: 8px; border-radius: 99px; background: var(--line); transition: width .25s, background .25s; }
-.dots i.on { width: 22px; background: var(--sun); }
-.tag { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--sun); border: 1px solid rgba(255,183,3,.4); border-radius: 99px; padding: 4px 9px; white-space: nowrap; }
-
-.screen { flex: 1; display: flex; flex-direction: column; gap: 20px; padding-block: 8px 20px; animation: entra .28s ease both; }
+.screen { display: flex; flex-direction: column; flex: 1; animation: entra .3s ease both; }
 .screen[hidden] { display: none; }
-@keyframes entra { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
-.screen h2 { font-size: 26px; line-height: 1.15; }
-.push { margin-top: auto; }
+@keyframes entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-.cta { width: 100%; min-height: 58px; border: 0; border-radius: 18px; background: var(--sun); color: var(--sun-ink); font: 700 17px var(--display); display: flex; align-items: center; justify-content: center; gap: 10px; transition: transform .1s; }
-.cta:active { transform: scale(.98); }
-.cta:disabled { opacity: .45; }
-.ghost { width: 100%; min-height: 52px; border: 1px solid var(--line); border-radius: 16px; background: transparent; font-weight: 700; }
+/* ---------- topo das telas internas ---------- */
+.topo { display: flex; align-items: center; gap: 12px; padding-top: calc(env(safe-area-inset-top, 0px) + 10px); padding-bottom: 6px; }
+.voltar { width: 44px; height: 44px; border-radius: 14px; border: 1px solid var(--line); background: var(--paper); display: grid; place-items: center; }
+.passos { margin-left: auto; font: 600 12px var(--mono); color: var(--ink-3); }
+.marca-mini { display: flex; align-items: center; font: 800 19px var(--display); letter-spacing: -.5px; }
+.marca-mini span { color: var(--clay); }
 
-/* início */
-.hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; padding-top: 28px; }
-.sol { width: 148px; height: 148px; }
-.sol .raios { transform-origin: 60px 60px; animation: gira 28s linear infinite; }
+/* ---------- INÍCIO ---------- */
+.ceu { background: var(--night); color: #fff; padding-top: calc(env(safe-area-inset-top, 0px) + 14px); border-radius: 0 0 30px 30px; overflow: hidden; }
+.ceu .linha-topo { display: flex; align-items: center; justify-content: space-between; }
+.logo { display: flex; align-items: center; gap: 9px; font: 800 22px var(--display); letter-spacing: -.8px; }
+.logo span { color: var(--sun); }
+.selo-sim { font: 600 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: #FFD66B; border: 1px solid rgba(255,214,107,.35); border-radius: 99px; padding: 4px 9px; }
+.ceu h1 { font-size: 33px; line-height: 1.05; margin-top: 22px; max-width: 330px; }
+.ceu h1 em { font-style: normal; color: var(--sun); }
+.ceu .sub { color: #B9CADB; margin-top: 10px; font-size: 16px; max-width: 320px; }
+.cena { display: block; width: 100%; height: auto; margin-top: 6px; }
+.cena .fluxo { stroke-dasharray: 3 7; animation: corre 1.4s linear infinite; }
+@keyframes corre { to { stroke-dashoffset: -20; } }
+.cena .raios-sol { transform-origin: 300px 46px; animation: gira 40s linear infinite; }
 @keyframes gira { to { transform: rotate(360deg); } }
-.marca { font: 800 40px var(--display); letter-spacing: -1.5px; line-height: 1; }
-.marca span { color: var(--sun); }
-.hero h1 { font-size: 30px; line-height: 1.1; max-width: 300px; }
-.hero p { color: var(--ink-2); font-size: 17px; max-width: 290px; }
-.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.trio div { background: var(--card); border-radius: 18px; padding: 14px 8px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; font-size: 13px; font-weight: 700; line-height: 1.2; }
-.trio svg { color: var(--sun); }
+.cena .janela { animation: pisca 4s ease-in-out infinite; }
+.cena .janela:nth-child(3n) { animation-delay: 1.3s; }
+.cena .janela:nth-child(4n) { animation-delay: 2.6s; }
+@keyframes pisca { 50% { opacity: .35; } }
 
-/* simular */
-.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--card); border-radius: 16px; padding: 4px; gap: 4px; }
-.seg label { position: relative; min-height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; color: var(--ink-2); cursor: pointer; }
-.seg input { position: absolute; opacity: 0; pointer-events: none; }
-.seg label:has(input:checked) { background: var(--card-2); color: var(--ink); }
-.seg label:has(input:checked) svg { color: var(--sun); }
-.valor { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.valor .icon-btn { width: 52px; height: 52px; border-radius: 16px; background: var(--card-2); font: 700 26px var(--display); }
-.valor output { font: 800 46px var(--display); letter-spacing: -2px; text-align: center; flex: 1; }
-.valor output small { font-size: 20px; letter-spacing: 0; color: var(--ink-2); margin-right: 4px; }
-.valor output small { margin: 0 0 0 6px; }
-.area { display: grid; grid-template-columns: 96px minmax(0,1fr); gap: 10px; }
-.sel { position: relative; display: flex; flex-direction: column; gap: 2px; background: var(--card); border-radius: 16px; padding: 8px 14px 6px; min-width: 0; }
-.sel span { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
-.sel select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; color: var(--ink); font: 700 16px var(--body); padding: 2px 22px 4px 0; width: 100%; text-overflow: ellipsis; cursor: pointer; }
+.calc { background: var(--paper); border-radius: 26px; margin: -2px 0 0; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 1px 0 var(--line); }
+.inicio-corpo { display: flex; flex-direction: column; gap: 28px; padding-top: 22px; padding-bottom: 28px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { border: 1px solid var(--line); background: var(--paper); border-radius: 99px; padding: 8px 14px; font-weight: 700; font-size: 14px; min-height: 40px; }
+.chip.on { background: var(--night); color: #fff; border-color: var(--night); }
+
+.trilha { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0; position: relative; }
+.trilha::before { content: ""; position: absolute; top: 27px; left: 16%; right: 16%; border-top: 2px dashed var(--sun); }
+.trilha div { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; font-size: 13.5px; font-weight: 600; color: var(--ink-2); position: relative; padding: 0 4px; }
+.trilha svg { background: var(--paper); border-radius: 18px; border: 1px solid var(--line); padding: 10px; width: 56px; height: 56px; }
+.trilha b { color: var(--ink); display: block; font-size: 14px; }
+
+.manifesto { background: var(--sun); border-radius: 26px; padding: 22px; display: flex; flex-direction: column; gap: 12px; color: var(--night); }
+.manifesto h2 { font-size: 26px; line-height: 1.08; }
+.manifesto p { font-size: 15px; color: #3A2A00; }
+.link-seta { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; background: var(--night); color: #fff; border: 0; border-radius: 99px; padding: 10px 16px; min-height: 44px; }
+
+.secao-titulo { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.secao-titulo h2 { font-size: 21px; }
+
+/* ---------- valor da conta ---------- */
+.valor { display: flex; align-items: center; gap: 10px; }
+.valor .mm { width: 50px; height: 50px; border-radius: 16px; border: 1px solid var(--line); background: var(--bg); font: 700 24px var(--display); display: grid; place-items: center; flex: none; }
+.valor output { flex: 1; text-align: center; font: 800 48px var(--display); letter-spacing: -2.5px; line-height: 1; }
+.valor output small { font-size: 20px; letter-spacing: 0; color: var(--ink-3); margin-right: 4px; vertical-align: 14px; }
+input[type=range] { width: 100%; accent-color: var(--night); height: 30px; margin: 0; }
+
+.cta { width: 100%; min-height: 58px; border: 0; border-radius: 18px; background: var(--night); color: #fff; font: 700 17px var(--display); display: flex; align-items: center; justify-content: center; gap: 10px; transition: transform .1s; }
+.cta.sol { background: var(--sun); color: var(--night); }
+.cta:active { transform: scale(.985); }
+.cta:disabled { opacity: .4; }
+.ghost { width: 100%; min-height: 52px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); font-weight: 700; }
+
+/* ---------- SIMULAR ---------- */
+.abas { display: grid; grid-template-columns: 1fr 1fr; background: #E6ECF2; border-radius: 14px; padding: 4px; gap: 4px; }
+.abas button { border: 0; background: transparent; min-height: 42px; border-radius: 11px; font-weight: 700; color: var(--ink-2); }
+.abas button[aria-selected="true"] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgba(14,42,71,.12); }
+.corpo { display: flex; flex-direction: column; gap: 18px; padding-top: 14px; padding-bottom: 24px; }
+.corpo h1 { font-size: 27px; line-height: 1.1; }
+
+.area { display: grid; grid-template-columns: 92px minmax(0,1fr); gap: 8px; }
+.sel { position: relative; display: flex; flex-direction: column; gap: 1px; background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 8px 12px 6px; min-width: 0; }
+.sel span { font: 600 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.sel select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; color: var(--ink); font: 700 15.5px var(--body); padding: 2px 20px 4px 0; width: 100%; text-overflow: ellipsis; cursor: pointer; }
 .sel select:focus { outline: none; }
-.sel::after { content: ""; position: absolute; right: 14px; bottom: 15px; width: 8px; height: 8px; border-right: 2px solid var(--sun); border-bottom: 2px solid var(--sun); transform: rotate(45deg); pointer-events: none; }
-.sel option { background: var(--card); color: var(--ink); }
-.lig { display: flex; align-items: center; gap: 8px; }
-.lig > span { font-size: 13px; font-weight: 700; color: var(--ink-2); margin-right: auto; }
-.lig label { position: relative; min-width: 58px; min-height: 40px; border-radius: 12px; background: var(--card); display: grid; place-items: center; font-weight: 700; font-size: 14px; color: var(--ink-2); cursor: pointer; padding: 0 10px; }
-.lig input { position: absolute; opacity: 0; pointer-events: none; }
-.lig label:has(input:checked) { background: var(--card-2); color: var(--ink); box-shadow: inset 0 0 0 2px var(--sun); }
-.fonte { font-size: 12.5px; color: var(--ink-2); font-weight: 600; }
-.fonte b { color: var(--ink); }
-.cap { font-size: 13px; color: var(--ink-2); text-align: center; font-weight: 600; }
-input[type=range] { width: 100%; accent-color: var(--sun); height: 32px; }
+.sel::after { content: ""; position: absolute; right: 13px; bottom: 15px; width: 7px; height: 7px; border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink); transform: rotate(45deg); pointer-events: none; }
 
-.res { background: var(--card); border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
-.barras { display: flex; flex-direction: column; gap: 8px; }
-.b { display: grid; grid-template-columns: 74px minmax(0,1fr); align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: var(--ink-2); }
-.b div { height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: flex-end; padding: 0 10px; font: 700 14px var(--display); color: #fff; transition: width .35s ease; min-width: 84px; white-space: nowrap; }
-.b .e { background: var(--enel); width: 100%; }
-.b .s { background: var(--sun); color: var(--sun-ink); }
-.eco { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.eco div { background: var(--card-2); border-radius: 16px; padding: 12px 14px; }
-.eco small { display: block; font-size: 12px; color: var(--ink-2); font-weight: 700; }
-.eco b { font: 800 22px var(--display); color: var(--good); letter-spacing: -0.5px; }
+.dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.op { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; border: 1px solid var(--line); background: var(--paper); border-radius: 14px; font-weight: 700; color: var(--ink-2); cursor: pointer; }
+.op input { position: absolute; opacity: 0; pointer-events: none; }
+.op:has(input:checked) { border-color: var(--night); color: var(--ink); box-shadow: inset 0 0 0 1px var(--night); }
+.lig { display: flex; align-items: center; gap: 6px; }
+.lig > span { font-size: 13.5px; font-weight: 600; color: var(--ink-2); margin-right: auto; }
+.lig .op { min-height: 40px; min-width: 54px; padding: 0 10px; font-size: 14px; }
 
-/* planos */
-.planos { display: flex; flex-direction: column; gap: 12px; }
-.plano { position: relative; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 4px 12px; background: var(--card); border: 2px solid transparent; border-radius: 22px; padding: 16px 18px; cursor: pointer; }
-.plano input { position: absolute; opacity: 0; pointer-events: none; }
-.plano:has(input:checked) { border-color: var(--sun); background: var(--card-2); }
-.plano:has(input:disabled) { opacity: .4; cursor: not-allowed; }
-.plano .nome { font: 700 20px var(--display); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.plano .prazo { font: 700 11px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); background: var(--bg); padding: 3px 8px; border-radius: 99px; }
-.plano .pct { grid-row: span 2; align-self: center; font: 800 34px var(--display); color: var(--sun); letter-spacing: -1px; }
-.plano .pct small { font-size: 15px; }
-.plano .linha { font-size: 14px; color: var(--ink-2); }
-.plano .linha b { color: var(--good); }
-.plano .extra { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-.plano .extra span { font-size: 12.5px; font-weight: 700; background: var(--bg); border-radius: 99px; padding: 5px 10px; }
-.top-tag { position: absolute; top: -10px; right: 16px; background: var(--sun); color: var(--sun-ink); font: 800 10.5px var(--body); letter-spacing: .08em; text-transform: uppercase; padding: 4px 9px; border-radius: 99px; }
-
-/* fatura */
-.fatura { background: var(--card); border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
-.l { display: flex; justify-content: space-between; gap: 10px; font-size: 15px; }
+.fatura { background: var(--paper); border-radius: 22px; position: relative; overflow: hidden; }
+.fatura::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 10px; background: radial-gradient(circle at 8px 10px, var(--bg) 6px, transparent 6.5px) 0 0 / 16px 10px repeat-x; }
+.fatura .cab { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px dashed var(--line); }
+.fatura .linhas { padding: 14px 18px 24px; display: flex; flex-direction: column; gap: 9px; }
+.l { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; }
 .l span:first-child { color: var(--ink-2); }
-.l.d span:last-child { color: var(--good); font-weight: 700; }
-.l.t { border-top: 1px dashed var(--line); padding-top: 12px; align-items: baseline; }
-.l.t span:first-child { color: var(--ink); font-weight: 700; }
-.l.t span:last-child { font: 800 30px var(--display); letter-spacing: -1px; }
-.antes { font-size: 13px; color: var(--ink-2); text-align: right; }
-.pags { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.pags label { position: relative; background: var(--card); border: 2px solid transparent; border-radius: 18px; min-height: 84px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
-.pags input { position: absolute; opacity: 0; pointer-events: none; }
-.pags label:has(input:checked) { border-color: var(--sun); background: var(--card-2); }
-.pags svg { color: var(--sun); }
-.sw { display: flex; align-items: center; gap: 12px; background: var(--card); border-radius: 18px; padding: 12px 14px; font-size: 14px; font-weight: 600; cursor: pointer; }
-.sw input { appearance: none; -webkit-appearance: none; width: 50px; height: 30px; border-radius: 99px; background: var(--line); position: relative; flex: none; transition: background .2s; cursor: pointer; margin: 0; }
-.sw input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .2s; }
+.l .mono { font-size: 14.5px; }
+.l.menos span:last-child { color: var(--good); font-weight: 600; }
+.l.total { border-top: 1px solid var(--line); padding-top: 11px; align-items: baseline; }
+.l.total span:first-child { color: var(--ink); font-weight: 700; }
+.l.total span:last-child { font: 800 28px var(--display); letter-spacing: -1px; }
+.riscado { text-decoration: line-through; color: var(--ink-3); }
+.ganho { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--good-soft); color: var(--good); border-radius: 14px; padding: 12px 14px; font-weight: 700; font-size: 14px; }
+.ganho b { font: 800 22px var(--display); letter-spacing: -.5px; }
+.leitura { font: 500 12px/1.5 var(--mono); color: var(--ink-3); }
+.leitura b { color: var(--ink-2); font-weight: 600; }
+
+/* como funciona */
+.etapas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.etapas li { display: grid; grid-template-columns: 56px minmax(0,1fr); gap: 14px; position: relative; padding-bottom: 22px; }
+.etapas li:not(:last-child)::before { content: ""; position: absolute; left: 27px; top: 58px; bottom: 4px; border-left: 2px dashed #C9D5E1; }
+.etapas .ic { width: 56px; height: 56px; border-radius: 18px; background: var(--paper); border: 1px solid var(--line); display: grid; place-items: center; }
+.etapas .n { font: 600 11px var(--mono); color: var(--clay); letter-spacing: .06em; }
+.etapas h3 { font-size: 17px; margin: 2px 0 4px; }
+.etapas p { font-size: 14.5px; color: var(--ink-2); }
+.nao-muda { background: var(--night); color: #fff; border-radius: 22px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.nao-muda h3 { font-size: 18px; color: var(--sun); }
+.nao-muda ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 14.5px; color: #D3DEEA; }
+.nao-muda li { display: flex; gap: 10px; }
+.nao-muda li svg { flex: none; margin-top: 2px; }
+.ficha { background: var(--paper); border-radius: 22px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.ficha h3 { font-size: 16px; }
+.ficha .l { font-size: 14px; }
+.nota { font-size: 12.5px; color: var(--ink-3); line-height: 1.5; }
+
+/* ---------- PLANOS ---------- */
+.carrossel { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 6px max(20px, env(safe-area-inset-left, 0px)) 14px; margin: 0; scrollbar-width: none; }
+.carrossel::-webkit-scrollbar { display: none; }
+.plano { position: relative; flex: 0 0 84%; scroll-snap-align: center; background: var(--paper); border: 2px solid var(--line); border-radius: 26px; padding: 20px; display: flex; flex-direction: column; gap: 14px; cursor: pointer; }
+.plano input { position: absolute; opacity: 0; pointer-events: none; }
+.plano:has(input:checked) { border-color: var(--night); box-shadow: 0 10px 30px rgba(14,42,71,.12); }
+.plano:has(input:disabled) { opacity: .45; cursor: not-allowed; }
+.plano .cab { display: flex; align-items: center; gap: 14px; }
+.plano .emblema { width: 64px; height: 64px; flex: none; }
+.plano h3 { font-size: 24px; line-height: 1; }
+.plano .prazo { font: 600 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin-top: 6px; display: block; }
+.plano .pct { display: flex; align-items: baseline; gap: 8px; }
+.plano .pct b { font: 800 46px var(--display); letter-spacing: -2px; line-height: 1; }
+.plano .pct span { color: var(--ink-2); font-weight: 600; font-size: 14px; }
+.plano .eco { background: var(--good-soft); color: var(--good); border-radius: 12px; padding: 10px 12px; font-weight: 700; font-size: 14px; }
+.plano ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 14.5px; }
+.plano li { display: flex; gap: 10px; align-items: flex-start; }
+.plano li svg { flex: none; margin-top: 3px; }
+.plano .marcar { margin-top: auto; text-align: center; font-weight: 700; font-size: 14px; border-radius: 12px; padding: 10px; background: var(--bg); color: var(--ink-2); }
+.plano:has(input:checked) .marcar { background: var(--night); color: #fff; }
+.fita { position: absolute; top: -1px; right: 22px; border-radius: 0 0 8px 8px !important; font: 600 10.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; background: var(--sun); color: var(--night); padding: 4px 8px; border-radius: 6px; }
+.pontos { display: flex; justify-content: center; gap: 6px; }
+.pontos i { width: 7px; height: 7px; border-radius: 99px; background: #C9D5E1; transition: width .2s, background .2s; }
+.pontos i.on { width: 20px; background: var(--night); }
+.todos { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13.5px; color: var(--ink-2); font-weight: 600; }
+.todos span { display: inline-flex; align-items: center; gap: 6px; }
+
+/* ---------- PAGAR ---------- */
+.pags { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pags .op { flex-direction: column; min-height: 82px; gap: 6px; font-size: 14px; }
+.sw { display: flex; align-items: center; gap: 12px; background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; font-size: 14.5px; font-weight: 600; cursor: pointer; }
+.sw input { appearance: none; -webkit-appearance: none; width: 50px; height: 30px; border-radius: 99px; background: #C9D5E1; position: relative; flex: none; transition: background .2s; cursor: pointer; margin: 0; }
+.sw input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
 .sw input:checked { background: var(--good); }
 .sw input:checked::after { transform: translateX(20px); }
 
-/* folha de pagamento */
-.veu { position: fixed; inset: 0; background: rgba(3,12,22,.6); display: flex; align-items: flex-end; justify-content: center; z-index: 20; animation: aparece .2s ease both; }
+.veu { position: fixed; inset: 0; background: rgba(8,22,38,.55); display: flex; align-items: flex-end; justify-content: center; z-index: 30; animation: aparece .2s ease both; }
 .veu[hidden] { display: none; }
 @keyframes aparece { from { opacity: 0; } }
-.folha { width: 100%; max-width: 460px; background: var(--card); border-radius: 28px 28px 0 0; padding: 12px 20px calc(20px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 16px; align-items: center; text-align: center; animation: sobe .28s cubic-bezier(.2,.8,.2,1) both; }
+.folha { width: 100%; max-width: 460px; background: var(--paper); border-radius: 28px 28px 0 0; padding: 12px 20px calc(20px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 14px; align-items: center; text-align: center; animation: sobe .3s cubic-bezier(.2,.8,.2,1) both; }
 @keyframes sobe { from { transform: translateY(100%); } }
 .folha .alca { width: 40px; height: 5px; border-radius: 99px; background: var(--line); }
-.folha h2 { font-size: 22px; }
-.folha p { color: var(--ink-2); font-size: 14px; }
-.qr { width: 184px; height: 184px; background: #fff; border-radius: 18px; padding: 12px; }
-.cartao { width: 260px; height: 160px; border-radius: 18px; background: linear-gradient(135deg, #1E4C7C, #0E2A47); border: 1px solid var(--line); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; text-align: left; }
-.cartao .n { font: 600 18px var(--display); letter-spacing: 3px; }
-.cartao small { color: var(--ink-2); font-size: 12px; font-weight: 700; }
-.codigo { width: 100%; font: 600 13px ui-monospace, Consolas, monospace; background: var(--bg); border-radius: 12px; padding: 12px; word-break: break-all; }
-.mini { font-size: 12px; color: var(--ink-2); }
-.spin { width: 22px; height: 22px; border-radius: 50%; border: 3px solid rgba(14,42,71,.25); border-top-color: var(--sun-ink); animation: gira .7s linear infinite; }
+.folha h2 { font-size: 21px; }
+.folha p { color: var(--ink-2); font-size: 14.5px; }
+.qr { width: 180px; height: 180px; border-radius: 16px; border: 1px solid var(--line); padding: 10px; background: #fff; }
+.cartao { width: 260px; height: 158px; border-radius: 18px; background: var(--night); color: #fff; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; text-align: left; position: relative; overflow: hidden; }
+.cartao::after { content: ""; position: absolute; right: -40px; top: -40px; width: 140px; height: 140px; border-radius: 50%; background: var(--sun); opacity: .9; }
+.cartao * { position: relative; z-index: 1; }
+.cartao .n { font: 600 17px var(--mono); letter-spacing: 2px; }
+.cartao small { font: 600 11px var(--mono); letter-spacing: .08em; color: #B9CADB; }
+.codigo { width: 100%; font: 500 13px var(--mono); background: var(--bg); border-radius: 12px; padding: 12px; word-break: break-all; }
+.spin { width: 22px; height: 22px; border-radius: 50%; border: 3px solid rgba(255,255,255,.3); border-top-color: #fff; animation: gira .7s linear infinite; }
 
-/* sucesso */
-.ok { align-items: center; text-align: center; justify-content: center; }
-.check { width: 104px; height: 104px; border-radius: 50%; background: rgba(79,211,148,.14); display: grid; place-items: center; color: var(--good); }
-.check path { stroke-dasharray: 30; stroke-dashoffset: 30; animation: risca .5s .15s ease forwards; }
-@keyframes risca { to { stroke-dashoffset: 0; } }
-.grande { font: 800 52px var(--display); color: var(--good); letter-spacing: -2px; line-height: 1; }
-.recibo { width: 100%; background: var(--card); border-radius: 22px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; text-align: left; }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .check path { stroke-dashoffset: 0; } }
+/* ---------- PRONTO ---------- */
+.pronto-topo { background: var(--night); color: #fff; padding-top: calc(env(safe-area-inset-top, 0px) + 30px); padding-bottom: 30px; border-radius: 0 0 30px 30px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.pronto-topo .sol-ok { width: 96px; height: 96px; }
+.pronto-topo h1 { font-size: 26px; }
+.pronto-topo .grande { font: 800 50px var(--display); color: var(--sun); letter-spacing: -2px; line-height: 1; }
+.pronto-topo p { color: #B9CADB; }
+.recibo { background: var(--paper); border-radius: 22px; padding: 16px 18px; display: flex; flex-direction: column; gap: 9px; }
+
+/* ---------- NÓS ---------- */
+.nos-topo { background: var(--night); color: #fff; padding-top: calc(env(safe-area-inset-top, 0px) + 18px); padding-bottom: 28px; border-radius: 0 0 30px 30px; display: flex; flex-direction: column; gap: 14px; }
+.nos-topo h1 { font-size: 32px; line-height: 1.05; }
+.nos-topo h1 em { font-style: normal; color: var(--sun); }
+.nos-topo p { color: #C4D3E2; font-size: 16px; }
+.bloco { display: flex; flex-direction: column; gap: 10px; }
+.bloco h2 { font-size: 22px; line-height: 1.15; }
+.bloco p { color: var(--ink-2); font-size: 15.5px; }
+.compromissos { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.compromissos div { display: grid; grid-template-columns: 40px minmax(0,1fr); gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.compromissos b { display: block; font-size: 15.5px; }
+.compromissos span { font-size: 14px; color: var(--ink-2); }
+.ufs { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 6px; }
+.ufs span { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 6px 4px; text-align: center; font: 600 13px var(--mono); }
+.ufs span small { display: block; font-size: 10.5px; color: var(--ink-3); font-weight: 500; }
+.ufs span.casa { background: var(--sun); border-color: var(--sun); }
+.grande-num { display: flex; gap: 20px; }
+.grande-num div b { display: block; font: 800 38px var(--display); letter-spacing: -1.5px; line-height: 1; }
+.grande-num div span { font-size: 13px; color: var(--ink-2); font-weight: 600; }
+.citacao { border-left: 4px solid var(--sun); padding: 4px 0 4px 14px; font: 700 19px/1.3 var(--display); letter-spacing: -.3px; }
+
+/* ---------- menu de baixo ---------- */
+.menu { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; justify-content: center; pointer-events: none; }
+.menu nav { pointer-events: auto; width: 100%; max-width: 460px; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, 1fr); padding: 6px max(12px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)); }
+@media (min-width: 600px) { .menu { bottom: 20px; } .menu nav { border-radius: 0 0 34px 34px; } }
+.menu[hidden] { display: none; }
+.menu button { border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 12px; font-weight: 700; color: var(--ink-3); min-height: 54px; justify-content: center; border-radius: 12px; }
+.menu button[aria-current="page"] { color: var(--ink); }
+.menu button[aria-current="page"] .bolinha { background: var(--sun); }
+.menu .bolinha { width: 44px; height: 28px; border-radius: 99px; display: grid; place-items: center; transition: background .2s; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
-<div class="app">
-  <header class="bar">
-    <button class="icon-btn" id="voltar" type="button" aria-label="Voltar" hidden><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
-    <div class="dots" id="dots" aria-hidden="true"><i></i><i></i><i></i></div>
-    <span class="tag">Simulação</span>
-  </header>
+<div class="app" id="app">
 
-  <!-- INÍCIO -->
+  <!-- =================== INÍCIO =================== -->
   <section class="screen" id="inicio">
-    <div class="hero">
-      <svg class="sol" viewBox="0 0 120 120" role="img" aria-label="SolarFlix">
-        <g class="raios" stroke="#FFB703" stroke-width="6" stroke-linecap="round">
-          <line x1="104" y1="60" x2="116" y2="60"/><line x1="91.1" y1="91.1" x2="99.6" y2="99.6"/><line x1="60" y1="104" x2="60" y2="116"/><line x1="28.9" y1="91.1" x2="20.4" y2="99.6"/><line x1="16" y1="60" x2="4" y2="60"/><line x1="28.9" y1="28.9" x2="20.4" y2="20.4"/><line x1="60" y1="16" x2="60" y2="4"/><line x1="91.1" y1="28.9" x2="99.6" y2="20.4"/>
+    <div class="ceu">
+      <div class="pad">
+        <div class="linha-topo">
+          <span class="logo"><svg width="30" height="30" viewBox="0 0 120 120" aria-hidden="true"><g stroke="#FFB703" stroke-width="8" stroke-linecap="round"><line x1="104" y1="60" x2="116" y2="60"/><line x1="91.1" y1="91.1" x2="99.6" y2="99.6"/><line x1="60" y1="104" x2="60" y2="116"/><line x1="28.9" y1="91.1" x2="20.4" y2="99.6"/><line x1="16" y1="60" x2="4" y2="60"/><line x1="28.9" y1="28.9" x2="20.4" y2="20.4"/><line x1="60" y1="16" x2="60" y2="4"/><line x1="91.1" y1="28.9" x2="99.6" y2="20.4"/></g><circle cx="60" cy="60" r="36" fill="#FFB703"/><path d="M52 45 L52 75 L77 60 Z" fill="#0E2A47"/></svg><span style="color:#fff">Solar<span>Flix</span></span></span>
+          <span class="selo-sim">Simulação</span>
+        </div>
+        <h1>A energia do sol na sua conta de luz. <em>Sem placa no telhado.</em></h1>
+        <p class="sub">Você assina, a usina gera e o desconto chega todo mês.</p>
+      </div>
+      <!-- cena: usina solar → rede → cidade -->
+      <svg class="cena" viewBox="0 0 360 200" role="img" aria-label="Uma usina solar manda energia pela rede elétrica até os prédios da cidade">
+        <defs>
+          <linearGradient id="ceuG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0E2A47"/><stop offset="1" stop-color="#1D4C7A"/></linearGradient>
+        </defs>
+        <rect width="360" height="200" fill="url(#ceuG)"/>
+        <g class="raios-sol" stroke="#FFB703" stroke-width="3" stroke-linecap="round" opacity=".9">
+          <line x1="300" y1="14" x2="300" y2="6"/><line x1="300" y1="78" x2="300" y2="86"/><line x1="268" y1="46" x2="260" y2="46"/><line x1="332" y1="46" x2="340" y2="46"/>
+          <line x1="277" y1="23" x2="271" y2="17"/><line x1="323" y1="69" x2="329" y2="75"/><line x1="323" y1="23" x2="329" y2="17"/><line x1="277" y1="69" x2="271" y2="75"/>
         </g>
-        <circle cx="60" cy="60" r="36" fill="#FFB703"/>
-        <path d="M52 45 L52 75 L77 60 Z" fill="#0E2A47" stroke="#0E2A47" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="300" cy="46" r="22" fill="#FFB703"/>
+        <path d="M0 150 Q 90 128 180 146 T 360 140 V200 H0Z" fill="#12355A"/>
+        <!-- usina -->
+        <g>
+          <g fill="#2F6DB0" stroke="#7FB2E5" stroke-width="1">
+            <path d="M16 150 L64 150 L56 132 L24 132 Z"/><path d="M70 152 L118 152 L110 134 L78 134 Z"/>
+            <path d="M24 176 L72 176 L64 158 L32 158 Z"/><path d="M78 178 L126 178 L118 160 L86 160 Z"/>
+          </g>
+          <g stroke="#7FB2E5" stroke-width=".8" opacity=".8">
+            <line x1="40" y1="132" x2="40" y2="150"/><line x1="94" y1="134" x2="94" y2="152"/><line x1="48" y1="158" x2="48" y2="176"/><line x1="102" y1="160" x2="102" y2="178"/>
+            <line x1="20" y1="141" x2="60" y2="141"/><line x1="74" y1="143" x2="114" y2="143"/><line x1="28" y1="167" x2="68" y2="167"/><line x1="82" y1="169" x2="122" y2="169"/>
+          </g>
+        </g>
+        <!-- torre -->
+        <g stroke="#9DB6CF" stroke-width="2" fill="none" stroke-linecap="round">
+          <path d="M168 150 L178 96 L188 150"/><path d="M171 132 L185 132"/><path d="M174 114 L182 114"/><path d="M164 104 L192 104"/>
+        </g>
+        <!-- prédios -->
+        <g fill="#0B2239">
+          <rect x="226" y="104" width="30" height="64" rx="2"/><rect x="260" y="88" width="34" height="80" rx="2"/><rect x="298" y="112" width="26" height="56" rx="2"/><rect x="328" y="96" width="30" height="72" rx="2"/>
+          <path d="M206 168 V136 L220 126 L234 136 V168Z"/>
+        </g>
+        <g fill="#FFD66B">
+          <rect class="janela" x="232" y="112" width="6" height="7"/><rect class="janela" x="244" y="112" width="6" height="7"/><rect class="janela" x="232" y="128" width="6" height="7"/><rect class="janela" x="244" y="144" width="6" height="7"/>
+          <rect class="janela" x="267" y="96" width="7" height="7"/><rect class="janela" x="280" y="96" width="7" height="7"/><rect class="janela" x="267" y="112" width="7" height="7"/><rect class="janela" x="280" y="128" width="7" height="7"/><rect class="janela" x="267" y="144" width="7" height="7"/>
+          <rect class="janela" x="304" y="120" width="6" height="7"/><rect class="janela" x="314" y="136" width="6" height="7"/>
+          <rect class="janela" x="334" y="104" width="7" height="7"/><rect class="janela" x="346" y="120" width="7" height="7"/><rect class="janela" x="334" y="136" width="7" height="7"/>
+          <rect class="janela" x="215" y="146" width="10" height="9"/>
+        </g>
+        <!-- fluxo de energia -->
+        <path class="fluxo" d="M118 140 Q 150 100 178 98 Q 205 96 220 128" fill="none" stroke="#FFB703" stroke-width="2.5" stroke-linecap="round"/>
+        <path class="fluxo" d="M188 104 Q 240 70 276 90" fill="none" stroke="#FFB703" stroke-width="2.5" stroke-linecap="round"/>
+        <g font-family="IBM Plex Mono, monospace" font-size="8.5" fill="#9DB6CF" letter-spacing=".5">
+          <text x="34" y="192">USINA</text><text x="160" y="164">REDE</text><text x="262" y="184">SUA CASA</text>
+        </g>
       </svg>
-      <div class="marca">Solar<span>Flix</span></div>
-      <h1>Energia limpa ao alcance de todos.</h1>
-      <p>Pague menos na conta de luz sem instalar nada.</p>
     </div>
-    <div class="trio">
-      <div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/><path d="M9 21v-6h6v6"/></svg>Sem obra</div>
-      <div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .8-3 2s1.3 1.7 3 2 3 .8 3 2-1.3 2-3 2c-1.4 0-2.5-.5-3-1.5M12 6v2M12 16v2"/></svg>Sem investimento</div>
-      <div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h9l4 4v16H6z"/><path d="M9 12h7M9 16h5"/></svg>Uma conta só</div>
-    </div>
-    <div class="push" style="display:flex;flex-direction:column;gap:10px">
-      <button class="cta" type="button" data-ir="simular">Simular minha economia
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-      <button class="ghost" type="button" id="instalar" hidden>Instalar o app</button>
+
+    <div class="pad inicio-corpo">
+      <div class="calc">
+        <span class="eyebrow">Quanto vem sua conta de luz?</span>
+        <div class="valor">
+          <button class="mm" type="button" data-passo="-1" aria-label="Diminuir">−</button>
+          <output class="num" data-valor>R$ 200</output>
+          <button class="mm" type="button" data-passo="1" aria-label="Aumentar">+</button>
+        </div>
+        <div class="chips" id="atalhos">
+          <button class="chip" type="button" data-rapido="150">R$ 150</button>
+          <button class="chip" type="button" data-rapido="200">R$ 200</button>
+          <button class="chip" type="button" data-rapido="350">R$ 350</button>
+          <button class="chip" type="button" data-rapido="600">R$ 600</button>
+        </div>
+        <div class="ganho"><span>Você economizaria por ano</span><b class="num" data-eco-ano>R$ 0</b></div>
+        <button class="cta" type="button" data-ir="simular">Ver minha simulação</button>
+      </div>
+
+      <div class="bloco">
+        <div class="secao-titulo"><h2>Do sol até você</h2><button class="chip" type="button" data-ir="como">Entender melhor</button></div>
+        <div class="trilha">
+          <div>
+            <svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="26" cy="9" r="5" fill="#FFB703"/><path d="M4 30 L28 30 L24 19 L8 19 Z" fill="#2F6DB0"/><path d="M16 19 V30 M6 24.5 H26" stroke="#fff" stroke-width="1.2"/></svg>
+            <span><b>A usina gera</b>energia solar perto de você</span>
+          </div>
+          <div>
+            <svg viewBox="0 0 36 36" aria-hidden="true"><path d="M12 32 L18 5 L24 32 M13.5 24 H22.5 M15 15 H21 M8 10 H28" stroke="#0E2A47" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="18" cy="5" r="2.5" fill="#FFB703"/></svg>
+            <span><b>Vira crédito</b>na rede da distribuidora</span>
+          </div>
+          <div>
+            <svg viewBox="0 0 36 36" aria-hidden="true"><path d="M5 17 L18 6 L31 17 V31 H5 Z" fill="#0E2A47"/><rect x="14" y="20" width="8" height="11" fill="#FFB703"/></svg>
+            <span><b>Sua conta cai</b>e você paga uma só</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="manifesto">
+        <span class="eyebrow" style="color:#5C4300">Por que existimos</span>
+        <h2>Energia limpa não pode depender de ter telhado.</h2>
+        <p>Quem mora de aluguel, em apartamento ou tem um pequeno comércio quase nunca consegue instalar placas solares. A SolarFlix existe para mudar isso.</p>
+        <button class="link-seta" type="button" data-ir="nos">Nosso objetivo <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </div>
+
+      <button class="ghost" type="button" id="instalar" hidden>Instalar o app no celular</button>
     </div>
   </section>
 
-  <!-- SIMULAR -->
+  <!-- =================== SIMULAR =================== -->
   <section class="screen" id="simular" hidden>
-    <h2>Sua conta de luz</h2>
-    <div class="area">
-      <label class="sel uf"><span>Estado</span><select id="uf" aria-label="Estado"></select></label>
-      <label class="sel"><span>Distribuidora</span><select id="dist" aria-label="Distribuidora"></select></label>
+    <div class="pad topo">
+      <span class="marca-mini">Solar<span>Flix</span></span>
+      <span class="passos">1 de 3</span>
     </div>
-    <div class="seg" role="radiogroup" aria-label="Tipo de cliente">
-      <label><input type="radio" name="tipo" id="tipo-casa" value="casa" checked>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>Casa</label>
-      <label><input type="radio" name="tipo" id="tipo-comercio" value="comercio">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h18l-1.5-5h-15z"/><path d="M5 9v12h14V9"/></svg>Comércio</label>
-    </div>
-    <div>
-      <div class="valor">
-        <button class="icon-btn" type="button" id="menos" aria-label="Diminuir">−</button>
-        <output id="valor" class="num" aria-live="polite">200<small>kWh</small></output>
-        <button class="icon-btn" type="button" id="mais" aria-label="Aumentar">+</button>
-      </div>
-      <p class="cap">consumo do mês · está na sua conta</p>
-      <input type="range" id="faixa" min="50" max="1000" step="10" value="200" aria-label="Consumo do mês em kWh">
-    </div>
-    <div class="lig" role="radiogroup" aria-label="Tipo de ligação">
-      <span>Ligação</span>
-      <label><input type="radio" name="lig" value="30">Mono</label>
-      <label><input type="radio" name="lig" value="50" checked>Bi</label>
-      <label><input type="radio" name="lig" value="100">Tri</label>
-    </div>
-    <div class="res">
-      <p class="fonte num" id="fonte">—</p>
-      <div class="barras" aria-label="Gasto em 1 ano">
-        <div class="b"><span>Hoje</span><div class="e num" id="b-enel">R$ 0</div></div>
-        <div class="b"><span>SolarFlix</span><div class="s num" id="b-sf">R$ 0</div></div>
-      </div>
-      <div class="eco">
-        <div><small>Economia no ano</small><b class="num" id="eco-ano">R$ 0</b></div>
-        <div><small>Em 5 anos</small><b class="num" id="eco-5">R$ 0</b></div>
+    <div class="pad">
+      <div class="abas" role="tablist" aria-label="Simulação">
+        <button type="button" role="tab" id="aba-conta" aria-selected="true" data-aba="conta">Minha conta</button>
+        <button type="button" role="tab" id="aba-como" aria-selected="false" data-aba="como">Como funciona</button>
       </div>
     </div>
-    <button class="cta push" type="button" data-ir="planos">Ver planos</button>
+
+    <!-- aba: minha conta -->
+    <div class="pad corpo" id="painel-conta" role="tabpanel" aria-labelledby="aba-conta">
+      <div class="area">
+        <label class="sel"><span>Estado</span><select id="uf" aria-label="Estado"></select></label>
+        <label class="sel"><span>Distribuidora</span><select id="dist" aria-label="Distribuidora"></select></label>
+      </div>
+      <div class="dupla" role="radiogroup" aria-label="Tipo de imóvel">
+        <label class="op"><input type="radio" name="tipo" id="tipo-casa" value="casa" checked>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>Casa</label>
+        <label class="op"><input type="radio" name="tipo" id="tipo-comercio" value="comercio">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h18l-1.5-5h-15z"/><path d="M5 9v12h14V9"/></svg>Comércio</label>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="valor">
+          <button class="mm" type="button" data-passo="-1" aria-label="Diminuir">−</button>
+          <output class="num" data-valor aria-live="polite">R$ 200</output>
+          <button class="mm" type="button" data-passo="1" aria-label="Aumentar">+</button>
+        </div>
+        <input type="range" id="faixa" min="50" max="2000" step="10" value="200" aria-label="Valor da conta de luz">
+      </div>
+      <div class="lig" role="radiogroup" aria-label="Tipo de ligação">
+        <span>Ligação na conta</span>
+        <label class="op"><input type="radio" name="lig" value="30">Mono</label>
+        <label class="op"><input type="radio" name="lig" value="50" checked>Bi</label>
+        <label class="op"><input type="radio" name="lig" value="100">Tri</label>
+      </div>
+
+      <div class="fatura">
+        <div class="cab"><span class="eyebrow">Sua conta por mês</span><span class="eyebrow" id="sigla">—</span></div>
+        <div class="linhas num">
+          <div class="l"><span>Hoje</span><span class="mono riscado" id="r-hoje">R$ 0</span></div>
+          <div class="l"><span>Com a SolarFlix</span><span class="mono" id="r-sf">R$ 0</span></div>
+          <div class="ganho"><span>Por ano, fica com você</span><b id="r-ano">R$ 0</b></div>
+          <p class="leitura" id="r-leitura">—</p>
+        </div>
+      </div>
+      <button class="cta" type="button" data-ir="planos">Escolher meu plano</button>
+    </div>
+
+    <!-- aba: como funciona -->
+    <div class="pad corpo" id="painel-como" role="tabpanel" aria-labelledby="aba-como" hidden>
+      <h1>Como a energia do sol chega até a sua conta</h1>
+      <ol class="etapas">
+        <li>
+          <span class="ic"><svg width="32" height="32" viewBox="0 0 36 36" aria-hidden="true"><circle cx="26" cy="9" r="5" fill="#FFB703"/><path d="M4 30 L28 30 L24 19 L8 19 Z" fill="#2F6DB0"/><path d="M16 19 V30 M6 24.5 H26" stroke="#fff" stroke-width="1.2"/></svg></span>
+          <div><span class="n">PASSO 1</span><h3>Uma usina solar parceira gera a energia</h3><p>São usinas que já existem, na área da mesma distribuidora que atende você. A gente não constrói usina: a gente conecta você a ela.</p></div>
+        </li>
+        <li>
+          <span class="ic"><svg width="32" height="32" viewBox="0 0 36 36" aria-hidden="true"><path d="M12 32 L18 5 L24 32 M13.5 24 H22.5 M15 15 H21 M8 10 H28" stroke="#0E2A47" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="18" cy="5" r="2.5" fill="#FFB703"/></svg></span>
+          <div><span class="n">PASSO 2</span><h3>A energia entra na rede e vira crédito</h3><p>A distribuidora mede o que a usina produziu e divide em créditos entre os assinantes. É a geração compartilhada, prevista na Lei 14.300/2022.</p></div>
+        </li>
+        <li>
+          <span class="ic"><svg width="32" height="32" viewBox="0 0 36 36" aria-hidden="true"><rect x="7" y="4" width="22" height="28" rx="3" fill="none" stroke="#0E2A47" stroke-width="2"/><path d="M12 12 H24 M12 18 H20" stroke="#0E2A47" stroke-width="2" stroke-linecap="round"/><circle cx="24" cy="25" r="6" fill="#FFB703"/><path d="M21 25 H27" stroke="#0E2A47" stroke-width="2" stroke-linecap="round"/></svg></span>
+          <div><span class="n">PASSO 3</span><h3>Os créditos abatem a sua conta</h3><p>Eles cobrem o consumo que passa do mínimo. O mínimo da ligação e a iluminação pública continuam com a distribuidora.</p></div>
+        </li>
+        <li>
+          <span class="ic"><svg width="32" height="32" viewBox="0 0 36 36" aria-hidden="true"><rect x="10" y="3" width="16" height="30" rx="3" fill="#0E2A47"/><circle cx="18" cy="17" r="5" fill="#FFB703"/><path d="M15.5 17 L17.3 18.8 L20.8 15.3" stroke="#0E2A47" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div><span class="n">PASSO 4</span><h3>Você paga uma fatura só</h3><p>A SolarFlix junta tudo, cobra uma vez por Pix, cartão ou boleto, paga a distribuidora por você e repassa a parte da usina.</p></div>
+        </li>
+      </ol>
+
+      <div class="nao-muda">
+        <h3>O que não muda na sua casa</h3>
+        <ul>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFB703" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>A luz chega pelos mesmos fios de sempre.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFB703" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Dia nublado ou noite: a energia não acaba, a rede continua atendendo.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFB703" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>A conta continua no seu nome. Nenhum técnico vai na sua casa.</li>
+        </ul>
+      </div>
+
+      <div class="ficha num">
+        <h3 id="f-titulo">Os números da sua região</h3>
+        <div class="l"><span>Tarifa ANEEL, sem impostos</span><span class="mono" id="f-tarifa">—</span></div>
+        <div class="l"><span>Com impostos médios</span><span class="mono" id="f-tarifa-imp">—</span></div>
+        <div class="l"><span>Seu consumo estimado</span><span class="mono" id="f-kwh">—</span></div>
+        <div class="l"><span id="f-min-lbl">Mínimo na distribuidora</span><span class="mono" id="f-min">—</span></div>
+        <div class="l"><span>Parte coberta pela usina</span><span class="mono" id="f-coberto">—</span></div>
+        <p class="nota">Tarifa homologada pela ANEEL para a sua distribuidora. Impostos pela média nacional usada pela ANEEL em 2026 (ICMS 17,3% e PIS/Cofins 5,2%). Mínimo da ligação pela regra da ANEEL: 30, 50 ou 100 kWh. Iluminação pública e bandeira variam por cidade e por mês e não entram na conta.</p>
+      </div>
+      <button class="cta" type="button" data-aba="conta">Voltar para a minha conta</button>
+    </div>
   </section>
 
-  <!-- PLANOS -->
+  <!-- =================== PLANOS =================== -->
   <section class="screen" id="planos" hidden>
-    <h2>Escolha seu plano</h2>
-    <div class="planos" role="radiogroup" aria-label="Planos">
+    <div class="pad topo">
+      <button class="voltar" type="button" data-voltar aria-label="Voltar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+      <span class="passos">2 de 3</span>
+    </div>
+    <div class="pad" style="padding-top:8px"><h1 style="font-size:27px">Escolha seu plano</h1><p style="color:var(--ink-2);margin-top:6px">A energia é a mesma. Muda o prazo e o que vem junto.</p></div>
+    <div class="carrossel" id="carrossel" role="radiogroup" aria-label="Planos">
       <label class="plano"><input type="radio" name="plano" value="livre">
-        <span class="nome">Livre <span class="prazo">Sem fidelidade</span></span>
-        <span class="pct">10<small>%</small></span>
-        <span class="linha num"><b data-eco="livre">R$ 0</b> a menos por ano</span>
-        <span class="extra"><span>Cancela quando quiser</span></span>
+        <div class="cab">
+          <svg class="emblema" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="18" fill="#FFF3D1"/><path d="M14 40 H50" stroke="#0E2A47" stroke-width="3" stroke-linecap="round"/><path d="M20 40 A12 12 0 0 1 44 40 Z" fill="#FFB703"/><g stroke="#FFB703" stroke-width="3" stroke-linecap="round"><line x1="32" y1="18" x2="32" y2="23"/><line x1="17" y1="25" x2="20.5" y2="28.5"/><line x1="47" y1="25" x2="43.5" y2="28.5"/></g><path d="M22 47 H42" stroke="#0E2A47" stroke-width="3" stroke-linecap="round" opacity=".35"/></svg>
+          <div><h3>Livre</h3><span class="prazo">Sem fidelidade</span></div>
+        </div>
+        <div class="pct"><b>10%</b><span>de desconto na energia</span></div>
+        <div class="eco num" data-eco="livre">—</div>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#137347" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Cancela quando quiser, sem multa</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#137347" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Economia do mês no app</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#137347" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Fatura única</li>
+        </ul>
+        <span class="marcar">Escolher Livre</span>
       </label>
       <label class="plano"><input type="radio" name="plano" value="mais" checked>
-        <span class="top-tag">Mais escolhido</span>
-        <span class="nome">Mais <span class="prazo">12 meses</span></span>
-        <span class="pct">15<small>%</small></span>
-        <span class="linha num"><b data-eco="mais">R$ 0</b> a menos por ano</span>
-        <span class="extra"><span>Alertas de consumo</span><span>Família no mesmo login</span><span>Indique e ganhe</span></span>
+        <span class="fita">Mais escolhido</span>
+        <div class="cab">
+          <svg class="emblema" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="18" fill="#0E2A47"/><circle cx="42" cy="21" r="8" fill="#FFB703"/><g stroke="#FFB703" stroke-width="2.4" stroke-linecap="round"><line x1="42" y1="7" x2="42" y2="9.5"/><line x1="54" y1="21" x2="56.5" y2="21"/><line x1="50.5" y1="12.5" x2="52.3" y2="10.7"/><line x1="50.5" y1="29.5" x2="52.3" y2="31.3"/></g><path d="M12 36 L26 24 L40 36 V52 H12 Z" fill="#FFFFFF"/><rect x="22" y="40" width="8" height="12" fill="#FFB703"/></svg>
+          <div><h3>Mais</h3><span class="prazo">12 meses</span></div>
+        </div>
+        <div class="pct"><b>15%</b><span>de desconto na energia</span></div>
+        <div class="eco num" data-eco="mais">—</div>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#137347" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Aviso quando o consumo sobe</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#137347" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Contas da família num login só</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#137347" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Indique um amigo e ganhe desconto</li>
+        </ul>
+        <span class="marcar">Escolher Mais</span>
       </label>
       <label class="plano"><input type="radio" name="plano" value="negocio" id="plano-negocio">
-        <span class="nome">Negócio <span class="prazo">24 meses · CNPJ</span></span>
-        <span class="pct">18<small>%</small></span>
-        <span class="linha num"><b data-eco="negocio">R$ 0</b> a menos por ano</span>
-        <span class="extra"><span>Selo empresa solar</span><span>Relatório de CO₂</span><span>Atendimento dedicado</span></span>
+        <div class="cab">
+          <svg class="emblema" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="18" fill="#B9500F"/><circle cx="46" cy="18" r="7" fill="#FFB703"/><path d="M10 26 H54 L50 34 H14 Z" fill="#FFFFFF"/><path d="M18 26 L16 34 M26 26 L25 34 M34 26 L34 34 M42 26 L43 34" stroke="#B9500F" stroke-width="2"/><rect x="14" y="34" width="36" height="20" fill="#FFF3D1"/><rect x="20" y="40" width="9" height="14" fill="#0E2A47"/><rect x="33" y="40" width="12" height="8" fill="#FFB703"/></svg>
+          <div><h3>Negócio</h3><span class="prazo">24 meses · CNPJ</span></div>
+        </div>
+        <div class="pct"><b>18%</b><span>de desconto na energia</span></div>
+        <div class="eco num" data-eco="negocio">—</div>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#137347" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Selo "movido a energia solar" para a vitrine</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#137347" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Relatório de CO₂ evitado</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#137347" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Atendimento dedicado</li>
+        </ul>
+        <span class="marcar" id="marcar-negocio">Escolher Negócio</span>
       </label>
     </div>
-    <button class="cta push" type="button" data-ir="pagar">Continuar</button>
+    <div class="pontos" id="pontos" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+    <div class="pad corpo">
+      <div class="todos">
+        <span><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="#FFB703"/></svg>Energia 100% solar</span>
+        <span><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="#FFB703"/></svg>Sem obra</span>
+        <span><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7" fill="#FFB703"/></svg>Uma fatura só</span>
+      </div>
+      <button class="cta" type="button" data-ir="pagar">Continuar</button>
+    </div>
   </section>
 
-  <!-- PAGAR -->
+  <!-- =================== PAGAR =================== -->
   <section class="screen" id="pagar" hidden>
-    <h2>Sua fatura única</h2>
-    <div class="fatura num">
-      <div class="l"><span id="f-enel-lbl">Mínimo da distribuidora</span><span id="f-enel">R$ 0</span></div>
-      <div class="l"><span id="f-energia-lbl">Energia solar</span><span id="f-energia">R$ 0</span></div>
-      <div class="l d"><span id="f-desc-lbl">Desconto</span><span id="f-desc">R$ 0</span></div>
-      <div class="l t"><span>Por mês</span><span id="f-total">R$ 0</span></div>
-      <p class="antes">antes <s id="f-antes">R$ 0</s></p>
-      <p class="mini">Sem impostos, bandeira e iluminação pública</p>
+    <div class="pad topo">
+      <button class="voltar" type="button" data-voltar aria-label="Voltar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+      <span class="passos">3 de 3</span>
     </div>
-    <div class="pags" role="radiogroup" aria-label="Forma de pagamento">
-      <label><input type="radio" name="pag" value="pix" checked>
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 4 4-4 4-4-4z"/><path d="m12 14 4 4-4 4-4-4z"/><path d="m2 12 4-4 4 4-4 4z"/><path d="m14 12 4-4 4 4-4 4z"/></svg>Pix</label>
-      <label><input type="radio" name="pag" value="cartao">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>Cartão</label>
-      <label><input type="radio" name="pag" value="boleto">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 5v14M7 5v14M10 5v14M14 5v14M16 5v14M20 5v14"/></svg>Boleto</label>
+    <div class="pad corpo">
+      <h1>Sua fatura única</h1>
+      <div class="fatura">
+        <div class="cab"><span class="eyebrow">SolarFlix · todo mês</span><span class="eyebrow" id="p-plano-tag">—</span></div>
+        <div class="linhas num">
+          <div class="l"><span id="p-min-lbl">Mínimo da distribuidora</span><span class="mono" id="p-min">—</span></div>
+          <div class="l"><span>Energia solar</span><span class="mono" id="p-energia">—</span></div>
+          <div class="l menos"><span id="p-desc-lbl">Desconto</span><span class="mono" id="p-desc">—</span></div>
+          <div class="l total"><span>Total</span><span id="p-total">—</span></div>
+          <div class="l"><span>Antes</span><span class="mono riscado" id="p-antes">—</span></div>
+        </div>
+      </div>
+      <span class="eyebrow">Como pagar</span>
+      <div class="pags" role="radiogroup" aria-label="Forma de pagamento">
+        <label class="op"><input type="radio" name="pag" value="pix" checked>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 4 4-4 4-4-4z"/><path d="m12 14 4 4-4 4-4-4z"/><path d="m2 12 4-4 4 4-4 4z"/><path d="m14 12 4-4 4 4-4 4z"/></svg>Pix</label>
+        <label class="op"><input type="radio" name="pag" value="cartao">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>Cartão</label>
+        <label class="op"><input type="radio" name="pag" value="boleto">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 5v14M7 5v14M10 5v14M14 5v14M16 5v14M20 5v14"/></svg>Boleto</label>
+      </div>
+      <label class="sw"><input type="checkbox" id="autoriza"><span>A SolarFlix recebe minha conta da distribuidora e paga por mim</span></label>
+      <button class="cta sol" type="button" id="assinar" disabled>Assinar</button>
     </div>
-    <label class="sw"><input type="checkbox" id="autoriza"><span>A SolarFlix paga minha conta da Enel por mim</span></label>
-    <button class="cta push" type="button" id="assinar" disabled>Assinar</button>
   </section>
 
-  <!-- PRONTO -->
-  <section class="screen ok" id="pronto" hidden>
-    <div class="check"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
-    <h2>Bem-vindo à energia solar!</h2>
-    <div><div class="grande num" id="p-ano">R$ 0</div><p class="cap" style="margin-top:6px">a menos por ano</p></div>
-    <div class="recibo num">
-      <div class="l"><span>Plano</span><span id="p-plano">—</span></div>
-      <div class="l"><span>Pagamento</span><span id="p-pag">—</span></div>
-      <div class="l"><span>Por mês</span><span id="p-total">—</span></div>
-      <div class="l"><span>Protocolo</span><span id="p-proto">—</span></div>
+  <!-- =================== PRONTO =================== -->
+  <section class="screen" id="pronto" hidden>
+    <div class="pronto-topo pad">
+      <svg class="sol-ok" viewBox="0 0 120 120" aria-hidden="true"><g stroke="#FFB703" stroke-width="6" stroke-linecap="round"><line x1="104" y1="60" x2="116" y2="60"/><line x1="91.1" y1="91.1" x2="99.6" y2="99.6"/><line x1="60" y1="104" x2="60" y2="116"/><line x1="28.9" y1="91.1" x2="20.4" y2="99.6"/><line x1="16" y1="60" x2="4" y2="60"/><line x1="28.9" y1="28.9" x2="20.4" y2="20.4"/><line x1="60" y1="16" x2="60" y2="4"/><line x1="91.1" y1="28.9" x2="99.6" y2="20.4"/></g><circle cx="60" cy="60" r="36" fill="#FFB703"/><path d="M44 61 L55 72 L77 49" stroke="#0E2A47" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h1>Sua casa agora usa energia solar</h1>
+      <div class="grande num" id="ok-ano">R$ 0</div>
+      <p>a menos por ano na conta de luz</p>
     </div>
-    <button class="cta push" type="button" id="recomecar">Voltar ao início</button>
-    <p class="mini" id="p-fonte">Simulação · tarifas ANEEL</p>
+    <div class="pad corpo">
+      <div class="recibo num">
+        <div class="l"><span>Plano</span><span id="ok-plano">—</span></div>
+        <div class="l"><span>Pagamento</span><span id="ok-pag">—</span></div>
+        <div class="l"><span>Fatura por mês</span><span class="mono" id="ok-total">—</span></div>
+        <div class="l"><span>Distribuidora</span><span id="ok-dist">—</span></div>
+        <div class="l"><span>Protocolo</span><span class="mono" id="ok-proto">—</span></div>
+      </div>
+      <p class="nota">A partir do próximo ciclo, os créditos de uma usina solar na área da sua distribuidora começam a abater a sua conta. Simulação: nenhum valor foi cobrado.</p>
+      <button class="cta" type="button" id="recomecar">Voltar ao início</button>
+    </div>
+  </section>
+
+  <!-- =================== NÓS =================== -->
+  <section class="screen" id="nos" hidden>
+    <div class="nos-topo pad">
+      <span class="logo"><svg width="30" height="30" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="36" fill="#FFB703"/><path d="M52 45 L52 75 L77 60 Z" fill="#0E2A47"/></svg><span style="color:#fff">Solar<span>Flix</span></span></span>
+      <h1>Nosso objetivo é <em>democratizar a energia limpa</em> no Brasil.</h1>
+      <p>Energia solar barata não deveria ser coisa de quem tem casa própria e dinheiro para investir.</p>
+    </div>
+    <div class="pad corpo" style="gap:30px;padding-top:24px">
+      <div class="bloco">
+        <span class="eyebrow">O problema</span>
+        <h2>Quem mais precisa economizar é quem fica de fora</h2>
+        <p>Para ter energia solar, normalmente é preciso telhado próprio, obra e um investimento alto. Inquilinos, moradores de apartamento e pequenos comércios ficam sem opção e continuam pagando a tarifa cheia.</p>
+      </div>
+      <div class="citacao">Nós não vendemos placas. Ligamos você ao sol que já está sendo gerado perto da sua casa.</div>
+      <div class="bloco">
+        <span class="eyebrow">O que a gente faz</span>
+        <h2>A ponte entre usinas solares e quem quer pagar menos</h2>
+        <p>Usinas solares produzem mais energia do que conseguem usar. A SolarFlix encontra clientes para essa energia, cuida do contrato, do cadastro na distribuidora e da cobrança. A usina tem seus créditos ocupados e você recebe o desconto.</p>
+      </div>
+      <div class="bloco">
+        <span class="eyebrow">Nossos compromissos</span>
+        <div class="compromissos">
+          <div><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="11" fill="#FFB703"/></svg><p><b>Só energia renovável</b><span>Todas as usinas parceiras são solares.</span></p></div>
+          <div><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="9" y="7" width="22" height="26" rx="3" fill="#0E2A47"/><path d="M14 15 H26 M14 21 H22" stroke="#FFB703" stroke-width="2.4" stroke-linecap="round"/></svg><p><b>Desconto escrito no contrato</b><span>O percentual do plano vale do primeiro ao último mês.</span></p></div>
+          <div><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="12" fill="none" stroke="#0E2A47" stroke-width="2.6"/><circle cx="20" cy="20" r="4" fill="#FFB703"/></svg><p><b>Você sabe de onde vem sua energia</b><span>O app mostra qual usina gera os seus créditos.</span></p></div>
+          <div><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><path d="M9 21 L17 29 L31 12" stroke="#137347" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><p><b>Nada de obra nem técnico em casa</b><span>Tudo é feito no cadastro, pelo celular.</span></p></div>
+        </div>
+      </div>
+      <div class="bloco">
+        <span class="eyebrow">Onde a SolarFlix pode chegar</span>
+        <div class="grande-num num"><div><b id="n-dist">103</b><span>distribuidoras</span></div><div><b id="n-uf">27</b><span>estados</span></div></div>
+        <p>A regra da geração compartilhada vale em todas as distribuidoras do país. A usina e o cliente só precisam estar na área da mesma distribuidora. Começamos por Niterói e região.</p>
+        <div class="ufs" id="ufs"></div>
+        <p class="nota">Contagem pelas tarifas homologadas pela ANEEL, separadas pelo estado da sede de cada distribuidora.</p>
+      </div>
+      <button class="cta sol" type="button" data-ir="simular">Simular minha economia</button>
+    </div>
   </section>
 </div>
 
-<!-- FOLHA DE PAGAMENTO -->
+<!-- menu de baixo -->
+<div class="menu" id="menu">
+  <nav aria-label="Menu principal">
+    <button type="button" data-tab="inicio"><span class="bolinha"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg></span>Início</button>
+    <button type="button" data-tab="simular"><span class="bolinha"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span>Minha conta</button>
+    <button type="button" data-tab="nos"><span class="bolinha"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg></span>Quem somos</button>
+  </nav>
+</div>
+
+<!-- folha de pagamento -->
 <div class="veu" id="veu" hidden>
   <div class="folha" role="dialog" aria-modal="true" aria-labelledby="folha-titulo">
     <span class="alca" aria-hidden="true"></span>
     <h2 id="folha-titulo">Pix Automático</h2>
-    <div id="folha-corpo"></div>
+    <div id="folha-corpo" style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%"></div>
     <button class="cta" type="button" id="confirmar">Confirmar</button>
-    <button class="ghost" type="button" id="cancelar">Cancelar</button>
+    <button class="ghost" type="button" id="cancelar">Agora não</button>
   </div>
 </div>
 
 <script src="distribuidoras.js"></script>
 <script>
 (() => {
+  // ---------- regras e fontes ----------
+  // Tarifas: ANEEL (distribuidoras.js), sem impostos.
+  // Impostos: média nacional usada pela ANEEL em jun/2026 (InfoTarifas): ICMS 17,3% e PIS/Cofins 5,2%, cobrados "por dentro".
+  // Mínimo (custo de disponibilidade, REN ANEEL 1.000/2021): 30 kWh mono, 50 kWh bi, 100 kWh tri.
+  const TRIBUTOS = 0.173 + 0.052;
   const PLANOS = { livre: { nome: 'Livre', pct: 0.10 }, mais: { nome: 'Mais', pct: 0.15 }, negocio: { nome: 'Negócio', pct: 0.18 } };
   const PAG = { pix: 'Pix Automático', cartao: 'Cartão', boleto: 'Boleto' };
-  // Tarifas: ANEEL (distribuidoras.js). Regra: quem compensa créditos paga no mínimo o custo de disponibilidade
-  // (REN ANEEL 1.000/2021): 30 kWh monofásico, 50 kWh bifásico, 100 kWh trifásico. O resto é coberto pelos créditos da usina.
   const DIST = window.DISTRIBUIDORAS || [];
   const CAPITAIS = { AC: 'Rio Branco', AL: 'Maceió', AM: 'Manaus', AP: 'Macapá', BA: 'Salvador', CE: 'Fortaleza', DF: 'Brasília', ES: 'Vitória',
     GO: 'Goiânia', MA: 'São Luís', MG: 'Belo Horizonte', MS: 'Campo Grande', MT: 'Cuiabá', PA: 'Belém', PB: 'João Pessoa', PE: 'Recife',
     PI: 'Teresina', PR: 'Curitiba', RJ: 'Rio de Janeiro', RN: 'Natal', RO: 'Porto Velho', RR: 'Boa Vista', RS: 'Porto Alegre',
     SC: 'Florianópolis', SE: 'Aracaju', SP: 'São Paulo', TO: 'Palmas' };
-  const ORDEM = ['inicio', 'simular', 'planos', 'pagar', 'pronto'];
+  const FAIXA = { casa: { min: 50, max: 2000, passo: 10, padrao: 200, lig: 50 }, comercio: { min: 300, max: 30000, passo: 100, padrao: 2000, lig: 100 } };
+  const TELAS = ['inicio', 'simular', 'planos', 'pagar', 'pronto', 'nos'];
+  const COM_MENU = ['inicio', 'simular', 'nos'];
+
   const $ = (id) => document.getElementById(id);
+  const $$ = (s) => document.querySelectorAll(s);
   const brl = (v, c = 2) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: c, maximumFractionDigits: c });
   const kwh = (v) => Math.round(v).toLocaleString('pt-BR') + ' kWh';
+  const tarifaTxt = (v) => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + '/kWh';
   const dataBR = (s) => s.split('-').reverse().join('/');
-  const inicial = DIST.findIndex((d) => d.sigla === 'ENEL RJ');
-  const st = { tipo: 'casa', kwh: 200, minimo: 50, plano: 'mais', pag: 'pix', tela: 'inicio', dist: inicial < 0 ? 0 : inicial };
+  const inicial = Math.max(0, DIST.findIndex((d) => d.sigla === 'ENEL RJ'));
+  const st = { tipo: 'casa', valor: 200, minimo: 50, plano: 'mais', pag: 'pix', dist: inicial, aba: 'conta' };
 
-  const conta = (plano = st.plano) => {
-    const d = DIST[st.dist], tarifa = st.tipo === 'casa' ? d.casa : d.comercio;
-    const minimo = Math.min(st.kwh, st.minimo), coberto = st.kwh - minimo;
-    const hoje = st.kwh * tarifa, fixo = minimo * tarifa, energia = coberto * tarifa, desc = energia * PLANOS[plano].pct;
-    return { d, tarifa, minimo, coberto, hoje, fixo, energia, desc, total: hoje - desc };
-  };
+  function conta(plano = st.plano) {
+    const d = DIST[st.dist];
+    const tarifa = st.tipo === 'casa' ? d.casa : d.comercio;
+    const comImp = tarifa / (1 - TRIBUTOS);
+    const consumo = st.valor / comImp;
+    const minKwh = Math.min(consumo, st.minimo);
+    const fixo = minKwh * comImp;
+    const energia = st.valor - fixo;
+    const desc = energia * PLANOS[plano].pct;
+    return { d, tarifa, comImp, consumo, minKwh, fixo, energia, desc, total: st.valor - desc };
+  }
 
-  function areas() {
+  // ---------- área ----------
+  function preencheEstados() {
     const ufs = [...new Set(DIST.map((d) => d.uf))];
     $('uf').innerHTML = ufs.map((u) => '<option>' + u + '</option>').join('');
     $('uf').value = DIST[st.dist].uf;
-    listaDist();
+    preencheDistribuidoras();
+    const cont = {}; DIST.forEach((d) => { cont[d.uf] = (cont[d.uf] || 0) + 1; });
+    $('ufs').innerHTML = ufs.map((u) => '<span' + (u === 'RJ' ? ' class="casa"' : '') + '>' + u + '<small>' + cont[u] + '</small></span>').join('');
+    $('n-dist').textContent = DIST.length; $('n-uf').textContent = ufs.length;
   }
-  function listaDist() {
+  function preencheDistribuidoras() {
     const uf = $('uf').value;
     $('dist').innerHTML = DIST.map((d, i) => d.uf === uf ? '<option value="' + i + '">' + d.nome + ' · ' + d.sede + '</option>' : '').join('');
     if (DIST[st.dist].uf !== uf) {
-      // ao trocar de estado, começa pela distribuidora com sede na capital (se houver)
       const daUf = DIST.map((d, i) => [d, i]).filter(([d]) => d.uf === uf);
-      const cap = daUf.find(([d]) => d.sede === CAPITAIS[uf]);
-      st.dist = (cap || daUf[0])[1];
+      st.dist = (daUf.find(([d]) => d.sede === CAPITAIS[uf]) || daUf[0])[1];
     }
     $('dist').value = String(st.dist);
   }
 
+  // ---------- desenha os números ----------
   function pinta() {
-    const c = conta();
-    $('valor').innerHTML = st.kwh.toLocaleString('pt-BR') + '<small>kWh</small>';
-    $('faixa').value = st.kwh;
-    $('fonte').innerHTML = '<b>' + c.d.nome + '</b> · R$ ' + c.tarifa.toLocaleString('pt-BR', { minimumFractionDigits: 4 }) + '/kWh<br>Tarifa ANEEL desde ' + dataBR(c.d.desde) + ', sem impostos';
-    $('b-enel').textContent = brl(c.hoje * 12, 0);
-    $('b-sf').textContent = brl(c.total * 12, 0);
-    $('b-sf').style.width = (c.total / c.hoje * 100).toFixed(1) + '%';
-    $('f-enel-lbl').textContent = 'Mínimo da distribuidora (' + kwh(c.minimo) + ')';
-    $('f-energia-lbl').textContent = 'Energia solar (' + kwh(c.coberto) + ')';
-    $('p-fonte').textContent = 'Simulação · ' + c.d.nome + ' · tarifa ANEEL sem impostos';
-    $('eco-ano').textContent = brl(c.desc * 12, 0);
-    $('eco-5').textContent = brl(c.desc * 60, 0);
-    document.querySelectorAll('[data-eco]').forEach((el) => { el.textContent = brl(conta(el.dataset.eco).desc * 12, 0); });
-    $('f-enel').textContent = brl(c.fixo);
-    $('f-energia').textContent = brl(c.energia);
-    $('f-desc-lbl').textContent = 'Desconto ' + PLANOS[st.plano].nome + ' (' + Math.round(PLANOS[st.plano].pct * 100) + '%)';
-    $('f-desc').textContent = '− ' + brl(c.desc);
-    $('f-total').textContent = brl(c.total);
-    $('f-antes').textContent = brl(c.hoje);
+    const c = conta(), p = PLANOS[st.plano];
+    $$('[data-valor]').forEach((o) => { o.innerHTML = '<small>R$</small>' + st.valor.toLocaleString('pt-BR'); });
+    $('faixa').value = st.valor;
+    $$('[data-rapido]').forEach((b) => b.classList.toggle('on', Number(b.dataset.rapido) === st.valor));
+    $$('[data-eco-ano]').forEach((e) => { e.textContent = brl(c.desc * 12, 0); });
+    $('sigla').textContent = c.d.sigla || c.d.nome;
+    $('r-hoje').textContent = brl(st.valor);
+    $('r-sf').textContent = brl(c.total);
+    $('r-ano').textContent = brl(c.desc * 12, 0);
+    $('r-leitura').innerHTML = '≈ <b>' + kwh(c.consumo) + '</b>/mês · tarifa ANEEL <b>' + tarifaTxt(c.tarifa) + '</b> desde ' + dataBR(c.d.desde) + ' · plano ' + p.nome + ' (' + Math.round(p.pct * 100) + '%)';
+    // como funciona
+    $('f-titulo').textContent = 'Os números da ' + c.d.nome;
+    $('f-tarifa').textContent = tarifaTxt(c.tarifa);
+    $('f-tarifa-imp').textContent = tarifaTxt(c.comImp);
+    $('f-kwh').textContent = kwh(c.consumo);
+    $('f-min').textContent = brl(c.fixo);
+    $('f-min-lbl').textContent = 'Mínimo na distribuidora (' + kwh(c.minKwh) + ')';
+    $('f-coberto').textContent = brl(c.energia);
+    // planos
+    $$('[data-eco]').forEach((el) => { el.textContent = brl(conta(el.dataset.eco).desc * 12, 0) + ' a menos por ano'; });
+    // fatura
+    $('p-plano-tag').textContent = 'Plano ' + p.nome;
+    $('p-min-lbl').textContent = 'Mínimo da distribuidora (' + kwh(c.minKwh) + ')';
+    $('p-min').textContent = brl(c.fixo);
+    $('p-energia').textContent = brl(c.energia);
+    $('p-desc-lbl').textContent = 'Desconto ' + p.nome + ' (' + Math.round(p.pct * 100) + '%)';
+    $('p-desc').textContent = '− ' + brl(c.desc);
+    $('p-total').textContent = brl(c.total);
+    $('p-antes').textContent = brl(st.valor);
     $('assinar').disabled = !$('autoriza').checked;
   }
 
-  function faixa() {
-    const f = $('faixa');
-    if (st.tipo === 'casa') { f.min = 50; f.max = 1000; f.step = 10; } else { f.min = 100; f.max = 10000; f.step = 50; }
-    const neg = document.querySelector('input[value=negocio]');
+  function ajustaTipo() {
+    const f = FAIXA[st.tipo];
+    $('faixa').min = f.min; $('faixa').max = f.max; $('faixa').step = f.passo;
+    $('atalhos').hidden = st.tipo !== 'casa';
+    const neg = $('plano-negocio');
     neg.disabled = st.tipo === 'casa';
+    $('marcar-negocio').textContent = neg.disabled ? 'Só para CNPJ' : 'Escolher Negócio';
     if (neg.disabled && st.plano === 'negocio') { st.plano = 'mais'; document.querySelector('input[name=plano][value=mais]').checked = true; }
     if (st.tipo === 'comercio' && st.plano === 'mais') { st.plano = 'negocio'; neg.checked = true; }
   }
 
+  // ---------- navegação ----------
   function mostra(tela) {
-    if (!ORDEM.includes(tela)) tela = 'inicio';
-    st.tela = tela;
-    ORDEM.forEach((t) => { $(t).hidden = t !== tela; });
-    const i = ORDEM.indexOf(tela);
-    $('voltar').hidden = i === 0 || tela === 'pronto';
-    $('dots').style.visibility = i >= 1 && i <= 3 ? 'visible' : 'hidden';
-    [...$('dots').children].forEach((d, k) => d.classList.toggle('on', k === i - 1));
+    if (!TELAS.includes(tela)) tela = 'inicio';
+    TELAS.forEach((t) => { $(t).hidden = t !== tela; });
+    const menu = COM_MENU.includes(tela);
+    $('menu').hidden = !menu; $('app').classList.toggle('sem-menu', !menu);
+    $$('[data-tab]').forEach((b) => { if (b.dataset.tab === tela) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+    if (tela === 'planos') requestAnimationFrame(centraPlano);
     window.scrollTo(0, 0);
   }
-
-  // navegação com o botão "voltar" do celular
-  const ir = (tela) => { if (location.hash !== '#' + tela) location.hash = tela; else mostra(tela); };
+  function aba(qual) {
+    st.aba = qual;
+    $$('[data-aba]').forEach((b) => { if (b.getAttribute('role') === 'tab') b.setAttribute('aria-selected', String(b.dataset.aba === qual)); });
+    $('painel-conta').hidden = qual !== 'conta';
+    $('painel-como').hidden = qual !== 'como';
+    window.scrollTo(0, 0);
+  }
+  const ir = (tela) => {
+    if (tela === 'como') { aba('como'); tela = 'simular'; }
+    if (location.hash !== '#' + tela) location.hash = tela; else mostra(tela);
+  };
   window.addEventListener('hashchange', () => {
     const t = location.hash.slice(1) || 'inicio';
-    if (t === 'pronto' && !$('p-proto').dataset.ok) return ir('inicio');
+    if (t === 'pronto' && !$('ok-proto').dataset.ok) return ir('inicio');
     mostra(t);
   });
-  document.querySelectorAll('[data-ir]').forEach((b) => b.addEventListener('click', () => ir(b.dataset.ir)));
-  $('voltar').addEventListener('click', () => history.back());
+  $$('[data-ir]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.ir === 'simular') aba('conta'); ir(b.dataset.ir); }));
+  $$('[data-tab]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.tab === 'simular') aba('conta'); ir(b.dataset.tab); }));
+  $$('[data-voltar]').forEach((b) => b.addEventListener('click', () => history.back()));
+  $$('[data-aba]').forEach((b) => b.addEventListener('click', () => aba(b.dataset.aba)));
 
-  document.querySelectorAll('input[name=tipo]').forEach((r) => r.addEventListener('change', () => {
-    st.tipo = r.value; st.kwh = st.tipo === 'casa' ? 200 : 2000;
-    st.minimo = st.tipo === 'casa' ? 50 : 100;
+  // ---------- controles ----------
+  const muda = (v) => { const f = FAIXA[st.tipo]; st.valor = Math.min(f.max, Math.max(f.min, v)); pinta(); };
+  $$('[data-passo]').forEach((b) => b.addEventListener('click', () => muda(st.valor + Number(b.dataset.passo) * FAIXA[st.tipo].passo)));
+  $$('[data-rapido]').forEach((b) => b.addEventListener('click', () => muda(Number(b.dataset.rapido))));
+  $('faixa').addEventListener('input', () => muda(Number($('faixa').value)));
+  $$('input[name=tipo]').forEach((r) => r.addEventListener('change', () => {
+    st.tipo = r.value; st.valor = FAIXA[st.tipo].padrao; st.minimo = FAIXA[st.tipo].lig;
     document.querySelector('input[name=lig][value="' + st.minimo + '"]').checked = true;
-    faixa(); pinta();
+    ajustaTipo(); pinta();
   }));
-  document.querySelectorAll('input[name=lig]').forEach((r) => r.addEventListener('change', () => { st.minimo = Number(r.value); pinta(); }));
-  $('uf').addEventListener('change', () => { listaDist(); pinta(); });
+  $$('input[name=lig]').forEach((r) => r.addEventListener('change', () => { st.minimo = Number(r.value); pinta(); }));
+  $('uf').addEventListener('change', () => { preencheDistribuidoras(); pinta(); });
   $('dist').addEventListener('change', () => { st.dist = Number($('dist').value); pinta(); });
-  $('faixa').addEventListener('input', () => { st.kwh = Number($('faixa').value); pinta(); });
-  const passo = (s) => {
-    const f = $('faixa'), d = Number(f.step);
-    st.kwh = Math.min(Number(f.max), Math.max(Number(f.min), st.kwh + s * d)); pinta();
-  };
-  $('menos').addEventListener('click', () => passo(-1));
-  $('mais').addEventListener('click', () => passo(1));
-  document.querySelectorAll('input[name=plano]').forEach((r) => r.addEventListener('change', () => { st.plano = r.value; pinta(); }));
-  document.querySelectorAll('input[name=pag]').forEach((r) => r.addEventListener('change', () => { st.pag = r.value; }));
+  $$('input[name=plano]').forEach((r) => r.addEventListener('change', () => { st.plano = r.value; pinta(); }));
+  $$('input[name=pag]').forEach((r) => r.addEventListener('change', () => { st.pag = r.value; }));
   $('autoriza').addEventListener('change', pinta);
 
-  // folha de pagamento
+  // carrossel dos planos
+  const car = $('carrossel');
+  function centraPlano() {
+    const el = document.querySelector('input[name=plano]:checked').closest('.plano');
+    car.scrollLeft = el.offsetLeft - (car.clientWidth - el.clientWidth) / 2;
+  }
+  car.addEventListener('scroll', () => {
+    const cards = [...car.children], meio = car.scrollLeft + car.clientWidth / 2;
+    let perto = 0, dist = Infinity;
+    cards.forEach((c, i) => { const d = Math.abs(c.offsetLeft + c.clientWidth / 2 - meio); if (d < dist) { dist = d; perto = i; } });
+    [...$('pontos').children].forEach((p, i) => p.classList.toggle('on', i === perto));
+  }, { passive: true });
+
+  // ---------- pagamento ----------
   function qr() {
     const n = 25, s = 7, cv = document.createElement('canvas');
     cv.width = cv.height = n * s; cv.className = 'qr'; cv.setAttribute('aria-label', 'QR Code de demonstração');
-    const x = cv.getContext('2d'); let seed = Math.round(st.kwh * 7 + PLANOS[st.plano].pct * 100);
+    const x = cv.getContext('2d'); let seed = Math.round(st.valor * 7 + PLANOS[st.plano].pct * 100);
     const r = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
     x.fillStyle = '#fff'; x.fillRect(0, 0, cv.width, cv.height); x.fillStyle = '#0E2A47';
     for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
@@ -476,24 +838,22 @@ input[type=range] { width: 100%; accent-color: var(--sun); height: 32px; }
   function abreFolha() {
     const c = conta(), corpo = $('folha-corpo');
     corpo.innerHTML = '';
-    corpo.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:12px;width:100%';
-    const p = (t) => { const e = document.createElement('p'); e.textContent = t; return e; };
+    const p = (t, cls) => { const e = document.createElement('p'); e.textContent = t; if (cls) e.className = cls; return e; };
     if (st.pag === 'pix') {
       $('folha-titulo').textContent = 'Pix Automático';
-      corpo.append(qr(), p('Aprove no app do seu banco. Todo mês, ' + brl(c.total) + '.'));
+      corpo.append(qr(), p('Aprove uma vez no app do seu banco. Todo mês sai ' + brl(c.total) + '.'));
     } else if (st.pag === 'cartao') {
       $('folha-titulo').textContent = 'Cartão recorrente';
       const k = document.createElement('div'); k.className = 'cartao';
-      k.innerHTML = '<small>SOLARFLIX</small><span class="n">•••• 0000</span><small>Cartão de demonstração</small>';
+      k.innerHTML = '<small>SOLARFLIX</small><span class="n">•••• 0000</span><small>CARTÃO DE DEMONSTRAÇÃO</small>';
       corpo.append(k, p('Cobrança de ' + brl(c.total) + ' todo mês.'));
     } else {
       $('folha-titulo').textContent = 'Boleto';
-      const cod = document.createElement('div'); cod.className = 'codigo num';
+      const cod = document.createElement('div'); cod.className = 'codigo';
       cod.textContent = '00190.00009 01234.567891 23456.789012 1 9999' + String(Math.round(c.total * 100)).padStart(10, '0');
-      corpo.append(cod, p('Chega por e-mail todo mês, antes da conta da Enel.'));
+      corpo.append(cod, p('Chega por e-mail todo mês, antes do vencimento da distribuidora.'));
     }
-    const m = document.createElement('p'); m.className = 'mini'; m.textContent = 'Demonstração · nenhum valor é cobrado';
-    corpo.append(m);
+    corpo.append(p('Demonstração: nada é cobrado.', 'nota'));
     $('confirmar').disabled = false; $('confirmar').textContent = 'Confirmar';
     $('veu').hidden = false; $('confirmar').focus();
   }
@@ -505,36 +865,34 @@ input[type=range] { width: 100%; accent-color: var(--sun); height: 32px; }
     const b = $('confirmar'); b.disabled = true; b.innerHTML = '<span class="spin" aria-label="Processando"></span>';
     setTimeout(() => {
       const c = conta();
-      $('p-ano').textContent = brl(c.desc * 12, 0);
-      $('p-plano').textContent = PLANOS[st.plano].nome + ' · ' + Math.round(PLANOS[st.plano].pct * 100) + '%';
-      $('p-pag').textContent = PAG[st.pag];
-      $('p-total').textContent = brl(c.total);
-      $('p-proto').textContent = 'SFX-' + Math.floor(100000 + Math.random() * 899999);
-      $('p-proto').dataset.ok = '1';
+      $('ok-ano').textContent = brl(c.desc * 12, 0);
+      $('ok-plano').textContent = PLANOS[st.plano].nome + ' · ' + Math.round(PLANOS[st.plano].pct * 100) + '%';
+      $('ok-pag').textContent = PAG[st.pag];
+      $('ok-total').textContent = brl(c.total);
+      $('ok-dist').textContent = c.d.sigla || c.d.nome;
+      $('ok-proto').textContent = 'SFX-' + Math.floor(100000 + Math.random() * 899999);
+      $('ok-proto').dataset.ok = '1';
       fechaFolha();
       try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
       history.replaceState(null, '', '#pronto'); mostra('pronto');
-    }, 1200);
+    }, 1100);
   });
   $('recomecar').addEventListener('click', () => {
-    Object.assign(st, { tipo: 'casa', kwh: 200, minimo: 50, plano: 'mais', pag: 'pix' });
-    $('tipo-casa').checked = true; document.querySelector('input[name=lig][value="50"]').checked = true; document.querySelector('input[name=plano][value=mais]').checked = true;
-    document.querySelector('input[name=pag][value=pix]').checked = true; $('autoriza').checked = false;
-    delete $('p-proto').dataset.ok; faixa(); pinta();
+    $('autoriza').checked = false; delete $('ok-proto').dataset.ok; pinta();
     history.replaceState(null, '', location.pathname + location.search); mostra('inicio');
   });
 
-  // instalar no Android
-  let pedidoInstalar = null;
-  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); pedidoInstalar = e; $('instalar').hidden = false; });
-  $('instalar').addEventListener('click', async () => { if (!pedidoInstalar) return; pedidoInstalar.prompt(); await pedidoInstalar.userChoice; pedidoInstalar = null; $('instalar').hidden = true; });
+  // ---------- instalar ----------
+  let pedido = null;
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); pedido = e; $('instalar').hidden = false; });
+  $('instalar').addEventListener('click', async () => { if (!pedido) return; pedido.prompt(); await pedido.userChoice; pedido = null; $('instalar').hidden = true; });
   if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
     try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {}
   }
 
-  areas(); faixa(); pinta();
+  preencheEstados(); ajustaTipo(); pinta();
   const t0 = location.hash.slice(1);
-  mostra(['simular', 'planos', 'pagar'].includes(t0) ? t0 : 'inicio');
+  mostra(['simular', 'planos', 'pagar', 'nos'].includes(t0) ? t0 : 'inicio');
 })();
 </script>
 </body>
