@@ -777,7 +777,13 @@ input[type=range] { width: 100%; accent-color: var(--navy); height: 28px; margin
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); pedido = e; $('instalar').hidden = false; });
   $('instalar').addEventListener('click', async () => { if (!pedido) return; pedido.prompt(); await pedido.userChoice; pedido = null; $('instalar').hidden = true; });
   if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
-    try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {}
+    try {
+      // quando uma versão nova do app assume, recarrega uma vez para mostrá-la
+      const tinha = !!navigator.serviceWorker.controller;
+      let recarregou = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => { if (tinha && !recarregou) { recarregou = true; location.reload(); } });
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((r) => r.update()).catch(() => {});
+    } catch (e) {}
   }
 
   estados(); pinta();
