@@ -1,6 +1,6 @@
 // SolarFlix: guarda o app no celular para abrir na hora, mesmo sem internet. Entrega o que está guardado
 // e busca a versão nova por trás (ela vale a partir da próxima abertura).
-const CACHE = "solarflix-2";
+const CACHE = "solarflix-3";
 const BASE = ["./", "index.html", "distribuidoras.js", "manifest.webmanifest", "img/logo.svg", "img/icone-180.png", "img/icone-192.png", "img/icone-512.png"];
 self.addEventListener("install", (e) => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then((c) => c.addAll(BASE))); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k.startsWith("solarflix-") && k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
