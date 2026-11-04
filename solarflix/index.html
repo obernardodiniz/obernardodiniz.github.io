@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SolarFlix</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Simule sua economia com energia solar por assinatura.">
+<meta name="theme-color" content="#0E2A47">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SolarFlix">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="img/icone-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Figtree:wght@500;600;700&display=swap">
+<style>
+/* App de celular em uma coluna: azul-noite da marca, sol amarelo como único destaque, verde só para economia. */
+:root {
+  --bg: #0B2239;
+  --card: #12304F;
+  --card-2: #193C61;
+  --line: #24496F;
+  --ink: #F2F6FA;
+  --ink-2: #A9BCD0;
+  --sun: #FFB703;
+  --sun-ink: #0E2A47;
+  --orange: #FF8A3D;
+  --good: #4FD394;
+  --enel: #5D7088;
+  --display: 'Sora', 'Segoe UI', system-ui, sans-serif;
+  --body: 'Figtree', 'Segoe UI', system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 500 16px/1.4 var(--body); -webkit-font-smoothing: antialiased; }
+h1, h2, p { margin: 0; }
+h1, h2 { font-family: var(--display); letter-spacing: -0.02em; text-wrap: balance; }
+.num { font-variant-numeric: tabular-nums; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible, label:focus-within { outline: 3px solid var(--sun); outline-offset: 2px; }
+
+.app { position: relative; max-width: 460px; min-height: 100%; margin: 0 auto; display: flex; flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+@media (min-width: 600px) {
+  body { background: #061524; }
+  .app { min-height: calc(100% - 48px); margin-block: 24px; border-radius: 36px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; }
+}
+
+/* barra do topo */
+.bar { height: 56px; display: flex; align-items: center; gap: 12px; flex: none; }
+.icon-btn { width: 44px; height: 44px; border-radius: 14px; border: 0; background: var(--card); display: grid; place-items: center; }
+.icon-btn[hidden] { display: none; }
+.dots { display: flex; gap: 6px; margin-left: auto; margin-right: auto; }
+.dots i { width: 8px; height: 8px; border-radius: 99px; background: var(--line); transition: width .25s, background .25s; }
+.dots i.on { width: 22px; background: var(--sun); }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--sun); border: 1px solid rgba(255,183,3,.4); border-radius: 99px; padding: 4px 9px; white-space: nowrap; }
+
+.screen { flex: 1; display: flex; flex-direction: column; gap: 20px; padding-block: 8px 20px; animation: entra .28s ease both; }
+.screen[hidden] { display: none; }
+@keyframes entra { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+.screen h2 { font-size: 26px; line-height: 1.15; }
+.push { margin-top: auto; }
+
+.cta { width: 100%; min-height: 58px; border: 0; border-radius: 18px; background: var(--sun); color: var(--sun-ink); font: 700 17px var(--display); display: flex; align-items: center; justify-content: center; gap: 10px; transition: transform .1s; }
+.cta:active { transform: scale(.98); }
+.cta:disabled { opacity: .45; }
+.ghost { width: 100%; min-height: 52px; border: 1px solid var(--line); border-radius: 16px; background: transparent; font-weight: 700; }
+
+/* início */
+.hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; padding-top: 28px; }
+.sol { width: 148px; height: 148px; }
+.sol .raios { transform-origin: 60px 60px; animation: gira 28s linear infinite; }
+@keyframes gira { to { transform: rotate(360deg); } }
+.marca { font: 800 40px var(--display); letter-spacing: -1.5px; line-height: 1; }
+.marca span { color: var(--sun); }
+.hero h1 { font-size: 30px; line-height: 1.1; max-width: 300px; }
+.hero p { color: var(--ink-2); font-size: 17px; max-width: 290px; }
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.trio div { background: var(--card); border-radius: 18px; padding: 14px 8px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; font-size: 13px; font-weight: 700; line-height: 1.2; }
+.trio svg { color: var(--sun); }
+
+/* simular */
+.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--card); border-radius: 16px; padding: 4px; gap: 4px; }
+.seg label { position: relative; min-height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; color: var(--ink-2); cursor: pointer; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label:has(input:checked) { background: var(--card-2); color: var(--ink); }
+.seg label:has(input:checked) svg { color: var(--sun); }
+.valor { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.valor .icon-btn { width: 52px; height: 52px; border-radius: 16px; background: var(--card-2); font: 700 26px var(--display); }
+.valor output { font: 800 46px var(--display); letter-spacing: -2px; text-align: center; flex: 1; }
+.valor output small { font-size: 20px; letter-spacing: 0; color: var(--ink-2); margin-right: 4px; }
+.valor output small { margin: 0 0 0 6px; }
+.area { display: grid; grid-template-columns: 96px minmax(0,1fr); gap: 10px; }
+.sel { position: relative; display: flex; flex-direction: column; gap: 2px; background: var(--card); border-radius: 16px; padding: 8px 14px 6px; min-width: 0; }
+.sel span { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.sel select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; color: var(--ink); font: 700 16px var(--body); padding: 2px 22px 4px 0; width: 100%; text-overflow: ellipsis; cursor: pointer; }
+.sel select:focus { outline: none; }
+.sel::after { content: ""; position: absolute; right: 14px; bottom: 15px; width: 8px; height: 8px; border-right: 2px solid var(--sun); border-bottom: 2px solid var(--sun); transform: rotate(45deg); pointer-events: none; }
+.sel option { background: var(--card); color: var(--ink); }
+.lig { display: flex; align-items: center; gap: 8px; }
+.lig > span { font-size: 13px; font-weight: 700; color: var(--ink-2); margin-right: auto; }
+.lig label { position: relative; min-width: 58px; min-height: 40px; border-radius: 12px; background: var(--card); display: grid; place-items: center; font-weight: 700; font-size: 14px; color: var(--ink-2); cursor: pointer; padding: 0 10px; }
+.lig input { position: absolute; opacity: 0; pointer-events: none; }
+.lig label:has(input:checked) { background: var(--card-2); color: var(--ink); box-shadow: inset 0 0 0 2px var(--sun); }
+.fonte { font-size: 12.5px; color: var(--ink-2); font-weight: 600; }
+.fonte b { color: var(--ink); }
+.cap { font-size: 13px; color: var(--ink-2); text-align: center; font-weight: 600; }
+input[type=range] { width: 100%; accent-color: var(--sun); height: 32px; }
+
+.res { background: var(--card); border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.barras { display: flex; flex-direction: column; gap: 8px; }
+.b { display: grid; grid-template-columns: 74px minmax(0,1fr); align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.b div { height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: flex-end; padding: 0 10px; font: 700 14px var(--display); color: #fff; transition: width .35s ease; min-width: 84px; white-space: nowrap; }
+.b .e { background: var(--enel); width: 100%; }
+.b .s { background: var(--sun); color: var(--sun-ink); }
+.eco { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.eco div { background: var(--card-2); border-radius: 16px; padding: 12px 14px; }
+.eco small { display: block; font-size: 12px; color: var(--ink-2); font-weight: 700; }
+.eco b { font: 800 22px var(--display); color: var(--good); letter-spacing: -0.5px; }
+
+/* planos */
+.planos { display: flex; flex-direction: column; gap: 12px; }
+.plano { position: relative; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 4px 12px; background: var(--card); border: 2px solid transparent; border-radius: 22px; padding: 16px 18px; cursor: pointer; }
+.plano input { position: absolute; opacity: 0; pointer-events: none; }
+.plano:has(input:checked) { border-color: var(--sun); background: var(--card-2); }
+.plano:has(input:disabled) { opacity: .4; cursor: not-allowed; }
+.plano .nome { font: 700 20px var(--display); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.plano .prazo { font: 700 11px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); background: var(--bg); padding: 3px 8px; border-radius: 99px; }
+.plano .pct { grid-row: span 2; align-self: center; font: 800 34px var(--display); color: var(--sun); letter-spacing: -1px; }
+.plano .pct small { font-size: 15px; }
+.plano .linha { font-size: 14px; color: var(--ink-2); }
+.plano .linha b { color: var(--good); }
+.plano .extra { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.plano .extra span { font-size: 12.5px; font-weight: 700; background: var(--bg); border-radius: 99px; padding: 5px 10px; }
+.top-tag { position: absolute; top: -10px; right: 16px; background: var(--sun); color: var(--sun-ink); font: 800 10.5px var(--body); letter-spacing: .08em; text-transform: uppercase; padding: 4px 9px; border-radius: 99px; }
+
+/* fatura */
+.fatura { background: var(--card); border-radius: 24px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.l { display: flex; justify-content: space-between; gap: 10px; font-size: 15px; }
+.l span:first-child { color: var(--ink-2); }
+.l.d span:last-child { color: var(--good); font-weight: 700; }
+.l.t { border-top: 1px dashed var(--line); padding-top: 12px; align-items: baseline; }
+.l.t span:first-child { color: var(--ink); font-weight: 700; }
+.l.t span:last-child { font: 800 30px var(--display); letter-spacing: -1px; }
+.antes { font-size: 13px; color: var(--ink-2); text-align: right; }
+.pags { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.pags label { position: relative; background: var(--card); border: 2px solid transparent; border-radius: 18px; min-height: 84px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-weight: 700; font-size: 14px; cursor: pointer; }
+.pags input { position: absolute; opacity: 0; pointer-events: none; }
+.pags label:has(input:checked) { border-color: var(--sun); background: var(--card-2); }
+.pags svg { color: var(--sun); }
+.sw { display: flex; align-items: center; gap: 12px; background: var(--card); border-radius: 18px; padding: 12px 14px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.sw input { appearance: none; -webkit-appearance: none; width: 50px; height: 30px; border-radius: 99px; background: var(--line); position: relative; flex: none; transition: background .2s; cursor: pointer; margin: 0; }
+.sw input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .2s; }
+.sw input:checked { background: var(--good); }
+.sw input:checked::after { transform: translateX(20px); }
+
+/* folha de pagamento */
+.veu { position: fixed; inset: 0; background: rgba(3,12,22,.6); display: flex; align-items: flex-end; justify-content: center; z-index: 20; animation: aparece .2s ease both; }
+.veu[hidden] { display: none; }
+@keyframes aparece { from { opacity: 0; } }
+.folha { width: 100%; max-width: 460px; background: var(--card); border-radius: 28px 28px 0 0; padding: 12px 20px calc(20px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 16px; align-items: center; text-align: center; animation: sobe .28s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes sobe { from { transform: translateY(100%); } }
+.folha .alca { width: 40px; height: 5px; border-radius: 99px; background: var(--line); }
+.folha h2 { font-size: 22px; }
+.folha p { color: var(--ink-2); font-size: 14px; }
+.qr { width: 184px; height: 184px; background: #fff; border-radius: 18px; padding: 12px; }
+.cartao { width: 260px; height: 160px; border-radius: 18px; background: linear-gradient(135deg, #1E4C7C, #0E2A47); border: 1px solid var(--line); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; text-align: left; }
+.cartao .n { font: 600 18px var(--display); letter-spacing: 3px; }
+.cartao small { color: var(--ink-2); font-size: 12px; font-weight: 700; }
+.codigo { width: 100%; font: 600 13px ui-monospace, Consolas, monospace; background: var(--bg); border-radius: 12px; padding: 12px; word-break: break-all; }
+.mini { font-size: 12px; color: var(--ink-2); }
+.spin { width: 22px; height: 22px; border-radius: 50%; border: 3px solid rgba(14,42,71,.25); border-top-color: var(--sun-ink); animation: gira .7s linear infinite; }
+
+/* sucesso */
+.ok { align-items: center; text-align: center; justify-content: center; }
+.check { width: 104px; height: 104px; border-radius: 50%; background: rgba(79,211,148,.14); display: grid; place-items: center; color: var(--good); }
+.check path { stroke-dasharray: 30; stroke-dashoffset: 30; animation: risca .5s .15s ease forwards; }
+@keyframes risca { to { stroke-dashoffset: 0; } }
+.grande { font: 800 52px var(--display); color: var(--good); letter-spacing: -2px; line-height: 1; }
+.recibo { width: 100%; background: var(--card); border-radius: 22px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; text-align: left; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .check path { stroke-dashoffset: 0; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar">
+    <button class="icon-btn" id="voltar" type="button" aria-label="Voltar" hidden><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+    <div class="dots" id="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+    <span class="tag">Simulação</span>
+  </header>
+
+  <!-- INÍCIO -->
+  <section class="screen" id="inicio">
+    <div class="hero">
+      <svg class="sol" viewBox="0 0 120 120" role="img" aria-label="SolarFlix">
+        <g class="raios" stroke="#FFB703" stroke-width="6" stroke-linecap="round">
+          <line x1="104" y1="60" x2="116" y2="60"/><line x1="91.1" y1="91.1" x2="99.6" y2="99.6"/><line x1="60" y1="104" x2="60" y2="116"/><line x1="28.9" y1="91.1" x2="20.4" y2="99.6"/><line x1="16" y1="60" x2="4" y2="60"/><line x1="28.9" y1="28.9" x2="20.4" y2="20.4"/><line x1="60" y1="16" x2="60" y2="4"/><line x1="91.1" y1="28.9" x2="99.6" y2="20.4"/>
+        </g>
+        <circle cx="60" cy="60" r="36" fill="#FFB703"/>
+        <path d="M52 45 L52 75 L77 60 Z" fill="#0E2A47" stroke="#0E2A47" stroke-width="3" stroke-linejoin="round"/>
+      </svg>
+      <div class="marca">Solar<span>Flix</span></div>
+      <h1>Energia limpa ao alcance de todos.</h1>
+      <p>Pague menos na conta de luz sem instalar nada.</p>
+    </div>
+    <div class="trio">
+      <div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/><path d="M9 21v-6h6v6"/></svg>Sem obra</div>
+      <div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .8-3 2s1.3 1.7 3 2 3 .8 3 2-1.3 2-3 2c-1.4 0-2.5-.5-3-1.5M12 6v2M12 16v2"/></svg>Sem investimento</div>
+      <div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h9l4 4v16H6z"/><path d="M9 12h7M9 16h5"/></svg>Uma conta só</div>
+    </div>
+    <div class="push" style="display:flex;flex-direction:column;gap:10px">
+      <button class="cta" type="button" data-ir="simular">Simular minha economia
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      <button class="ghost" type="button" id="instalar" hidden>Instalar o app</button>
+    </div>
+  </section>
+
+  <!-- SIMULAR -->
+  <section class="screen" id="simular" hidden>
+    <h2>Sua conta de luz</h2>
+    <div class="area">
+      <label class="sel uf"><span>Estado</span><select id="uf" aria-label="Estado"></select></label>
+      <label class="sel"><span>Distribuidora</span><select id="dist" aria-label="Distribuidora"></select></label>
+    </div>
+    <div class="seg" role="radiogroup" aria-label="Tipo de cliente">
+      <label><input type="radio" name="tipo" id="tipo-casa" value="casa" checked>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>Casa</label>
+      <label><input type="radio" name="tipo" id="tipo-comercio" value="comercio">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h18l-1.5-5h-15z"/><path d="M5 9v12h14V9"/></svg>Comércio</label>
+    </div>
+    <div>
+      <div class="valor">
+        <button class="icon-btn" type="button" id="menos" aria-label="Diminuir">−</button>
+        <output id="valor" class="num" aria-live="polite">200<small>kWh</small></output>
+        <button class="icon-btn" type="button" id="mais" aria-label="Aumentar">+</button>
+      </div>
+      <p class="cap">consumo do mês · está na sua conta</p>
+      <input type="range" id="faixa" min="50" max="1000" step="10" value="200" aria-label="Consumo do mês em kWh">
+    </div>
+    <div class="lig" role="radiogroup" aria-label="Tipo de ligação">
+      <span>Ligação</span>
+      <label><input type="radio" name="lig" value="30">Mono</label>
+      <label><input type="radio" name="lig" value="50" checked>Bi</label>
+      <label><input type="radio" name="lig" value="100">Tri</label>
+    </div>
+    <div class="res">
+      <p class="fonte num" id="fonte">—</p>
+      <div class="barras" aria-label="Gasto em 1 ano">
+        <div class="b"><span>Hoje</span><div class="e num" id="b-enel">R$ 0</div></div>
+        <div class="b"><span>SolarFlix</span><div class="s num" id="b-sf">R$ 0</div></div>
+      </div>
+      <div class="eco">
+        <div><small>Economia no ano</small><b class="num" id="eco-ano">R$ 0</b></div>
+        <div><small>Em 5 anos</small><b class="num" id="eco-5">R$ 0</b></div>
+      </div>
+    </div>
+    <button class="cta push" type="button" data-ir="planos">Ver planos</button>
+  </section>
+
+  <!-- PLANOS -->
+  <section class="screen" id="planos" hidden>
+    <h2>Escolha seu plano</h2>
+    <div class="planos" role="radiogroup" aria-label="Planos">
+      <label class="plano"><input type="radio" name="plano" value="livre">
+        <span class="nome">Livre <span class="prazo">Sem fidelidade</span></span>
+        <span class="pct">10<small>%</small></span>
+        <span class="linha num"><b data-eco="livre">R$ 0</b> a menos por ano</span>
+        <span class="extra"><span>Cancela quando quiser</span></span>
+      </label>
+      <label class="plano"><input type="radio" name="plano" value="mais" checked>
+        <span class="top-tag">Mais escolhido</span>
+        <span class="nome">Mais <span class="prazo">12 meses</span></span>
+        <span class="pct">15<small>%</small></span>
+        <span class="linha num"><b data-eco="mais">R$ 0</b> a menos por ano</span>
+        <span class="extra"><span>Alertas de consumo</span><span>Família no mesmo login</span><span>Indique e ganhe</span></span>
+      </label>
+      <label class="plano"><input type="radio" name="plano" value="negocio" id="plano-negocio">
+        <span class="nome">Negócio <span class="prazo">24 meses · CNPJ</span></span>
+        <span class="pct">18<small>%</small></span>
+        <span class="linha num"><b data-eco="negocio">R$ 0</b> a menos por ano</span>
+        <span class="extra"><span>Selo empresa solar</span><span>Relatório de CO₂</span><span>Atendimento dedicado</span></span>
+      </label>
+    </div>
+    <button class="cta push" type="button" data-ir="pagar">Continuar</button>
+  </section>
+
+  <!-- PAGAR -->
+  <section class="screen" id="pagar" hidden>
+    <h2>Sua fatura única</h2>
+    <div class="fatura num">
+      <div class="l"><span id="f-enel-lbl">Mínimo da distribuidora</span><span id="f-enel">R$ 0</span></div>
+      <div class="l"><span id="f-energia-lbl">Energia solar</span><span id="f-energia">R$ 0</span></div>
+      <div class="l d"><span id="f-desc-lbl">Desconto</span><span id="f-desc">R$ 0</span></div>
+      <div class="l t"><span>Por mês</span><span id="f-total">R$ 0</span></div>
+      <p class="antes">antes <s id="f-antes">R$ 0</s></p>
+      <p class="mini">Sem impostos, bandeira e iluminação pública</p>
+    </div>
+    <div class="pags" role="radiogroup" aria-label="Forma de pagamento">
+      <label><input type="radio" name="pag" value="pix" checked>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 4 4-4 4-4-4z"/><path d="m12 14 4 4-4 4-4-4z"/><path d="m2 12 4-4 4 4-4 4z"/><path d="m14 12 4-4 4 4-4 4z"/></svg>Pix</label>
+      <label><input type="radio" name="pag" value="cartao">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>Cartão</label>
+      <label><input type="radio" name="pag" value="boleto">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 5v14M7 5v14M10 5v14M14 5v14M16 5v14M20 5v14"/></svg>Boleto</label>
+    </div>
+    <label class="sw"><input type="checkbox" id="autoriza"><span>A SolarFlix paga minha conta da Enel por mim</span></label>
+    <button class="cta push" type="button" id="assinar" disabled>Assinar</button>
+  </section>
+
+  <!-- PRONTO -->
+  <section class="screen ok" id="pronto" hidden>
+    <div class="check"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h2>Bem-vindo à energia solar!</h2>
+    <div><div class="grande num" id="p-ano">R$ 0</div><p class="cap" style="margin-top:6px">a menos por ano</p></div>
+    <div class="recibo num">
+      <div class="l"><span>Plano</span><span id="p-plano">—</span></div>
+      <div class="l"><span>Pagamento</span><span id="p-pag">—</span></div>
+      <div class="l"><span>Por mês</span><span id="p-total">—</span></div>
+      <div class="l"><span>Protocolo</span><span id="p-proto">—</span></div>
+    </div>
+    <button class="cta push" type="button" id="recomecar">Voltar ao início</button>
+    <p class="mini" id="p-fonte">Simulação · tarifas ANEEL</p>
+  </section>
+</div>
+
+<!-- FOLHA DE PAGAMENTO -->
+<div class="veu" id="veu" hidden>
+  <div class="folha" role="dialog" aria-modal="true" aria-labelledby="folha-titulo">
+    <span class="alca" aria-hidden="true"></span>
+    <h2 id="folha-titulo">Pix Automático</h2>
+    <div id="folha-corpo"></div>
+    <button class="cta" type="button" id="confirmar">Confirmar</button>
+    <button class="ghost" type="button" id="cancelar">Cancelar</button>
+  </div>
+</div>
+
+<script src="distribuidoras.js"></script>
+<script>
+(() => {
+  const PLANOS = { livre: { nome: 'Livre', pct: 0.10 }, mais: { nome: 'Mais', pct: 0.15 }, negocio: { nome: 'Negócio', pct: 0.18 } };
+  const PAG = { pix: 'Pix Automático', cartao: 'Cartão', boleto: 'Boleto' };
+  // Tarifas: ANEEL (distribuidoras.js). Regra: quem compensa créditos paga no mínimo o custo de disponibilidade
+  // (REN ANEEL 1.000/2021): 30 kWh monofásico, 50 kWh bifásico, 100 kWh trifásico. O resto é coberto pelos créditos da usina.
+  const DIST = window.DISTRIBUIDORAS || [];
+  const CAPITAIS = { AC: 'Rio Branco', AL: 'Maceió', AM: 'Manaus', AP: 'Macapá', BA: 'Salvador', CE: 'Fortaleza', DF: 'Brasília', ES: 'Vitória',
+    GO: 'Goiânia', MA: 'São Luís', MG: 'Belo Horizonte', MS: 'Campo Grande', MT: 'Cuiabá', PA: 'Belém', PB: 'João Pessoa', PE: 'Recife',
+    PI: 'Teresina', PR: 'Curitiba', RJ: 'Rio de Janeiro', RN: 'Natal', RO: 'Porto Velho', RR: 'Boa Vista', RS: 'Porto Alegre',
+    SC: 'Florianópolis', SE: 'Aracaju', SP: 'São Paulo', TO: 'Palmas' };
+  const ORDEM = ['inicio', 'simular', 'planos', 'pagar', 'pronto'];
+  const $ = (id) => document.getElementById(id);
+  const brl = (v, c = 2) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: c, maximumFractionDigits: c });
+  const kwh = (v) => Math.round(v).toLocaleString('pt-BR') + ' kWh';
+  const dataBR = (s) => s.split('-').reverse().join('/');
+  const inicial = DIST.findIndex((d) => d.sigla === 'ENEL RJ');
+  const st = { tipo: 'casa', kwh: 200, minimo: 50, plano: 'mais', pag: 'pix', tela: 'inicio', dist: inicial < 0 ? 0 : inicial };
+
+  const conta = (plano = st.plano) => {
+    const d = DIST[st.dist], tarifa = st.tipo === 'casa' ? d.casa : d.comercio;
+    const minimo = Math.min(st.kwh, st.minimo), coberto = st.kwh - minimo;
+    const hoje = st.kwh * tarifa, fixo = minimo * tarifa, energia = coberto * tarifa, desc = energia * PLANOS[plano].pct;
+    return { d, tarifa, minimo, coberto, hoje, fixo, energia, desc, total: hoje - desc };
+  };
+
+  function areas() {
+    const ufs = [...new Set(DIST.map((d) => d.uf))];
+    $('uf').innerHTML = ufs.map((u) => '<option>' + u + '</option>').join('');
+    $('uf').value = DIST[st.dist].uf;
+    listaDist();
+  }
+  function listaDist() {
+    const uf = $('uf').value;
+    $('dist').innerHTML = DIST.map((d, i) => d.uf === uf ? '<option value="' + i + '">' + d.nome + ' · ' + d.sede + '</option>' : '').join('');
+    if (DIST[st.dist].uf !== uf) {
+      // ao trocar de estado, começa pela distribuidora com sede na capital (se houver)
+      const daUf = DIST.map((d, i) => [d, i]).filter(([d]) => d.uf === uf);
+      const cap = daUf.find(([d]) => d.sede === CAPITAIS[uf]);
+      st.dist = (cap || daUf[0])[1];
+    }
+    $('dist').value = String(st.dist);
+  }
+
+  function pinta() {
+    const c = conta();
+    $('valor').innerHTML = st.kwh.toLocaleString('pt-BR') + '<small>kWh</small>';
+    $('faixa').value = st.kwh;
+    $('fonte').innerHTML = '<b>' + c.d.nome + '</b> · R$ ' + c.tarifa.toLocaleString('pt-BR', { minimumFractionDigits: 4 }) + '/kWh<br>Tarifa ANEEL desde ' + dataBR(c.d.desde) + ', sem impostos';
+    $('b-enel').textContent = brl(c.hoje * 12, 0);
+    $('b-sf').textContent = brl(c.total * 12, 0);
+    $('b-sf').style.width = (c.total / c.hoje * 100).toFixed(1) + '%';
+    $('f-enel-lbl').textContent = 'Mínimo da distribuidora (' + kwh(c.minimo) + ')';
+    $('f-energia-lbl').textContent = 'Energia solar (' + kwh(c.coberto) + ')';
+    $('p-fonte').textContent = 'Simulação · ' + c.d.nome + ' · tarifa ANEEL sem impostos';
+    $('eco-ano').textContent = brl(c.desc * 12, 0);
+    $('eco-5').textContent = brl(c.desc * 60, 0);
+    document.querySelectorAll('[data-eco]').forEach((el) => { el.textContent = brl(conta(el.dataset.eco).desc * 12, 0); });
+    $('f-enel').textContent = brl(c.fixo);
+    $('f-energia').textContent = brl(c.energia);
+    $('f-desc-lbl').textContent = 'Desconto ' + PLANOS[st.plano].nome + ' (' + Math.round(PLANOS[st.plano].pct * 100) + '%)';
+    $('f-desc').textContent = '− ' + brl(c.desc);
+    $('f-total').textContent = brl(c.total);
+    $('f-antes').textContent = brl(c.hoje);
+    $('assinar').disabled = !$('autoriza').checked;
+  }
+
+  function faixa() {
+    const f = $('faixa');
+    if (st.tipo === 'casa') { f.min = 50; f.max = 1000; f.step = 10; } else { f.min = 100; f.max = 10000; f.step = 50; }
+    const neg = document.querySelector('input[value=negocio]');
+    neg.disabled = st.tipo === 'casa';
+    if (neg.disabled && st.plano === 'negocio') { st.plano = 'mais'; document.querySelector('input[name=plano][value=mais]').checked = true; }
+    if (st.tipo === 'comercio' && st.plano === 'mais') { st.plano = 'negocio'; neg.checked = true; }
+  }
+
+  function mostra(tela) {
+    if (!ORDEM.includes(tela)) tela = 'inicio';
+    st.tela = tela;
+    ORDEM.forEach((t) => { $(t).hidden = t !== tela; });
+    const i = ORDEM.indexOf(tela);
+    $('voltar').hidden = i === 0 || tela === 'pronto';
+    $('dots').style.visibility = i >= 1 && i <= 3 ? 'visible' : 'hidden';
+    [...$('dots').children].forEach((d, k) => d.classList.toggle('on', k === i - 1));
+    window.scrollTo(0, 0);
+  }
+
+  // navegação com o botão "voltar" do celular
+  const ir = (tela) => { if (location.hash !== '#' + tela) location.hash = tela; else mostra(tela); };
+  window.addEventListener('hashchange', () => {
+    const t = location.hash.slice(1) || 'inicio';
+    if (t === 'pronto' && !$('p-proto').dataset.ok) return ir('inicio');
+    mostra(t);
+  });
+  document.querySelectorAll('[data-ir]').forEach((b) => b.addEventListener('click', () => ir(b.dataset.ir)));
+  $('voltar').addEventListener('click', () => history.back());
+
+  document.querySelectorAll('input[name=tipo]').forEach((r) => r.addEventListener('change', () => {
+    st.tipo = r.value; st.kwh = st.tipo === 'casa' ? 200 : 2000;
+    st.minimo = st.tipo === 'casa' ? 50 : 100;
+    document.querySelector('input[name=lig][value="' + st.minimo + '"]').checked = true;
+    faixa(); pinta();
+  }));
+  document.querySelectorAll('input[name=lig]').forEach((r) => r.addEventListener('change', () => { st.minimo = Number(r.value); pinta(); }));
+  $('uf').addEventListener('change', () => { listaDist(); pinta(); });
+  $('dist').addEventListener('change', () => { st.dist = Number($('dist').value); pinta(); });
+  $('faixa').addEventListener('input', () => { st.kwh = Number($('faixa').value); pinta(); });
+  const passo = (s) => {
+    const f = $('faixa'), d = Number(f.step);
+    st.kwh = Math.min(Number(f.max), Math.max(Number(f.min), st.kwh + s * d)); pinta();
+  };
+  $('menos').addEventListener('click', () => passo(-1));
+  $('mais').addEventListener('click', () => passo(1));
+  document.querySelectorAll('input[name=plano]').forEach((r) => r.addEventListener('change', () => { st.plano = r.value; pinta(); }));
+  document.querySelectorAll('input[name=pag]').forEach((r) => r.addEventListener('change', () => { st.pag = r.value; }));
+  $('autoriza').addEventListener('change', pinta);
+
+  // folha de pagamento
+  function qr() {
+    const n = 25, s = 7, cv = document.createElement('canvas');
+    cv.width = cv.height = n * s; cv.className = 'qr'; cv.setAttribute('aria-label', 'QR Code de demonstração');
+    const x = cv.getContext('2d'); let seed = Math.round(st.kwh * 7 + PLANOS[st.plano].pct * 100);
+    const r = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    x.fillStyle = '#fff'; x.fillRect(0, 0, cv.width, cv.height); x.fillStyle = '#0E2A47';
+    for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+      const canto = (i < 8 && j < 8) || (i > n - 9 && j < 8) || (i < 8 && j > n - 9);
+      if (!canto && r() > .5) x.fillRect(i * s, j * s, s, s);
+    }
+    [[0, 0], [n - 7, 0], [0, n - 7]].forEach(([a, b]) => {
+      x.fillRect(a * s, b * s, 7 * s, 7 * s); x.fillStyle = '#fff'; x.fillRect((a + 1) * s, (b + 1) * s, 5 * s, 5 * s);
+      x.fillStyle = '#0E2A47'; x.fillRect((a + 2) * s, (b + 2) * s, 3 * s, 3 * s);
+    });
+    return cv;
+  }
+  function abreFolha() {
+    const c = conta(), corpo = $('folha-corpo');
+    corpo.innerHTML = '';
+    corpo.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:12px;width:100%';
+    const p = (t) => { const e = document.createElement('p'); e.textContent = t; return e; };
+    if (st.pag === 'pix') {
+      $('folha-titulo').textContent = 'Pix Automático';
+      corpo.append(qr(), p('Aprove no app do seu banco. Todo mês, ' + brl(c.total) + '.'));
+    } else if (st.pag === 'cartao') {
+      $('folha-titulo').textContent = 'Cartão recorrente';
+      const k = document.createElement('div'); k.className = 'cartao';
+      k.innerHTML = '<small>SOLARFLIX</small><span class="n">•••• 0000</span><small>Cartão de demonstração</small>';
+      corpo.append(k, p('Cobrança de ' + brl(c.total) + ' todo mês.'));
+    } else {
+      $('folha-titulo').textContent = 'Boleto';
+      const cod = document.createElement('div'); cod.className = 'codigo num';
+      cod.textContent = '00190.00009 01234.567891 23456.789012 1 9999' + String(Math.round(c.total * 100)).padStart(10, '0');
+      corpo.append(cod, p('Chega por e-mail todo mês, antes da conta da Enel.'));
+    }
+    const m = document.createElement('p'); m.className = 'mini'; m.textContent = 'Demonstração · nenhum valor é cobrado';
+    corpo.append(m);
+    $('confirmar').disabled = false; $('confirmar').textContent = 'Confirmar';
+    $('veu').hidden = false; $('confirmar').focus();
+  }
+  const fechaFolha = () => { $('veu').hidden = true; };
+  $('assinar').addEventListener('click', abreFolha);
+  $('cancelar').addEventListener('click', fechaFolha);
+  $('veu').addEventListener('click', (e) => { if (e.target === $('veu')) fechaFolha(); });
+  $('confirmar').addEventListener('click', () => {
+    const b = $('confirmar'); b.disabled = true; b.innerHTML = '<span class="spin" aria-label="Processando"></span>';
+    setTimeout(() => {
+      const c = conta();
+      $('p-ano').textContent = brl(c.desc * 12, 0);
+      $('p-plano').textContent = PLANOS[st.plano].nome + ' · ' + Math.round(PLANOS[st.plano].pct * 100) + '%';
+      $('p-pag').textContent = PAG[st.pag];
+      $('p-total').textContent = brl(c.total);
+      $('p-proto').textContent = 'SFX-' + Math.floor(100000 + Math.random() * 899999);
+      $('p-proto').dataset.ok = '1';
+      fechaFolha();
+      try { navigator.vibrate && navigator.vibrate(40); } catch (e) {}
+      history.replaceState(null, '', '#pronto'); mostra('pronto');
+    }, 1200);
+  });
+  $('recomecar').addEventListener('click', () => {
+    Object.assign(st, { tipo: 'casa', kwh: 200, minimo: 50, plano: 'mais', pag: 'pix' });
+    $('tipo-casa').checked = true; document.querySelector('input[name=lig][value="50"]').checked = true; document.querySelector('input[name=plano][value=mais]').checked = true;
+    document.querySelector('input[name=pag][value=pix]').checked = true; $('autoriza').checked = false;
+    delete $('p-proto').dataset.ok; faixa(); pinta();
+    history.replaceState(null, '', location.pathname + location.search); mostra('inicio');
+  });
+
+  // instalar no Android
+  let pedidoInstalar = null;
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); pedidoInstalar = e; $('instalar').hidden = false; });
+  $('instalar').addEventListener('click', async () => { if (!pedidoInstalar) return; pedidoInstalar.prompt(); await pedidoInstalar.userChoice; pedidoInstalar = null; $('instalar').hidden = true; });
+  if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
+    try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {}
+  }
+
+  areas(); faixa(); pinta();
+  const t0 = location.hash.slice(1);
+  mostra(['simular', 'planos', 'pagar'].includes(t0) ? t0 : 'inicio');
+})();
+</script>
+</body>
+</html>
