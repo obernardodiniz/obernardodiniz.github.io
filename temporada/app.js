@@ -7,7 +7,22 @@ const GUARDADO = "temporada-link";
 const MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
 const MESES_C = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
 const SEMANA = ["D", "S", "T", "Q", "Q", "S", "S"];
-const CATEGORIAS = ["Manutenção", "Material de limpeza", "Enxoval e utensílios", "Contas (luz, água, internet)", "Condomínio e IPTU", "Itens para hóspedes", "Outros"];
+// Tipos de custo, cada um com um ícone de traço simples. Nomes antigos continuam valendo (ANTIGAS).
+const CATEGORIAS = [
+  ["Manutenção", '<path d="M14.5 6.5a4 4 0 0 0-5.3 5.3L4 17l3 3 5.2-5.2a4 4 0 0 0 5.3-5.3l-2.4 2.4-2.6-.6-.6-2.6z"/>'],
+  ["Limpeza", '<path d="M11 3l1.6 3.9L16.5 8.5l-3.9 1.6L11 14l-1.6-3.9L5.5 8.5l3.9-1.6zM17.5 14l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z"/>'],
+  ["Compras", '<path d="M5.5 8h13l-1.2 12H6.7zM9 8V6.5a3 3 0 0 1 6 0V8"/>'],
+  ["Enxoval", '<path d="M3.5 11h17v7h-17zM3.5 15h17M6.5 11V7.5h11V11M3.5 18v2M20.5 18v2"/>'],
+  ["Contas", '<path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/>'],
+  ["Condomínio/IPTU", '<path d="M4 21h16M6 21V4h8v17M14 9h4v12M9 8h2M9 12h2M9 16h2"/>'],
+  ["Outros", '<circle cx="6" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/>'],
+];
+const ANTIGAS = { "Material de limpeza": "Limpeza", "Enxoval e utensílios": "Enxoval", "Contas (luz, água, internet)": "Contas", "Condomínio e IPTU": "Condomínio/IPTU", "Itens para hóspedes": "Compras" };
+const catNome = (c) => ANTIGAS[c] || c;
+const catDesenho = (c) => (CATEGORIAS.find((x) => x[0] === catNome(c)) || CATEGORIAS[CATEGORIAS.length - 1])[1];
+const DESENHO_ADM = '<path d="M18 6 6 18"/><circle cx="7.5" cy="7.5" r="2.3"/><circle cx="16.5" cy="16.5" r="2.3"/>';
+const DESENHO_TAXA_LIMPEZA = '<path d="M14 4 9 13M6 14h7l2 7H4z"/>';
+const tile = (desenho, cls = "") => `<span class="tile ${cls}">${ic(desenho)}</span>`;
 const ABAS = [
   ["inicio", "Início", '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>'],
   ["calendario", "Agenda", '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>'],
@@ -206,6 +221,8 @@ function contas(r) {
   const valor = r.valor ?? 0, adm = Math.round((valor * r.pct_admin_bp) / 10000), limpeza = r.limpeza ?? 0;
   return { valor, adm, limpeza, liquido: valor - adm - limpeza };
 }
+const custosDa = (r) => D.custos.filter((c) => c.reserva_id === r.id);
+const liquidoDa = (r) => contas(r).liquido - custosDa(r).reduce((s, c) => s + c.valor, 0);
 // Cancelada só entra na conta se tiver valor (o que o Airbnb pagou mesmo assim).
 const valeNaConta = (r) => r.tipo === "reserva" && (r.situacao !== "cancelada" || r.valor != null);
 const reservas = () => D.reservas.filter((r) => r.tipo === "reserva");
@@ -272,6 +289,18 @@ function telaInicio() {
   const totalAno = liq.reduce((a, b) => a + b, 0);
   const proximas = reservas().filter((x) => x.situacao !== "cancelada" && x.saida > hoje()).slice(0, 3);
   const ocup = r.diasMes ? Math.round((r.ocupadas / r.diasMes) * 100) : 0;
+  // Para onde foi o dinheiro: taxas e cada tipo de custo, do maior para o menor.
+  const porTipo = {};
+  r.cs.forEach((c) => { porTipo[catNome(c.categoria)] = (porTipo[catNome(c.categoria)] || 0) + c.valor; });
+  const saidas = [["Taxa de administração", DESENHO_ADM, r.adm], ["Taxa de limpeza", DESENHO_TAXA_LIMPEZA, r.limpeza],
+    ...Object.entries(porTipo).sort((a, b) => b[1] - a[1]).map(([nome, v]) => [nome, catDesenho(nome), v])].filter((x) => x[2] > 0);
+  // Reserva que acabou de chegar do Airbnb: aparece em cima, com os atalhos de custo, até alguém tocar em "Pronto".
+  let vistas = []; try { vistas = JSON.parse(localStorage.getItem("temporada-vistas")) || []; } catch { /* sem acesso */ }
+  const novas = adm ? reservas().filter((x) => x.situacao === "confirmada" && x.saida > hoje() && !vistas.includes(x.id)
+    && x.criado_em && Date.now() - new Date(x.criado_em) < 5 * 864e5).map((x) => `<section class="cartao nova">
+      <div class="nova-topo"><span class="selo airbnb">Nova reserva</span><button class="pronto" data-acao="nova-vista" data-id="${x.id}">Pronto ${I.ok}</button></div>
+      ${linhaReserva(x, true)}
+      <div class="atalhos">${atalhosCusto(x)}</div></section>`) : [];
 
   let semInstalar = false; try { semInstalar = !!localStorage.getItem("temporada-sem-instalar"); } catch { /* sem acesso */ }
   const instalar = !instalado() && !semInstalar && (pedidoInstalar || matchMedia("(pointer: coarse)").matches)
@@ -286,17 +315,18 @@ function telaInicio() {
     <div class="nota">${plural(r.rs.length, "reserva", "reservas")} · ${plural(r.noites, "noite", "noites")}${r.semValor.length ? ` · ${plural(r.semValor.length, "valor ainda a lançar", "valores ainda a lançar")}` : ""}</div>
   </section>
   ${avisos.join("")}
-  <section class="cartao"><h2>Detalhes do mês</h2><div class="linhas">
-    <div class="linha"><span>Recebido do Airbnb</span><b class="num">${brl(r.recebido)}</b></div>
-    <div class="linha"><span>Taxa de administração</span><span class="num menos">− ${brl(r.adm)}</span></div>
-    <div class="linha"><span>Taxa de limpeza</span><span class="num menos">− ${brl(r.limpeza)}</span></div>
-    <div class="linha"><span>Outros custos <span class="pequeno">(${plural(r.cs.length, "nota", "notas")})</span></span><span class="num menos">− ${brl(r.custos)}</span></div>
-    <div class="linha total"><span>Líquido</span><span class="num">${brl(r.liquido)}</span></div>
-  </div></section>
+  ${novas.join("")}
+  <section class="cartao"><h2>Para onde foi</h2>
+    <div class="fluxo entrada">${tile('<path d="M12 19V5M6 11l6-6 6 6"/>', "verde")}<span class="meio">Recebido do Airbnb</span><b class="num">${brl(r.recebido)}</b></div>
+    ${saidas.map(([nome, desenho, valor]) => `<div class="fluxo">${tile(desenho)}<span class="meio">${esc(nome)}
+      <span class="trilho"><i style="width:${r.recebido ? Math.min(100, Math.round((valor / r.recebido) * 100)) : 0}%"></i></span></span>
+      <span class="num menos">− ${brl(valor)}</span></div>`).join("")}
+    <div class="fluxo total"><span class="meio">Líquido do proprietário</span><b class="num">${brl(r.liquido)}</b></div>
+  </section>
   ${adm ? `<section class="cartao so-adm"><h2>Administração</h2><div class="linhas">
     <div class="linha"><span>Taxa de administração</span><span class="num">${brl(r.adm)}</span></div>
     <div class="linha"><span>Taxa de limpeza</span><span class="num">${brl(r.limpeza)}</span></div>
-    <div class="linha total"><span>Fica com a administração</span><span class="num">${brl(r.adm + r.limpeza)}</span></div>
+    <div class="linha total"><span>Total</span><span class="num">${brl(r.adm + r.limpeza)}</span></div>
   </div></section>` : ""}
   <section class="cartao"><h2>Ocupação</h2>
     <div class="ocupacao"><div style="width:${ocup}%"></div></div>
@@ -318,17 +348,26 @@ function selosReserva(r) {
   return s.join("");
 }
 
-function linhaReserva(r) {
-  const k = contas(r), adm = ehAdm();
-  const rapida = adm && r.limpeza == null && r.situacao !== "cancelada"
+// Atalhos de custo de uma hospedagem: um toque abre o custo já com o tipo e a reserva escolhidos.
+function atalhosCusto(r, comLimpeza = true) {
+  const limpeza = comLimpeza && r.limpeza == null
+    ? `<button class="atalho" data-acao="limpeza-rapida" data-id="${r.id}">${tile(DESENHO_TAXA_LIMPEZA, "verde")}<span>Taxa limpeza</span></button>` : "";
+  return limpeza + CATEGORIAS.slice(0, 3).map(([nome, desenho]) =>
+    `<button class="atalho" data-acao="custo-da-reserva" data-id="${r.id}" data-cat="${esc(nome)}">${tile(desenho)}<span>${esc(nome)}</span></button>`).join("")
+    + `<button class="atalho" data-acao="custo-da-reserva" data-id="${r.id}">${tile('<path d="M12 5v14M5 12h14"/>')}<span>Outro</span></button>`;
+}
+
+function linhaReserva(r, semAtalho = false) {
+  const adm = ehAdm(), gastos = custosDa(r);
+  const rapida = !semAtalho && adm && r.limpeza == null && r.situacao !== "cancelada"
     ? `<div class="acao-rapida"><button class="chip" data-acao="limpeza-rapida" data-id="${r.id}">${I.vassoura.replace("<svg", '<svg style="width:15px;height:15px;vertical-align:-2px"')} + Limpeza ${brl(D.config.limpeza_padrao)}</button></div>` : "";
-  const selos = selosReserva(r);
+  const selos = selosReserva(r) + (gastos.length ? `<span class="selo neutro">${plural(gastos.length, "custo", "custos")}</span>` : "");
   return `<div class="item toque reserva" role="button" tabindex="0" data-acao="abrir-reserva" data-id="${r.id}">
     <div class="data-bloco"><b>${+r.entrada.slice(8, 10)}</b><span>${MESES_C[+r.entrada.slice(5, 7) - 1]}</span></div>
     <div class="meio"><div class="titulo">${esc(r.hospede || (r.codigo ? `Reserva ${r.codigo}` : "Reserva"))}</div>
       <div class="pequeno">${dataCurta(r.entrada)} → ${dataCurta(r.saida)} · ${plural(noites(r), "noite", "noites")}</div>
       ${selos ? `<div class="selos">${selos}</div>` : ""}${rapida}</div>
-    <div class="direita num">${r.valor != null ? brl(k.liquido) : "—"}<div class="pequeno">líquido</div></div></div>`;
+    <div class="direita num">${r.valor != null ? brl(liquidoDa(r)) : "—"}<div class="pequeno">líquido</div></div></div>`;
 }
 
 function telaCalendario() {
@@ -382,9 +421,9 @@ function linhaCusto(c) {
   const img = c.arquivo_id && /^image\//.test(c.arquivo_tipo || "");
   const mini = c.arquivo_id
     ? (img ? `<img class="miniatura" alt="Nota" data-arquivo="${c.arquivo_id}">` : `<div class="miniatura">${I.arquivo}</div>`)
-    : `<div class="miniatura">${I.nota}</div>`;
+    : `<div class="miniatura cat">${ic(catDesenho(c.categoria))}</div>`;
   return `<div class="item toque" role="button" tabindex="0" data-acao="abrir-custo" data-id="${c.id}">${mini}
-    <div class="meio"><div class="titulo">${esc(c.descricao)}</div><div class="pequeno">${dataCurta(c.data)} · ${esc(c.categoria)}${c.arquivo_id ? "" : " · sem nota"}</div></div>
+    <div class="meio"><div class="titulo">${esc(c.descricao)}</div><div class="pequeno">${dataCurta(c.data)} · ${esc(catNome(c.categoria))}</div></div>
     <div class="direita num">${brl(c.valor)}</div></div>`;
 }
 
@@ -411,10 +450,12 @@ function quando(iso) {
 }
 
 function telaAjustes() {
-  const meuLink = `<section class="cartao"><h2>Este aparelho</h2>
-    <p class="pequeno" style="margin-top:0"><b>${esc(D.eu.nome)}</b> · ${ehAdm() ? "administra" : "proprietário"}</p>
-    <div class="botoes-fim"><button class="botao claro" data-acao="conectar-aparelho" style="flex:2">${I.mais} Outro aparelho</button><button class="botao perigo" data-acao="sair">Sair</button></div></section>`;
-  if (!ehAdm()) return `${cabecalho("Ajustes", "")}${meuLink}<p class="pequeno" style="text-align:center">Dúvidas sobre os valores? Fale com a administração.</p>`;
+  const meuLink = `<section class="cartao"><h2>Meu acesso</h2>
+    <div class="fluxo">${tile('<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>', D.eu.tem_codigo ? "verde" : "")}
+      <span class="meio">Código de acesso<span class="pequeno">${D.eu.tem_codigo ? "Ativo · entra em qualquer navegador" : "Para entrar em outro navegador"}</span></span>
+      <button class="chip" data-acao="codigo">${D.eu.tem_codigo ? "Trocar" : "Criar"}</button></div>
+    <div class="botoes-fim" style="margin-top:10px"><button class="botao claro" data-acao="conectar-aparelho" style="flex:2">${I.mais} Outro aparelho</button><button class="botao perigo" data-acao="sair">Sair</button></div></section>`;
+  if (!ehAdm()) return `${cabecalho("Ajustes", "")}${meuLink}`;
   const c = D.config, rel = c.robo_relato || {};
   return `${cabecalho("Ajustes", "")}
   <section class="cartao"><h2>Imóvel</h2>
@@ -422,15 +463,16 @@ function telaAjustes() {
     <div class="dupla"><label class="campo"><span>Taxa de adm. (%)</span><input id="cfg-pct" inputmode="decimal" value="${(c.pct_admin_bp / 100).toLocaleString("pt-BR")}"></label>
     <label class="campo"><span>Limpeza padrão (R$)</span><input id="cfg-limpeza" inputmode="decimal" value="${mostrarReais(c.limpeza_padrao)}"></label></div>    <button class="botao cheio" data-acao="salvar-config">Salvar</button></section>
   <section class="cartao"><h2>Quem tem acesso</h2><div id="pessoas"><div class="esqueleto" style="height:60px"></div></div></section>
-  <section class="cartao"><h2>Robô do Airbnb</h2>
-    ${c.robo_ligado ? `<div class="linhas">
-      <div class="linha"><span>Última leitura</span><b>${quando(c.robo_visto_em)}</b></div>
-      ${c.robo_visto_em ? `<div class="linha"><span>Reservas no calendário</span><span>${rel.reservas_no_calendario ?? 0}</span></div>
-      <div class="linha"><span>E-mails lidos na última vez</span><span>${rel.emails_lidos ?? 0}</span></div>` : ""}
-    </div>${(rel.avisos || []).map((a) => `<div class="selo aviso" style="white-space:normal;margin-top:8px;display:block;border-radius:12px;padding:8px 10px">${esc(a)}</div>`).join("")}`
-    : `<p class="pequeno" style="margin-top:0">Desligado. Ligado, ele traz sozinho as datas e os valores do Airbnb.</p>`}
-    <div class="botoes-fim" style="margin-top:12px;flex-wrap:wrap"><button class="botao claro" data-acao="robo-instalar">Como ligar</button>
-    <button class="botao claro" data-acao="robo-segredo">${c.robo_ligado ? "Novo segredo" : "Gerar segredo"}</button></div></section>
+  <section class="cartao"><h2>Airbnb</h2>
+    <div class="fluxo">${tile(ABAS[1][2], c.calendario_ligado && !c.calendario_erro ? "verde" : "")}
+      <span class="meio">Reservas e datas<span class="pequeno">${!c.calendario_ligado ? "Desligado" : c.calendario_erro ? `Erro: ${esc(c.calendario_erro)}`
+        : c.calendario_lido_em ? `Automático · lido ${quando(c.calendario_lido_em)}` : "Conectado · primeira leitura em instantes"}</span></span>
+      <button class="chip" data-acao="calendario">${c.calendario_ligado ? "Ajustar" : "Conectar"}</button></div>
+    <div class="fluxo">${tile('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>', c.robo_ligado && c.robo_visto_em ? "verde" : "")}
+      <span class="meio">Valores (e-mail)<span class="pequeno">${!c.robo_ligado ? "Desligado" : c.robo_visto_em ? `Automático · lido ${quando(c.robo_visto_em)}` : "Esperando o robô rodar no Google"}</span></span>
+      <button class="chip" data-acao="robo-instalar">${c.robo_ligado ? "Ajustar" : "Ligar"}</button></div>
+    ${(rel.avisos || []).slice(0, 3).map((a) => `<div class="selo aviso" style="white-space:normal;margin-top:8px;display:block;border-radius:12px;padding:8px 10px">${esc(a)}</div>`).join("")}
+  </section>
   ${meuLink}`;
 }
 
@@ -495,10 +537,18 @@ async function telaEntrada(erro) {
   let iniciado = true;
   try { iniciado = await rpc("ab_ja_iniciado"); } catch { /* sem internet: mostra a entrada por convite */ }
   app.innerHTML = `<main class="tela"><div class="boas-vindas"><div class="logo">${LOGO}</div>
-    ${iniciado ? `<h1>Terê House's</h1><p>Este app é só para quem recebeu um convite.<br>Abra o convite que mandaram para você — ou cole aqui:</p>
+    ${iniciado ? `<h1>Terê House's</h1>
       ${erro ? `<p class="selo aviso" style="display:block;white-space:normal;border-radius:12px;padding:10px 12px;margin:0 0 14px">${esc(erro)}</p>` : ""}
-      <label class="campo"><input id="colar" placeholder="Cole o convite aqui" autocomplete="off"></label>
-      <button class="botao cheio" data-acao="entrar-colado">Entrar</button>`
+      <div id="com-codigo">
+        <label class="campo"><input id="login-nome" placeholder="Seu nome" autocomplete="username" autocapitalize="words"></label>
+        <label class="campo"><input id="login-codigo" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="Código" autocomplete="current-password" maxlength="12"></label>
+        <button class="botao cheio" data-acao="entrar-codigo">Entrar</button>
+        <button class="botao claro cheio" style="margin-top:10px;background:none;box-shadow:none" data-acao="mostrar-convite">Tenho um convite</button>
+      </div>
+      <div id="com-convite" hidden>
+        <label class="campo"><input id="colar" placeholder="Cole o convite aqui" autocomplete="off"></label>
+        <button class="botao cheio" data-acao="entrar-colado">Entrar</button>
+      </div>`
     : `<h1>Vamos começar</h1><p>Você é a primeira pessoa. Depois você convida as outras duas.</p>
       <label class="campo"><input id="meu-nome" placeholder="Seu nome" maxlength="60" autocomplete="name"></label>
       <button class="botao cheio" data-acao="iniciar">Começar</button>`}
@@ -551,6 +601,8 @@ function traduzir(e) {
   if (/check constraint|saida/.test(m)) return "Confira as datas e os valores.";
   if (/so quem administra/.test(m)) return "Só quem administra pode mexer.";
   if (/ja tem 3 pessoas/.test(m)) return "Já são 3 pessoas com acesso.";
+  if (/link do calendario invalido/.test(m)) return "Cole o link do Airbnb que termina em .ics";
+  if (/codigo invalido/.test(m)) return "Use de 6 a 12 números.";
   return m;
 }
 
@@ -562,6 +614,7 @@ function folhaReserva(r) {
   const padrao = D.config.limpeza_padrao;
   let modoLimpeza = r.limpeza == null ? "nao" : r.limpeza === padrao ? "padrao" : "outro";
   const doCalendario = r.origem !== "manual";
+  const ligados = novo ? [] : custosDa(r), totalLigados = ligados.reduce((s, c) => s + c.valor, 0);
   const { f, fechar } = abrirFolha(`<h3>${novo ? "Nova reserva" : "Reserva"}</h3>
     ${doCalendario ? `<p class="pequeno" style="margin-top:-8px">Veio do Airbnb${r.codigo ? ` · código ${esc(r.codigo)}` : ""}. As datas se atualizam sozinhas.</p>` : ""}
     <div class="dupla"><label class="campo"><span>Chegada</span><input type="date" id="r-entrada" value="${r.entrada}"></label>
@@ -581,7 +634,10 @@ function folhaReserva(r) {
         <option value="cancelada"${r.situacao === "cancelada" ? " selected" : ""}>Cancelada</option>
         ${r.situacao === "sumiu" ? `<option value="sumiu" selected>Saiu do calendário do Airbnb</option>` : ""}</select></label>
       <label class="campo"><span>Observação</span><textarea id="r-obs" maxlength="500">${esc(r.obs)}</textarea></label></div></details>
+    ${novo ? "" : `<div class="campo"><span>Custos desta hospedagem</span>${ligados.map(linhaCusto).join("")}
+      <div class="atalhos">${atalhosCusto(r, false)}</div></div>`}
     <div class="botoes-fim">${novo ? "" : `<button class="botao perigo" id="r-apagar">Apagar</button>`}<button class="botao" id="r-salvar">Salvar</button></div>`);
+  carregarMiniaturas(f);
 
   const ler = () => {
     const pctTxt = $("#r-pct", f).value.replace(",", ".");
@@ -598,7 +654,8 @@ function folhaReserva(r) {
     const n = x.saida > x.entrada ? noites(x) : 0;
     $("#r-previa", f).innerHTML = `<div class="linha"><span>Taxa de administração (${pct(x.pct_admin_bp)})</span><span class="num menos">− ${brl(k.adm)}</span></div>
       <div class="linha"><span>Taxa de limpeza</span><span class="num menos">− ${brl(k.limpeza)}</span></div>
-      <div class="linha"><b>Líquido desta reserva${n ? ` · ${plural(n, "noite", "noites")}` : ""}</b><b class="num">${brl(k.liquido)}</b></div>`;
+      ${totalLigados ? `<div class="linha"><span>Custos desta hospedagem</span><span class="num menos">− ${brl(totalLigados)}</span></div>` : ""}
+      <div class="linha"><b>Líquido desta reserva${n ? ` · ${plural(n, "noite", "noites")}` : ""}</b><b class="num">${brl(k.liquido - totalLigados)}</b></div>`;
   };
   $("#r-limpeza", f).addEventListener("click", (e) => {
     const b = e.target.closest("[data-l]"); if (!b) return;
@@ -627,15 +684,15 @@ function folhaReserva(r) {
 
 function verReserva(r) {
   const k = contas(r);
-  const ligados = D.custos.filter((c) => c.reserva_id === r.id);
+  const ligados = custosDa(r);
+  const saidas = [["Taxa de administração", DESENHO_ADM, k.adm], ["Taxa de limpeza", DESENHO_TAXA_LIMPEZA, k.limpeza],
+    ...ligados.map((c) => [c.descricao, catDesenho(c.categoria), c.valor])].filter((x) => x[2] > 0);
   const { f } = abrirFolha(`<h3>${esc(r.hospede || "Reserva")}</h3>
-    <p class="pequeno" style="margin-top:-8px">${dataCurta(r.entrada)} → ${dataCurta(r.saida)} · ${plural(noites(r), "noite", "noites")} ${selosReserva(r)}</p>
-    <div class="linhas">
-      <div class="linha"><span>Recebido do Airbnb</span><b class="num">${r.valor != null ? brl(k.valor) : "a lançar"}</b></div>
-      <div class="linha"><span>Taxa de administração (${pct(r.pct_admin_bp)})</span><span class="num menos">− ${brl(k.adm)}</span></div>
-      <div class="linha"><span>Taxa de limpeza</span><span class="num menos">− ${brl(k.limpeza)}</span></div>
-      <div class="linha total"><span>Líquido</span><span class="num">${r.valor != null ? brl(k.liquido) : "—"}</span></div></div>
-    ${ligados.length ? `<div class="secao">Custos desta hospedagem</div>${ligados.map(linhaCusto).join("")}` : ""}
+    <p class="pequeno" style="margin-top:-8px">${dataCurta(r.entrada)} → ${dataCurta(r.saida)} · ${plural(noites(r), "noite", "noites")}</p>
+    <div class="fluxo entrada">${tile('<path d="M12 19V5M6 11l6-6 6 6"/>', "verde")}<span class="meio">Recebido do Airbnb</span><b class="num">${r.valor != null ? brl(k.valor) : "a lançar"}</b></div>
+    ${saidas.map(([nome, desenho, valor]) => `<div class="fluxo">${tile(desenho)}<span class="meio">${esc(nome)}</span><span class="num menos">− ${brl(valor)}</span></div>`).join("")}
+    <div class="fluxo total"><span class="meio">Líquido</span><b class="num">${r.valor != null ? brl(liquidoDa(r)) : "—"}</b></div>
+    ${ligados.some((c) => c.arquivo_id) ? `<div class="secao">Notas</div>${ligados.filter((c) => c.arquivo_id).map(linhaCusto).join("")}` : ""}
     ${r.obs ? `<p class="pequeno">${esc(r.obs)}</p>` : ""}`);
   carregarMiniaturas(f);
 }
@@ -643,10 +700,10 @@ function verReserva(r) {
 // ---------- custo ----------
 function folhaCusto(c) {
   if (!ehAdm()) return c.arquivo_id ? verArquivo(c.arquivo_id) : avisar("Este custo não tem nota anexada.");
-  const novo = !c;
-  c = c || { data: hoje(), categoria: CATEGORIAS[0] };
+  const novo = !c?.id;
+  c = { data: hoje(), categoria: CATEGORIAS[0][0], ...c }; // atalho da reserva já traz tipo, data e hospedagem
   let arquivo = c.arquivo_id ? { id: c.arquivo_id, tipo: c.arquivo_tipo } : null; // {id} já na nuvem ou {blob, tipo} novo
-  let categoria = c.categoria;
+  let categoria = catNome(c.categoria);
   const opcoesReserva = reservas().filter((r) => r.situacao !== "cancelada")
     .sort((a, b) => Math.abs(dia(a.entrada) - dia(c.data)) - Math.abs(dia(b.entrada) - dia(c.data))).slice(0, 15);
   const { f, fechar } = abrirFolha(`<h3>${novo ? "Novo custo" : "Custo"}</h3>
@@ -655,13 +712,14 @@ function folhaCusto(c) {
     <input type="file" id="k-arquivo" accept="image/*,application/pdf" hidden>
     <label class="campo"><span>Valor (R$)</span><input id="k-valor" inputmode="decimal" value="${mostrarReais(c.valor)}" placeholder="0,00"></label>
     <label class="campo"><span>O que foi</span><input id="k-desc" value="${esc(c.descricao)}" maxlength="120" placeholder="Ex.: troca do chuveiro"></label>
-    <div class="campo"><span>Tipo</span><div class="chips" id="k-cat">${[...new Set([...CATEGORIAS, categoria])].map((k) => `<button class="chip" data-c="${esc(k)}">${esc(k)}</button>`).join("")}</div></div>
+    <div class="campo"><span>Tipo</span><div class="tiles" id="k-cat">${(CATEGORIAS.some((x) => x[0] === categoria) ? CATEGORIAS : [...CATEGORIAS, [categoria, catDesenho(categoria)]])
+      .map(([n, d]) => `<button class="tile-opcao" data-c="${esc(n)}">${tile(d)}<span>${esc(n)}</span></button>`).join("")}</div></div>
     <div class="dupla"><label class="campo"><span>Data</span><input type="date" id="k-data" value="${c.data}"></label>
     <label class="campo"><span>Hospedagem (opcional)</span><select id="k-reserva"><option value="">Nenhuma</option>
       ${opcoesReserva.map((r) => `<option value="${r.id}"${r.id === c.reserva_id ? " selected" : ""}>${dataCurta(r.entrada)} · ${esc(r.hospede || r.codigo || "reserva")}</option>`).join("")}</select></label></div>
     <div class="botoes-fim">${novo ? "" : `<button class="botao perigo" id="k-apagar">Apagar</button>`}<button class="botao" id="k-salvar">Salvar</button></div>`);
 
-  const marcarCat = () => $("#k-cat", f).querySelectorAll(".chip").forEach((b) => b.classList.toggle("ligado", b.dataset.c === categoria));
+  const marcarCat = () => $("#k-cat", f).querySelectorAll(".tile-opcao").forEach((b) => b.classList.toggle("ligado", b.dataset.c === categoria));
   $("#k-cat", f).addEventListener("click", (e) => { const b = e.target.closest("[data-c]"); if (b) { categoria = b.dataset.c; marcarCat(); } });
   marcarCat();
 
@@ -796,20 +854,74 @@ function folhaNovaPessoa() {
   }).catch(() => {}));
 }
 
+// Valores pelo e-mail: o código do robô já sai daqui com o segredo dentro. É só colar no Google.
 function folhaRoboInstalar() {
-  abrirFolha(`<h3>Ligar o robô do Airbnb</h3>
-    <p class="pequeno" style="font-size:15px;margin-top:-6px">Ele roda de graça no Google, na conta de e-mail que recebe os avisos do Airbnb. Faça uma vez, pelo computador:</p>
-    <ol style="padding-left:20px;line-height:1.6">
-      <li>Toque em <b>Gerar segredo</b> (em Ajustes) e guarde o segredo.</li>
-      <li>No Airbnb: <b>Anúncios › seu imóvel › Disponibilidade › Sincronizar calendários › Exportar calendário</b>. Copie o link.</li>
-      <li>Entre em <b>script.google.com</b> com a conta que recebe os e-mails do Airbnb › <b>Novo projeto</b>. Apague o que vier e cole o código do robô.</li>
-      <li>Engrenagem (<b>Configurações do projeto</b>) › <b>Propriedades do script</b>: crie <b>SEGREDO</b> (o segredo do passo 1) e <b>CALENDARIO</b> (o link do passo 2).</li>
-      <li>Volte ao editor, escolha a função <b>instalar</b> e clique em <b>Executar</b>. Autorize quando o Google pedir.</li>
+  const { f } = abrirFolha(`<h3>Valores pelo e-mail</h3>
+    <ol class="passos">
+      <li>Toque em <b>Copiar robô</b>.</li>
+      <li>No computador, entre em <b>script.google.com</b> com a conta que recebe os e-mails do Airbnb › <b>Novo projeto</b> › apague tudo e cole.</li>
+      <li>Escolha <b>instalar</b> › <b>Executar</b> › autorize.</li>
     </ol>
-    <p class="pequeno">Depois disso ele lê de hora em hora. O valor só é preenchido quando o e-mail diz com clareza quanto o anfitrião recebe; se não, aparece “valor a lançar”.</p>
-    <button class="botao cheio" id="copiar-robo">${I.copiar} Copiar código do robô</button>`).f.querySelector("#copiar-robo").addEventListener("click", async (e) => {
-    await ocupado(e.currentTarget, async () => { const r = await fetch("robo.gs.txt", { cache: "no-cache" }); if (!r.ok) throw new Error("Não deu para pegar o código."); await copiar(await r.text(), "Código copiado"); }).catch(() => {});
+    <button class="botao cheio" id="copiar-robo">${I.copiar} Copiar robô</button>
+    ${D.config.robo_ligado ? `<p class="pequeno" style="text-align:center;margin-top:12px">Copiar de novo troca o segredo: cole o código novo no lugar do antigo.</p>` : ""}`);
+  $("#copiar-robo", f).addEventListener("click", (e) => ocupado(e.currentTarget, async () => {
+    const r = await fetch("robo.gs.txt", { cache: "no-cache" });
+    if (!r.ok) throw new Error("Não deu para pegar o código.");
+    const codigo = await r.text();
+    const segredo = await rpc("ab_robo_novo_segredo", { p_token: token });
+    await copiar(codigo.replace('const SEGREDO = "COLE_AQUI";', `const SEGREDO = "${segredo}";`), "Robô copiado");
+    recarregar();
+  }).catch(() => {}));
+}
+
+// Reservas e datas: o banco lê o calendário do Airbnb sozinho a cada 10 minutos.
+function folhaCalendario() {
+  const c = D.config;
+  const { f, fechar } = abrirFolha(`<h3>Reservas do Airbnb</h3>
+    <ol class="passos"><li>No Airbnb: <b>Anúncios › seu imóvel › Disponibilidade › Sincronizar calendários › Exportar calendário</b>.</li>
+      <li>Copie o link e cole aqui.</li></ol>
+    <label class="campo"><input id="cal-url" placeholder="https://www.airbnb.com.br/calendar/ical/…" autocomplete="off" inputmode="url"></label>
+    <button class="botao cheio" id="cal-salvar">${c.calendario_ligado ? "Trocar link" : "Conectar"}</button>
+    ${c.calendario_ligado ? `<div class="botoes-fim" style="margin-top:10px"><button class="botao claro" id="cal-agora">Atualizar agora</button><button class="botao perigo" id="cal-tirar">Desligar</button></div>` : ""}`);
+  const lerAgora = async () => {
+    await new Promise((ok) => setTimeout(ok, 5000)); // o Airbnb responde em poucos segundos
+    await rpc("ab_calendario_agora", { p_token: token });
+    await recarregar();
+  };
+  $("#cal-salvar", f).addEventListener("click", (e) => ocupado(e.currentTarget, async () => {
+    const url = $("#cal-url", f).value.trim();
+    if (!/^https:\/\/([a-z0-9-]+\.)*airbnb\.[a-z.]+\/calendar\/ical\//i.test(url)) throw new Error("Cole o link do Airbnb que termina em .ics");
+    await rpc("ab_calendario_salvar", { p_token: token, p_url: url });
+    await lerAgora(); fechar();
+    avisar(D.config.calendario_erro ? "O Airbnb não respondeu. Tento de novo sozinho." : "Conectado! As reservas chegam sozinhas.");
+  }).catch(() => {}));
+  $("#cal-agora", f)?.addEventListener("click", (e) => ocupado(e.currentTarget, async () => {
+    await rpc("ab_calendario_agora", { p_token: token }); await lerAgora(); fechar(); avisar("Calendário atualizado");
+  }).catch(() => {}));
+  $("#cal-tirar", f)?.addEventListener("click", async () => {
+    if (!(await perguntar("Desligar o calendário?", "As reservas param de chegar sozinhas. As que já estão aqui ficam.", "Desligar"))) return;
+    try { await rpc("ab_calendario_salvar", { p_token: token, p_url: "" }); fechar(); avisar("Calendário desligado"); await recarregar(); } catch (err) { avisar(traduzir(err)); }
   });
+}
+
+// Código de acesso: 6 a 12 números, para entrar em qualquer navegador sem convite.
+function folhaCodigo() {
+  const { f, fechar } = abrirFolha(`<h3>Código de acesso</h3>
+    <label class="campo"><span>Novo código (6 a 12 números)</span><input id="cod-1" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="new-password"></label>
+    <label class="campo"><span>Repita</span><input id="cod-2" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="new-password"></label>
+    <div class="botoes-fim">${D.eu.tem_codigo ? `<button class="botao perigo" id="cod-tirar">Remover</button>` : ""}<button class="botao" id="cod-salvar">Salvar</button></div>
+    <p class="pequeno" style="text-align:center">Para entrar: seu primeiro nome + o código. Cinco erros travam por 15 minutos.</p>`);
+  $("#cod-salvar", f).addEventListener("click", (e) => ocupado(e.currentTarget, async () => {
+    const a = $("#cod-1", f).value, b = $("#cod-2", f).value;
+    if (!/^[0-9]{6,12}$/.test(a)) throw new Error("Use de 6 a 12 números.");
+    if (/^(\d)\1+$/.test(a) || "0123456789012".includes(a) || "9876543210987".includes(a)) throw new Error("Fácil demais. Escolha outro.");
+    if (a !== b) throw new Error("Os dois não são iguais.");
+    await rpc("ab_codigo_definir", { p_token: token, p_codigo: a });
+    fechar(); avisar("Código salvo"); await recarregar();
+  }).catch(() => {}));
+  $("#cod-tirar", f)?.addEventListener("click", (e) => ocupado(e.currentTarget, async () => {
+    await rpc("ab_codigo_definir", { p_token: token, p_codigo: null }); fechar(); avisar("Código removido"); await recarregar();
+  }).catch(() => {}));
 }
 
 // ---------- ações dos botões ----------
@@ -846,16 +958,26 @@ const ACOES = {
   },
   "esconder-instalar": () => { try { localStorage.setItem("temporada-sem-instalar", "1"); } catch { /* sem espaço */ } desenhar(); },
   "robo-instalar": () => folhaRoboInstalar(),
-  "robo-segredo": async () => {
-    if (D.config.robo_ligado && !(await perguntar("Trocar o segredo do robô?", "O robô para até você colar o segredo novo no Google (propriedade SEGREDO).", "Trocar", false))) return;
-    try {
-      const s = await rpc("ab_robo_novo_segredo", { p_token: token });
-      const { f } = abrirFolha(`<h3>Segredo do robô</h3><p class="pequeno" style="font-size:15px;margin-top:-6px">Cole no Google, em Propriedades do script, com o nome <b>SEGREDO</b>. Ele não aparece de novo.</p>
-        <div class="link-caixa">${esc(s)}</div><button class="botao cheio" id="cs">${I.copiar} Copiar segredo</button>`);
-      $("#cs", f).addEventListener("click", () => copiar(s, "Segredo copiado"));
-      await recarregar();
-    } catch (e) { avisar(traduzir(e)); }
+  calendario: () => folhaCalendario(),
+  codigo: () => folhaCodigo(),
+  "custo-da-reserva": (b) => {
+    const r = D.reservas.find((x) => x.id === b.dataset.id);
+    document.querySelectorAll(".veu").forEach((v) => v.click()); // fecha a reserva e abre o custo já preenchido
+    setTimeout(() => folhaCusto({ reserva_id: r.id, data: r.entrada < hoje() ? hoje() : r.entrada, ...(b.dataset.cat ? { categoria: b.dataset.cat } : {}) }), document.querySelector(".folha") ? 300 : 0);
   },
+  "nova-vista": (b) => {
+    let v = []; try { v = JSON.parse(localStorage.getItem("temporada-vistas")) || []; } catch { /* sem acesso */ }
+    gravarLocal("temporada-vistas", JSON.stringify([...v, b.dataset.id].slice(-50)));
+    desenhar();
+  },
+  "mostrar-convite": () => { $("#com-codigo").hidden = true; $("#com-convite").hidden = false; $("#colar").focus(); },
+  "entrar-codigo": (b) => ocupado(b, async () => {
+    const nome = $("#login-nome").value.trim(), codigo = $("#login-codigo").value.trim();
+    if (!nome || !codigo) throw new Error("Digite seu nome e o código.");
+    const r = await rpc("ab_entrar_codigo", { p_nome: nome, p_codigo: codigo });
+    if (!r?.token) { $("#login-codigo").value = ""; throw new Error(r?.erro === "travado" ? "Muitas tentativas. Espere 15 minutos." : "Nome ou código errado."); }
+    token = r.token; guardar(token); D = null; abaAtual = null; await mostrar();
+  }).catch(() => {}),
   sair: async () => {
     if (!(await perguntar("Sair deste aparelho?", "Para entrar de novo, você vai precisar de um convite novo.", "Sair"))) return;
     token = null; D = null; guardar(null); guardarDados(); abaAtual = null;
@@ -880,7 +1002,7 @@ const ACOES = {
 
 document.addEventListener("click", (e) => {
   const b = e.target.closest("[data-acao]");
-  if (!b || b.closest(".folha") && !b.dataset.acao.startsWith("abrir-")) return;
+  if (!b || b.closest(".folha") && !/^(abrir-|custo-da-reserva)/.test(b.dataset.acao)) return;
   e.preventDefault();
   ACOES[b.dataset.acao]?.(b, e);
 });

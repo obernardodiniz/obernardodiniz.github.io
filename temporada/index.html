@@ -298,6 +298,43 @@ img.miniatura:not([src]) { color: transparent; font-size: 0; }
 .pessoa .seta svg { width: 18px; height: 18px; }
 .avatar { width: 42px; height: 42px; flex: none; border-radius: 50%; display: grid; place-items: center; font-weight: 750; background: var(--mar-claro); color: var(--mar); }
 .lista-acoes { display: grid; gap: 10px; }
+/* ícones de traço em quadradinho (tipos de custo, taxas, Airbnb) */
+.tile {
+  width: 38px; height: 38px; flex: none; border-radius: 12px; display: grid; place-items: center;
+  background: var(--mar-claro); color: var(--mar); box-shadow: var(--realce);
+}
+.tile svg { width: 20px; height: 20px; stroke-width: 1.8; }
+.tile.verde { background: var(--gradiente); color: var(--sobre-mar); }
+.fluxo { display: flex; align-items: center; gap: 10px; padding: 9px 0; font-size: 15px; }
+.fluxo + .fluxo { border-top: 1px dashed var(--linha); }
+.fluxo .tile { width: 34px; height: 34px; border-radius: 11px; }
+.fluxo .tile svg { width: 18px; height: 18px; }
+.fluxo .meio { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; letter-spacing: -.01em; }
+.fluxo .pequeno { margin-top: -2px; }
+.fluxo > .num, .fluxo > b { white-space: nowrap; flex: none; }
+.fluxo .trilho { display: block; height: 4px; border-radius: 9px; background: var(--cinza-claro); overflow: hidden; }
+.fluxo .trilho i { display: block; height: 100%; border-radius: 9px; background: var(--coral); opacity: .55; transform-origin: left; animation: encher .9s var(--suavizar) both; }
+.fluxo.entrada b { font-size: 17px; }
+.fluxo.total { border-top: 2px solid var(--tinta) !important; margin-top: 4px; padding-top: 12px; font-weight: 750; font-size: 18px; }
+.atalhos { display: grid; grid-template-columns: repeat(auto-fit, minmax(54px, 1fr)); gap: 6px; margin-top: 10px; }
+.atalhos .atalho { padding: 8px 2px 7px; font-size: 11px; gap: 5px; }
+.atalhos .tile { width: 34px; height: 34px; border-radius: 11px; }
+.atalhos .tile svg { width: 18px; height: 18px; }
+.atalho, .tile-opcao {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px 8px; border-radius: 14px;
+  background: var(--fundo); font-size: 12px; font-weight: 650; color: var(--tinta); text-align: center; line-height: 1.2;
+  transition: transform .2s var(--mola), background .25s, box-shadow .25s;
+}
+.atalho:active, .tile-opcao:active { transform: scale(.93); }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.tile-opcao.ligado { background: var(--mar-claro); box-shadow: inset 0 0 0 2px var(--mar); }
+.tile-opcao.ligado .tile { background: var(--gradiente); color: var(--sobre-mar); }
+.miniatura.cat { background: var(--mar-claro); color: var(--mar); }
+.nova { border: 1.5px solid color-mix(in srgb, var(--mar) 45%, transparent); }
+.nova .item { box-shadow: none; border: 0; padding: 10px 0; margin: 0; background: none; }
+.nova-topo { display: flex; justify-content: space-between; align-items: center; }
+.pronto { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: var(--mar); padding: 6px 10px; border-radius: 999px; background: var(--mar-claro); }
+.pronto svg { width: 16px; height: 16px; }
 .trocar-conta {
   flex: none; display: flex; align-items: center; gap: 4px; padding: 4px 10px 4px 4px; border-radius: 999px;
   background: var(--cartao); box-shadow: var(--sombra), var(--realce); color: var(--suave); transition: transform .2s var(--mola);

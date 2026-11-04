@@ -1,18 +1,11 @@
-// Robô da Temporada — roda de graça no Google (script.google.com), na conta de e-mail que recebe
-// os avisos do Airbnb. A cada hora ele:
-//   1. lê o calendário do Airbnb (datas reservadas e bloqueadas);
-//   2. lê os e-mails novos de "Reserva confirmada" e "Reserva cancelada";
-//   3. manda tudo para o app.
-// Ele nunca inventa: se não achar o valor no e-mail com certeza, deixa em branco e avisa no app.
+// Robô de e-mail da Terê House's — roda de graça no Google, na conta que recebe os avisos do Airbnb.
+// A cada hora lê os e-mails novos de "Reserva confirmada" e "Reserva cancelada" e manda o valor para o app.
+// (As datas o próprio app já busca no calendário do Airbnb.) Ele nunca inventa: se não achar o valor com
+// certeza, deixa em branco e a reserva aparece como "valor a lançar".
 //
-// Como instalar (uma vez só):
-//   a) Em script.google.com: Novo projeto, apague o que vier e cole este código. Salve.
-//   b) Engrenagem (Configurações do projeto) > Propriedades do script > adicione:
-//        SEGREDO     = o segredo gerado no app (Ajustes > Robô do Airbnb)
-//        CALENDARIO  = o link "Exportar calendário" do anúncio no Airbnb (termina em .ics)
-//   c) Volte ao editor, escolha a função "instalar" e clique em Executar. Autorize quando o Google pedir.
-// Para só ver o que ele está lendo, sem mandar nada: execute "ensaiar" e olhe o Registro de execução.
+// Instalar: cole este código em script.google.com (Novo projeto), salve, escolha "instalar" e clique em Executar.
 
+const SEGREDO = "COLE_AQUI";
 const NUVEM_URL = "https://rexifhjmtphbpyirajgq.supabase.co";
 const NUVEM_CHAVE = "sb_publishable_VHk3k9180XGEVrmWKWC3OA_f0BxEzJQ";
 const BUSCA = "from:airbnb.com newer_than:45d subject:(confirmada OR confirmed OR cancelada OR canceled OR cancelled)";
@@ -23,35 +16,22 @@ function instalar() {
   rodar();
 }
 
+// Só mostra o que está lendo, sem mandar nada (Registro de execução).
 function ensaiar() {
-  const props = PropertiesService.getScriptProperties();
   const avisos = [];
-  const cal = props.getProperty("CALENDARIO");
-  if (cal) Logger.log("Calendário: " + JSON.stringify(lerCalendario(baixarCalendario(cal)), null, 1));
-  const emails = lerEmails([], avisos);
-  Logger.log("E-mails: " + JSON.stringify(emails.map((e) => e.dados), null, 1));
+  Logger.log(JSON.stringify(lerEmails([], avisos).map((e) => e.dados), null, 1));
   Logger.log("Avisos: " + JSON.stringify(avisos));
 }
 
 function rodar() {
+  if (!SEGREDO || SEGREDO === "COLE_AQUI") throw new Error("Copie o código pelo app (Ajustes › Airbnb): ele já vem com o segredo.");
   const props = PropertiesService.getScriptProperties();
-  const segredo = props.getProperty("SEGREDO");
-  if (!segredo) throw new Error("Falta a propriedade SEGREDO (gere no app, em Ajustes > Robô do Airbnb).");
-  const dados = { avisos: [] };
-
-  const cal = props.getProperty("CALENDARIO");
-  if (cal) {
-    try { dados.calendario = lerCalendario(baixarCalendario(cal)); }
-    catch (e) { dados.avisos.push("Calendário do Airbnb não abriu: " + e.message); }
-  } else dados.avisos.push("Falta o link do calendário do Airbnb (propriedade CALENDARIO).");
-
   const vistos = JSON.parse(props.getProperty("VISTOS") || "[]");
-  const lidos = lerEmails(vistos, dados.avisos);
-  dados.emails = lidos.map((e) => e.dados);
-
+  const avisos = [];
+  const lidos = lerEmails(vistos, avisos);
   const r = UrlFetchApp.fetch(NUVEM_URL + "/rest/v1/rpc/ab_robo", {
     method: "post", contentType: "application/json", headers: { apikey: NUVEM_CHAVE }, muteHttpExceptions: true,
-    payload: JSON.stringify({ p_segredo: segredo, p_dados: dados }),
+    payload: JSON.stringify({ p_segredo: SEGREDO, p_dados: { emails: lidos.map((e) => e.dados), avisos: avisos } }),
   });
   if (r.getResponseCode() >= 300) throw new Error("O app recusou (" + r.getResponseCode() + "): " + r.getContentText());
   const relato = JSON.parse(r.getContentText());
@@ -60,34 +40,6 @@ function rodar() {
   lidos.filter((e) => pendentes.indexOf(e.dados.codigo) < 0).forEach((e) => vistos.push(e.id));
   props.setProperty("VISTOS", JSON.stringify(vistos.slice(-300)));
   Logger.log(JSON.stringify(relato));
-}
-
-function baixarCalendario(url) {
-  const r = UrlFetchApp.fetch(url, { muteHttpExceptions: true, followRedirects: true });
-  const txt = r.getContentText();
-  if (r.getResponseCode() >= 300 || txt.indexOf("BEGIN:VCALENDAR") < 0) throw new Error("resposta " + r.getResponseCode());
-  return txt;
-}
-
-// Calendário do Airbnb (.ics): cada VEVENT é uma reserva ("Reserved", com o código no link) ou um bloqueio.
-function lerCalendario(txt) {
-  const linhas = txt.replace(/\r\n[ \t]/g, "").replace(/\n[ \t]/g, "").split(/\r?\n/);
-  const eventos = [];
-  let ev = null;
-  linhas.forEach((l) => {
-    if (l === "BEGIN:VEVENT") ev = {};
-    else if (l === "END:VEVENT") { if (ev) eventos.push(ev); ev = null; }
-    else if (ev) {
-      const i = l.indexOf(":");
-      if (i > 0) ev[l.slice(0, i).split(";")[0].toUpperCase()] = l.slice(i + 1);
-    }
-  });
-  const data = (v) => (/^(\d{4})(\d{2})(\d{2})/.exec(v || "") || []).slice(1).join("-") || null;
-  return eventos.map((e) => {
-    const m = /details\/([A-Z0-9]{6,14})/i.exec(e.DESCRIPTION || "");
-    const reservado = /reserv/i.test(e.SUMMARY || "") || !!m;
-    return { tipo: reservado && m ? "reserva" : "bloqueio", codigo: m ? m[1].toUpperCase() : null, entrada: data(e.DTSTART), saida: data(e.DTEND) };
-  }).filter((e) => e.entrada && e.saida && e.saida > e.entrada);
 }
 
 function lerEmails(vistos, avisos) {

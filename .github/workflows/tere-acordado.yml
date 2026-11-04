@@ -1,0 +1,16 @@
+# Terê House's: o banco grátis do Supabase dorme depois de uns dias sem uso.
+# Este passo do GitHub dá um "oi" no banco duas vezes por dia, para o app ficar no ar 24 horas.
+name: Terê House's acordado
+on:
+  schedule:
+    - cron: "17 3,15 * * *"
+  workflow_dispatch:
+jobs:
+  oi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Oi para o banco
+        run: |
+          curl -fsS -X POST "https://rexifhjmtphbpyirajgq.supabase.co/rest/v1/rpc/ab_ja_iniciado" \
+            -H "apikey: sb_publishable_VHk3k9180XGEVrmWKWC3OA_f0BxEzJQ" -H "Content-Type: application/json" -d "{}"
