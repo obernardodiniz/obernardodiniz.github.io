@@ -123,6 +123,22 @@ body { font-variant-numeric: lining-nums tabular-nums; }
 .valor output { flex: 1; text-align: center; font: 600 40px/1 var(--sans); letter-spacing: -.02em; }
 .valor output small { font: 500 18px var(--sans); color: var(--ink-3); margin-right: 6px; vertical-align: 12px; }
 input[type=range] { width: 100%; accent-color: var(--navy); height: 28px; margin: 0; }
+.sim-grade { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+.sim-campos { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.sim-res { display: flex; flex-direction: column; gap: 12px; border-top: 1px solid var(--line); padding-top: 18px; min-width: 0; }
+@media (min-width: 900px) {
+  .sim-grade { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 32px; padding: 28px; }
+  .sim-res { border-top: 0; border-left: 1px solid var(--line); padding-top: 0; padding-left: 32px; }
+}
+.sim-res > .btn { margin-top: auto; }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.tile { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; min-width: 0; }
+.tile span { font: 500 12.5px var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.tile b { font: 700 24px/1.1 var(--sans); letter-spacing: -.01em; color: var(--ink); white-space: nowrap; }
+.tile b.riscado { color: var(--ink-3); font-weight: 500; }
+.tile.eco { grid-column: 1 / -1; background: var(--green-soft); border-color: #CFE2D5; flex-direction: row; align-items: center; justify-content: space-between; }
+.tile.eco span { color: var(--green); }
+.tile.eco b { color: var(--green); font-size: 30px; }
 .resultado { border-top: 1px solid var(--line); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; }
 .l { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 16px; }
 .l span:first-child { color: var(--ink-2); }
@@ -167,7 +183,18 @@ input[type=range] { width: 100%; accent-color: var(--navy); height: 28px; margin
 .nao-muda div { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 16px; }
 .nao-muda svg { flex: none; margin-top: 3px; }
 .numeros { margin-top: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
-.numeros .l { font-size: 15px; }
+.numeros { gap: 12px; }
+.tiles.cinco .tile b { font-size: 19px; }
+.tiles.cinco .tile:last-child { grid-column: 1 / -1; }
+@media (min-width: 900px) {
+  .tiles.cinco { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .tiles.cinco .tile:last-child { grid-column: auto; }
+  .nao-muda { flex-direction: row; border-top: 0; gap: 16px; }
+  .nao-muda div { flex: 1; border: 1px solid var(--line); border-radius: 10px; padding: 16px; background: var(--card); }
+  .secao .lista { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
+  .onde { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 40px; align-items: start; }
+  .onde .ufs { margin-top: 0; }
+}
 
 /* quem somos */
 .missao { position: relative; color: #fff; }
@@ -325,7 +352,8 @@ input[type=range] { width: 100%; accent-color: var(--navy); height: 28px; margin
   <section class="secao" id="simular">
     <div class="wrap">
       <div class="cab-secao"><div><span class="sobre">Simule</span><h2 class="titulo">Sua conta de luz</h2></div></div>
-      <div class="sim">
+      <div class="sim sim-grade">
+        <div class="sim-campos">
         <div class="linha2">
           <label class="campo"><span>Estado</span><select id="uf" aria-label="Estado"></select></label>
           <label class="campo"><span>Distribuidora</span><select id="dist" aria-label="Distribuidora"></select></label>
@@ -351,13 +379,17 @@ input[type=range] { width: 100%; accent-color: var(--navy); height: 28px; margin
             <label><input type="radio" name="lig" value="100">Tri</label>
           </div>
         </div>
-        <div class="resultado num">
-          <div class="l"><span>Hoje</span><span class="riscado" id="r-hoje">R$ 0</span></div>
-          <div class="l forte"><span>Com a SolarFlix</span><span id="r-sf">R$ 0</span></div>
-          <div class="selo-eco"><span>Economia no ano</span><b id="r-ano">R$ 0</b></div>
-          <p class="miuda" id="r-leitura">—</p>
         </div>
-        <button class="btn cheio" type="button" data-ir="planos">Ver planos</button>
+        <div class="sim-res num">
+          <span class="rotulo">Resultado</span>
+          <div class="tiles">
+            <div class="tile"><span>Hoje, por mês</span><b class="riscado" id="r-hoje">R$ 0</b></div>
+            <div class="tile forte"><span>Com a SolarFlix</span><b id="r-sf">R$ 0</b></div>
+            <div class="tile eco"><span>Economia no ano</span><b id="r-ano">R$ 0</b></div>
+          </div>
+          <p class="miuda" id="r-leitura">—</p>
+          <button class="btn cheio" type="button" data-ir="planos">Ver planos</button>
+        </div>
       </div>
     </div>
   </section>
@@ -419,11 +451,13 @@ input[type=range] { width: 100%; accent-color: var(--navy); height: 28px; margin
       </div>
       <div class="numeros num">
         <span class="rotulo" id="n-titulo">Os números da sua região</span>
-        <div class="l"><span>Tarifa ANEEL, sem impostos</span><span id="n-tarifa">—</span></div>
-        <div class="l"><span>Com impostos médios</span><span id="n-imp">—</span></div>
-        <div class="l"><span>Seu consumo estimado</span><span id="n-kwh">—</span></div>
-        <div class="l"><span id="n-min-lbl">Mínimo na distribuidora</span><span id="n-min">—</span></div>
-        <div class="l"><span>Parte coberta pela usina</span><span id="n-cob">—</span></div>
+        <div class="tiles cinco">
+          <div class="tile"><span>Tarifa ANEEL</span><b id="n-tarifa">—</b></div>
+          <div class="tile"><span>Com impostos</span><b id="n-imp">—</b></div>
+          <div class="tile"><span>Seu consumo</span><b id="n-kwh">—</b></div>
+          <div class="tile"><span id="n-min-lbl">Mínimo</span><b id="n-min">—</b></div>
+          <div class="tile"><span>Coberto pela usina</span><b id="n-cob">—</b></div>
+        </div>
         <p class="miuda">Tarifa homologada pela ANEEL. Impostos pela média nacional de 2026 (ICMS 17,3% e PIS/Cofins 5,2%). Iluminação pública e bandeira variam por cidade e por mês.</p>
       </div>
     </div>
@@ -455,9 +489,13 @@ input[type=range] { width: 100%; accent-color: var(--navy); height: 28px; margin
       </div>
       <div>
         <div class="cab-secao"><div><span class="sobre">Onde atendemos</span><h2 class="titulo">Brasil todo</h2></div></div>
-        <div class="grandes num"><div><b id="g-dist">103</b><span>distribuidoras</span></div><div><b id="g-uf">27</b><span>estados</span></div></div>
-        <p class="lead">A geração compartilhada vale em todas as distribuidoras do país: usina e cliente só precisam estar na mesma área. Começamos por Niterói e região.</p>
-        <div class="ufs" id="ufs"></div>
+        <div class="onde">
+          <div>
+            <div class="grandes num"><div><b id="g-dist">103</b><span>distribuidoras</span></div><div><b id="g-uf">27</b><span>estados</span></div></div>
+            <p class="lead">A geração compartilhada vale em todas as distribuidoras do país: usina e cliente só precisam estar na mesma área. Começamos por Niterói e região.</p>
+          </div>
+          <div class="ufs" id="ufs"></div>
+        </div>
       </div>
     </div>
   </section>
@@ -618,7 +656,7 @@ input[type=range] { width: 100%; accent-color: var(--navy); height: 28px; margin
     $('n-tarifa').textContent = tarifaTxt(c.tarifa);
     $('n-imp').textContent = tarifaTxt(c.comImp);
     $('n-kwh').textContent = kwh(c.consumo);
-    $('n-min-lbl').textContent = 'Mínimo na distribuidora (' + kwh(c.minKwh) + ')';
+    $('n-min-lbl').textContent = 'Mínimo (' + kwh(c.minKwh) + ')';
     $('n-min').textContent = brl(c.fixo);
     $('n-cob').textContent = brl(c.energia);
     $('p-plano').textContent = 'Plano ' + p.nome + ' · ' + p.prazo;
