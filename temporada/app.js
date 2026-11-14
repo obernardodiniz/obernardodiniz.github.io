@@ -218,7 +218,8 @@ function avisar(texto) {
 
 // ---------- contas ----------
 function contas(r) {
-  const valor = r.valor ?? 0, adm = Math.round((valor * r.pct_admin_bp) / 10000), limpeza = r.limpeza ?? 0;
+  // A limpeza sai primeiro; a comissão da administração é calculada sobre o que sobra.
+  const valor = r.valor ?? 0, limpeza = r.limpeza ?? 0, adm = Math.round((Math.max(0, valor - limpeza) * r.pct_admin_bp) / 10000);
   return { valor, adm, limpeza, liquido: valor - adm - limpeza };
 }
 const custosDa = (r) => D.custos.filter((c) => c.reserva_id === r.id);
@@ -306,7 +307,7 @@ function telaInicio() {
   // Para onde foi o dinheiro: taxas e cada tipo de custo, do maior para o menor.
   const porTipo = {};
   r.cs.forEach((c) => { porTipo[catNome(c.categoria)] = (porTipo[catNome(c.categoria)] || 0) + c.valor; });
-  const saidas = [["Taxa de administração", DESENHO_ADM, r.adm], ["Taxa de limpeza", DESENHO_TAXA_LIMPEZA, r.limpeza],
+  const saidas = [["Taxa de limpeza", DESENHO_TAXA_LIMPEZA, r.limpeza], ["Taxa de administração", DESENHO_ADM, r.adm],
     ...Object.entries(porTipo).sort((a, b) => b[1] - a[1]).map(([nome, v]) => [nome, catDesenho(nome), v])].filter((x) => x[2] > 0);
   // Reserva que acabou de chegar do Airbnb: aparece em cima, com os atalhos de custo, até alguém tocar em "Pronto".
   let vistas = []; try { vistas = JSON.parse(localStorage.getItem("temporada-vistas")) || []; } catch { /* sem acesso */ }
@@ -364,7 +365,7 @@ function telaInicio() {
 function abrirExtrato() {
   const r = resumoMes(mesSel), mesNome = nomeMes(mesSel);
   const tabelaRes = r.rs.map((x) => { const k = contas(x); return `<tr><td>${dataCurta(x.entrada)} → ${dataCurta(x.saida)}<small>${plural(noites(x), "noite", "noites")}${x.obs ? ` · ${esc(x.obs)}` : ""}</small></td>
-    <td class="num">${x.valor != null ? brl(k.valor) : "a lançar"}</td><td class="num">− ${brl(k.adm)}</td><td class="num">− ${brl(k.limpeza)}</td></tr>`; }).join("");
+    <td class="num">${x.valor != null ? brl(k.valor) : "a lançar"}</td><td class="num">− ${brl(k.limpeza)}</td><td class="num">− ${brl(k.adm)}</td></tr>`; }).join("");
   const tabelaGastos = r.cs.map((c) => `<tr><td>${dataCurta(c.data)}</td><td>${esc(c.descricao)}<small>${esc(catNome(c.categoria))}</small></td><td class="num">− ${brl(c.valor)}</td></tr>`).join("");
   const v = document.createElement("div");
   v.className = "extrato";
@@ -374,13 +375,13 @@ function abrirExtrato() {
       <header><img src="img/logo.svg" alt=""><div><span>Extrato do proprietário</span><h1>${esc(D.config.nome)}</h1><b>${mesNome}</b></div></header>
       <section class="ex-resumo">
         <div><span>Recebido</span><b class="num">${brl(r.recebido)}</b></div>
-        <div><span>Taxa de administração</span><b class="num">− ${brl(r.adm)}</b></div>
         <div><span>Taxa de limpeza</span><b class="num">− ${brl(r.limpeza)}</b></div>
+        <div><span>Taxa de administração</span><b class="num">− ${brl(r.adm)}</b></div>
         <div><span>Gastos</span><b class="num">− ${brl(r.custos)}</b></div>
         <div class="ex-liquido"><span>Líquido do proprietário</span><b class="num">${brl(r.liquido)}</b></div>
       </section>
       <h2>Hospedagens</h2>
-      ${tabelaRes ? `<table><thead><tr><th>Período</th><th>Recebido</th><th>Administração</th><th>Limpeza</th></tr></thead><tbody>${tabelaRes}</tbody></table>` : `<p class="ex-vazio">Nenhuma hospedagem neste mês.</p>`}
+      ${tabelaRes ? `<table><thead><tr><th>Período</th><th>Recebido</th><th>Limpeza</th><th>Administração</th></tr></thead><tbody>${tabelaRes}</tbody></table>` : `<p class="ex-vazio">Nenhuma hospedagem neste mês.</p>`}
       <h2>Gastos com o imóvel</h2>
       ${tabelaGastos ? `<table><thead><tr><th>Data</th><th>O que foi</th><th>Valor</th></tr></thead><tbody>${tabelaGastos}</tbody></table>` : `<p class="ex-vazio">Nenhum gasto neste mês.</p>`}
       <footer>Ocupação ${r.diasMes ? Math.round((r.ocupadas / r.diasMes) * 100) : 0}% · ${plural(r.ocupadas, "noite", "noites")} · Gerado em ${new Date().toLocaleDateString("pt-BR")} · Terê House's</footer>
@@ -678,7 +679,7 @@ function folhaReserva(r) {
     <div class="dupla"><label class="campo"><span>Chegada</span><input type="date" id="r-entrada" value="${r.entrada}"></label>
     <label class="campo"><span>Saída</span><input type="date" id="r-saida" value="${r.saida}"></label></div>
     <label class="campo"><span>Hóspede</span><input id="r-hospede" value="${esc(r.hospede)}" maxlength="80" placeholder="Nome (opcional)"></label>
-    <label class="campo"><span>Quanto o Airbnb paga (R$)</span><input id="r-valor" inputmode="decimal" value="${mostrarReais(r.valor)}" placeholder="0,00"></label>
+    <label class="campo"><span>Quanto entrou no total, com a limpeza (R$)</span><input id="r-valor" inputmode="decimal" value="${mostrarReais(r.valor)}" placeholder="0,00"></label>
     ${r.valor_origem === "email" ? `<p class="pequeno" style="margin-top:-8px">Este valor foi lido do e-mail do Airbnb. Confira.</p>` : ""}
     <div class="campo"><span>Taxa de limpeza</span><div class="chips" id="r-limpeza">
       <button class="chip" data-l="nao">Sem limpeza</button><button class="chip" data-l="padrao">${brl(padrao)}</button><button class="chip" data-l="outro">Outro valor</button></div>
@@ -710,8 +711,8 @@ function folhaReserva(r) {
     if (x.valor == null || Number.isNaN(x.valor) || Number.isNaN(x.limpeza) || !Number.isFinite(x.pct_admin_bp)) { $("#r-previa", f).innerHTML = `<span class="pequeno">Digite o valor para ver o líquido.</span>`; return; }
     const k = contas({ ...x });
     const n = x.saida > x.entrada ? noites(x) : 0;
-    $("#r-previa", f).innerHTML = `<div class="linha"><span>Taxa de administração (${pct(x.pct_admin_bp)})</span><span class="num menos">− ${brl(k.adm)}</span></div>
-      <div class="linha"><span>Taxa de limpeza</span><span class="num menos">− ${brl(k.limpeza)}</span></div>
+    $("#r-previa", f).innerHTML = `<div class="linha"><span>Taxa de limpeza</span><span class="num menos">− ${brl(k.limpeza)}</span></div>
+      <div class="linha"><span>Taxa de administração (${pct(x.pct_admin_bp)} do que sobra)</span><span class="num menos">− ${brl(k.adm)}</span></div>
       ${totalLigados ? `<div class="linha"><span>Custos desta hospedagem</span><span class="num menos">− ${brl(totalLigados)}</span></div>` : ""}
       <div class="linha"><b>Líquido desta reserva${n ? ` · ${plural(n, "noite", "noites")}` : ""}</b><b class="num">${brl(k.liquido - totalLigados)}</b></div>`;
   };
@@ -743,7 +744,7 @@ function folhaReserva(r) {
 function verReserva(r) {
   const k = contas(r);
   const ligados = custosDa(r);
-  const saidas = [["Taxa de administração", DESENHO_ADM, k.adm], ["Taxa de limpeza", DESENHO_TAXA_LIMPEZA, k.limpeza],
+  const saidas = [["Taxa de limpeza", DESENHO_TAXA_LIMPEZA, k.limpeza], ["Taxa de administração", DESENHO_ADM, k.adm],
     ...ligados.map((c) => [c.descricao, catDesenho(c.categoria), c.valor])].filter((x) => x[2] > 0);
   const { f } = abrirFolha(`<h3>${esc(r.hospede || "Reserva")}</h3>
     <p class="pequeno" style="margin-top:-8px">${dataCurta(r.entrada)} → ${dataCurta(r.saida)} · ${plural(noites(r), "noite", "noites")}</p>
