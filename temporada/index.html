@@ -298,6 +298,68 @@ img.miniatura:not([src]) { color: transparent; font-size: 0; }
 .pessoa .seta svg { width: 18px; height: 18px; }
 .avatar { width: 42px; height: 42px; flex: none; border-radius: 50%; display: grid; place-items: center; font-weight: 750; background: var(--mar-claro); color: var(--mar); }
 .lista-acoes { display: grid; gap: 10px; }
+/* topo do destaque, números do mês e próxima hospedagem */
+.destaque-topo { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.extrato-botao {
+  display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; color: #fff; font-size: 13px; font-weight: 700;
+  background: rgba(255, 255, 255, .16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2); transition: transform .2s var(--mola), background .2s;
+}
+.extrato-botao:active { transform: scale(.94); }
+.extrato-botao svg { width: 16px; height: 16px; }
+.variacao { display: inline-block; font-size: 12px; font-weight: 750; padding: 2px 7px; border-radius: 999px; }
+.variacao.sobe { background: var(--verde-claro); color: var(--verde); }
+.variacao.desce { background: var(--coral-claro); color: var(--coral); }
+.variacao.clara { background: rgba(255, 255, 255, .18); color: #fff; margin-right: 4px; }
+.kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.kpi {
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 10px; align-items: center; padding: 12px;
+  background: var(--cartao); border-radius: 18px; border: 1px solid color-mix(in srgb, var(--linha) 55%, transparent); box-shadow: var(--sombra), var(--realce);
+}
+.kpi .tile { grid-row: 1 / span 2; width: 36px; height: 36px; }
+.kpi-valor { font-size: 19px; font-weight: 750; letter-spacing: -.02em; line-height: 1.15; }
+.kpi-rotulo { font-size: 12px; color: var(--suave); font-weight: 600; }
+.kpi .variacao { grid-column: 2; justify-self: start; margin-top: 4px; }
+@media (min-width: 560px) { .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.proxima { display: flex; align-items: center; gap: 12px; cursor: pointer; transition: transform .2s var(--mola); }
+.proxima:active { transform: scale(.98); }
+.proxima .meio { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.proxima .meio b { font-size: 17px; }
+.proxima .seta { color: var(--suave); display: grid; } .proxima .seta svg { width: 20px; height: 20px; }
+/* extrato do mês (tela cheia e impressão) */
+.extrato { position: fixed; inset: 0; z-index: 80; overflow-y: auto; background: var(--fundo2); padding: calc(env(safe-area-inset-top) + 12px) 12px 40px; opacity: 0; transition: opacity .25s; }
+.extrato.aberto { opacity: 1; }
+.extrato-acoes { max-width: 720px; margin: 0 auto 12px; display: flex; gap: 8px; align-items: center; }
+.extrato-acoes .botao { min-height: 44px; }
+.extrato-acoes .redondo { margin-right: auto; }
+.folha-extrato { max-width: 720px; margin: 0 auto; background: #fff; color: #16231a; border-radius: 20px; padding: 26px 22px; box-shadow: var(--sombra-forte); }
+.folha-extrato header { display: flex; align-items: center; gap: 14px; padding-bottom: 16px; border-bottom: 2px solid #3b6b2b; }
+.folha-extrato header img { width: 64px; height: 64px; }
+.folha-extrato header span { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: #66756a; font-weight: 700; }
+.folha-extrato header h1 { margin: 2px 0; font-size: 22px; }
+.folha-extrato header b { text-transform: capitalize; color: #3b6b2b; }
+.ex-resumo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 18px 0 6px; }
+.ex-resumo div { background: #f3f6f0; border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.ex-resumo span { font-size: 12px; color: #66756a; font-weight: 600; }
+.ex-resumo b { font-size: 16px; }
+.ex-resumo .ex-liquido { grid-column: 1 / -1; background: linear-gradient(145deg, #5a9443, #2d5420); color: #fff; }
+.ex-resumo .ex-liquido span { color: rgba(255, 255, 255, .85); }
+.ex-resumo .ex-liquido b { font-size: 26px; }
+.folha-extrato h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: #66756a; margin: 20px 0 8px; }
+.folha-extrato table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.folha-extrato th { text-align: left; font-size: 11px; color: #66756a; font-weight: 700; padding: 6px 4px; border-bottom: 1px solid #dce4d6; }
+.folha-extrato td { padding: 8px 4px; border-bottom: 1px dashed #dce4d6; vertical-align: top; }
+.folha-extrato td.num, .folha-extrato th:not(:first-child) { text-align: right; white-space: nowrap; }
+.folha-extrato td small { display: block; color: #66756a; font-size: 11px; margin-top: 2px; }
+.ex-vazio { color: #66756a; font-size: 13px; }
+.folha-extrato footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid #dce4d6; font-size: 11px; color: #66756a; text-align: center; }
+@media print {
+  @page { margin: 14mm; }
+  body.com-extrato { background: #fff !important; }
+  body.com-extrato > *:not(.extrato) { display: none !important; }
+  .extrato { position: static; padding: 0; background: #fff; opacity: 1; overflow: visible; }
+  .extrato-acoes { display: none; }
+  .folha-extrato { box-shadow: none; border-radius: 0; padding: 0; max-width: none; }
+}
 /* ícones de traço em quadradinho (tipos de custo, taxas, Airbnb) */
 .tile {
   width: 38px; height: 38px; flex: none; border-radius: 12px; display: grid; place-items: center;

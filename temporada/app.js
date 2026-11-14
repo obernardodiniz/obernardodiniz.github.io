@@ -237,7 +237,9 @@ function resumoMes(mes) {
   const ocupadas = reservas().filter((r) => r.situacao !== "cancelada")
     .reduce((s, r) => s + Math.max(0, Math.min(fim, dia(r.saida)) - Math.max(ini, dia(r.entrada))), 0);
   const pcts = [...new Set(rs.filter((r) => r.valor != null).map((r) => r.pct_admin_bp))];
+  const noitesComValor = rs.filter((x) => x.valor != null).reduce((s, x) => s + noites(x), 0);
   return { rs, cs, recebido, adm, limpeza, custos, liquido: recebido - adm - limpeza - custos, semValor: rs.filter((r) => r.valor == null && r.situacao !== "cancelada"),
+    diaria: noitesComValor ? Math.round(recebido / noitesComValor) : 0,
     noites: rs.reduce((s, r) => s + noites(r), 0), ocupadas, diasMes: fim - ini, pctUnico: pcts.length === 1 ? pcts[0] : null };
 }
 
@@ -289,6 +291,18 @@ function telaInicio() {
   const totalAno = liq.reduce((a, b) => a + b, 0);
   const proximas = reservas().filter((x) => x.situacao !== "cancelada" && x.saida > hoje()).slice(0, 3);
   const ocup = r.diasMes ? Math.round((r.ocupadas / r.diasMes) * 100) : 0;
+  // Comparação com o mês anterior e os números que todo extrato de temporada mostra: ocupação e diária média.
+  const ant = resumoMes(somarMes(mesSel, -1));
+  const ocupAnt = ant.diasMes ? Math.round((ant.ocupadas / ant.diasMes) * 100) : 0;
+  const variacao = (agora, antes, fmt) => {
+    if (!antes || agora === antes) return "";
+    const sobe = agora > antes;
+    return `<span class="variacao ${sobe ? "sobe" : "desce"}">${sobe ? "▲" : "▼"} ${fmt(Math.abs(agora - antes))}</span>`;
+  };
+  const kpi = (desenho, rotulo, valor, extra = "") => `<div class="kpi">${tile(desenho)}<span class="kpi-valor num">${valor}</span><span class="kpi-rotulo">${rotulo}</span>${extra}</div>`;
+  const prox = proximas[0];
+  const diasAte = prox ? dia(prox.entrada) - dia(hoje()) : 0;
+  const quandoProx = !prox ? "" : diasAte <= 0 ? "Hospedado agora" : diasAte === 1 ? "Chega amanhã" : `Chega em ${diasAte} dias`;
   // Para onde foi o dinheiro: taxas e cada tipo de custo, do maior para o menor.
   const porTipo = {};
   r.cs.forEach((c) => { porTipo[catNome(c.categoria)] = (porTipo[catNome(c.categoria)] || 0) + c.valor; });
@@ -310,12 +324,23 @@ function telaInicio() {
   ${instalar}
   ${barraMes()}
   <section class="destaque">
-    <div class="rotulo">Líquido do proprietário em ${MESES[+mesSel.slice(5) - 1]}</div>
+    <div class="destaque-topo"><div class="rotulo">Líquido do proprietário em ${MESES[+mesSel.slice(5) - 1]}</div>
+      <button class="extrato-botao" data-acao="extrato">${ic('<path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/>')} Extrato</button></div>
     <div class="valor num">${brl(r.liquido)}</div>
-    <div class="nota">${plural(r.rs.length, "reserva", "reservas")} · ${plural(r.noites, "noite", "noites")}${r.semValor.length ? ` · ${plural(r.semValor.length, "valor ainda a lançar", "valores ainda a lançar")}` : ""}</div>
+    <div class="nota">${variacao(r.liquido, ant.liquido, brl).replace("variacao", "variacao clara")}${ant.liquido && r.liquido !== ant.liquido ? ` vs ${MESES_C[+somarMes(mesSel, -1).slice(5) - 1]} · ` : ""}${r.semValor.length ? plural(r.semValor.length, "valor a lançar", "valores a lançar") : plural(r.rs.length, "hospedagem", "hospedagens")}</div>
+  </section>
+  <section class="kpis">
+    ${kpi('<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>', "Ocupação", `${ocup}%`, variacao(ocup, ocupAnt, (v) => `${v} p.p.`))}
+    ${kpi('<path d="M12 3v18M16.5 7.5c0-1.7-2-3-4.5-3s-4.5 1.3-4.5 3 2 2.6 4.5 3 4.5 1.3 4.5 3-2 3-4.5 3-4.5-1.3-4.5-3"/>', "Diária média", r.diaria ? brl(r.diaria).replace(/,\d\d$/, "") : "—", variacao(r.diaria, ant.diaria, (v) => brl(v).replace(/,\d\d$/, "")))}
+    ${kpi('<path d="M20 15.5A8 8 0 0 1 8.5 4 8 8 0 1 0 20 15.5z"/>', "Noites", r.ocupadas)}
+    ${kpi(ABAS[2][2], "Hospedagens", r.rs.length)}
   </section>
   ${avisos.join("")}
   ${novas.join("")}
+  ${prox && !novas.length ? `<section class="cartao proxima" role="button" tabindex="0" data-acao="abrir-reserva" data-id="${prox.id}">
+    <div class="data-bloco"><b>${+prox.entrada.slice(8, 10)}</b><span>${MESES_C[+prox.entrada.slice(5, 7) - 1]}</span></div>
+    <div class="meio"><span class="pequeno">Próxima hospedagem</span><b>${quandoProx}</b><span class="pequeno">${dataCurta(prox.entrada)} → ${dataCurta(prox.saida)} · ${plural(noites(prox), "noite", "noites")}</span></div>
+    <span class="seta">${I.dir}</span></section>` : ""}
   <section class="cartao"><h2>Para onde foi</h2>
     <div class="fluxo entrada">${tile('<path d="M12 19V5M6 11l6-6 6 6"/>', "verde")}<span class="meio">Recebido do Airbnb</span><b class="num">${brl(r.recebido)}</b></div>
     ${saidas.map(([nome, desenho, valor]) => `<div class="fluxo">${tile(desenho)}<span class="meio">${esc(nome)}
@@ -328,15 +353,48 @@ function telaInicio() {
     <div class="linha"><span>Taxa de limpeza</span><span class="num">${brl(r.limpeza)}</span></div>
     <div class="linha total"><span>Total</span><span class="num">${brl(r.adm + r.limpeza)}</span></div>
   </div></section>` : ""}
-  <section class="cartao"><h2>Ocupação</h2>
-    <div class="ocupacao"><div style="width:${ocup}%"></div></div>
-    <div class="pequeno">${plural(r.ocupadas, "noite ocupada", "noites ocupadas")} de ${r.diasMes} (${ocup}%)</div>
-  </section>
   <section class="cartao"><h2>Líquido em ${ano} · <span class="num">${brl(totalAno)}</span></h2>
     <div class="barras">${meses.map((m, i) => `<button class="barra${m === mesSel ? " atual" : ""}${liq[i] < 0 ? " negativo" : ""}" data-acao="ir-mes" data-mes="${m}" aria-label="${nomeMes(m)}: ${brl(liq[i])}">
       <div style="height:${Math.round((Math.abs(liq[i]) / maior) * 100)}%;animation-delay:${i * 0.03}s"></div><span>${MESES_C[i][0]}</span></button>`).join("")}</div>
   </section>
   ${proximas.length ? `<div class="secao">Próximas hospedagens</div>${proximas.map((x) => linhaReserva(x)).join("")}` : ""}`;
+}
+
+// Extrato do mês: uma página limpa, com a logo, para salvar em PDF (imprimir › salvar como PDF) ou mandar ao proprietário.
+function abrirExtrato() {
+  const r = resumoMes(mesSel), mesNome = nomeMes(mesSel);
+  const tabelaRes = r.rs.map((x) => { const k = contas(x); return `<tr><td>${dataCurta(x.entrada)} → ${dataCurta(x.saida)}<small>${plural(noites(x), "noite", "noites")}${x.obs ? ` · ${esc(x.obs)}` : ""}</small></td>
+    <td class="num">${x.valor != null ? brl(k.valor) : "a lançar"}</td><td class="num">− ${brl(k.adm)}</td><td class="num">− ${brl(k.limpeza)}</td></tr>`; }).join("");
+  const tabelaGastos = r.cs.map((c) => `<tr><td>${dataCurta(c.data)}</td><td>${esc(c.descricao)}<small>${esc(catNome(c.categoria))}</small></td><td class="num">− ${brl(c.valor)}</td></tr>`).join("");
+  const v = document.createElement("div");
+  v.className = "extrato";
+  v.innerHTML = `<div class="extrato-acoes"><button class="redondo" data-e="fechar" aria-label="Fechar">${I.x}</button>
+      <button class="botao" data-e="pdf">${I.arquivo} Salvar PDF</button>${navigator.share ? `<button class="botao claro" data-e="enviar">${I.enviar} Enviar resumo</button>` : ""}</div>
+    <article class="folha-extrato">
+      <header><img src="img/logo.svg" alt=""><div><span>Extrato do proprietário</span><h1>${esc(D.config.nome)}</h1><b>${mesNome}</b></div></header>
+      <section class="ex-resumo">
+        <div><span>Recebido</span><b class="num">${brl(r.recebido)}</b></div>
+        <div><span>Taxa de administração</span><b class="num">− ${brl(r.adm)}</b></div>
+        <div><span>Taxa de limpeza</span><b class="num">− ${brl(r.limpeza)}</b></div>
+        <div><span>Gastos</span><b class="num">− ${brl(r.custos)}</b></div>
+        <div class="ex-liquido"><span>Líquido do proprietário</span><b class="num">${brl(r.liquido)}</b></div>
+      </section>
+      <h2>Hospedagens</h2>
+      ${tabelaRes ? `<table><thead><tr><th>Período</th><th>Recebido</th><th>Administração</th><th>Limpeza</th></tr></thead><tbody>${tabelaRes}</tbody></table>` : `<p class="ex-vazio">Nenhuma hospedagem neste mês.</p>`}
+      <h2>Gastos com o imóvel</h2>
+      ${tabelaGastos ? `<table><thead><tr><th>Data</th><th>O que foi</th><th>Valor</th></tr></thead><tbody>${tabelaGastos}</tbody></table>` : `<p class="ex-vazio">Nenhum gasto neste mês.</p>`}
+      <footer>Ocupação ${r.diasMes ? Math.round((r.ocupadas / r.diasMes) * 100) : 0}% · ${plural(r.ocupadas, "noite", "noites")} · Gerado em ${new Date().toLocaleDateString("pt-BR")} · Terê House's</footer>
+    </article>`;
+  document.body.append(v);
+  document.body.classList.add("com-extrato");
+  requestAnimationFrame(() => requestAnimationFrame(() => v.classList.add("aberto")));
+  const fechar = () => { v.classList.remove("aberto"); document.body.classList.remove("com-extrato"); setTimeout(() => v.remove(), 300); };
+  v.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-e]"); if (!b) return;
+    if (b.dataset.e === "fechar") fechar();
+    else if (b.dataset.e === "pdf") window.print();
+    else navigator.share({ title: `Extrato ${mesNome}`, text: `${D.config.nome} · ${mesNome}\nRecebido: ${brl(r.recebido)}\nTaxa de administração: −${brl(r.adm)}\nTaxa de limpeza: −${brl(r.limpeza)}\nGastos: −${brl(r.custos)}\nLíquido do proprietário: ${brl(r.liquido)}` }).catch(() => {});
+  });
 }
 
 function selosReserva(r) {
@@ -959,6 +1017,7 @@ const ACOES = {
   "esconder-instalar": () => { try { localStorage.setItem("temporada-sem-instalar", "1"); } catch { /* sem espaço */ } desenhar(); },
   "robo-instalar": () => folhaRoboInstalar(),
   calendario: () => folhaCalendario(),
+  extrato: () => abrirExtrato(),
   codigo: () => folhaCodigo(),
   "custo-da-reserva": (b) => {
     const r = D.reservas.find((x) => x.id === b.dataset.id);
